@@ -81,17 +81,17 @@ export default function Home() {
   const getColorCode = (str:string) => {
     switch (str.slice(0,4)) {
       case "0041":
-        return "bg-pink-400"
+        return "bg-pink-400 hover:bg-pink-700"
       case "0042":
-        return "bg-orange-400"
+        return "bg-orange-400 hover:bg-orange-700"
       case "0043":
-        return "bg-green-400"
+        return "bg-green-400 hover:bg-green-700"
       case "0044":
-        return "bg-blue-400"
+        return "bg-blue-400 hover:bg-blue-700"
       case "0045":
-        return "bg-purple-400"
+        return "bg-purple-400 hover:bg-purple-700"
       default:
-        return "bg-red-400"
+        return "bg-red-400 hover:bg-red-700"
     }
   };
 
@@ -109,7 +109,7 @@ export default function Home() {
               <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
                 {days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < days.length && "border-b-2"} border-white/10`}>
                   <p className='transition-all duration-300 pl-4 text-white' style={{opacity: 1-(scrolled/38)}}>{d}</p>
-                  <p className='transition-all duration-300 pl-[2.6rem] text-white absolute' style={{opacity: scrolled/38}}>{days_scrolled[dindex]}</p>
+                  <p className='transition-all duration-300 pl-[2.55rem] text-white absolute' style={{opacity: scrolled/38}}>{days_scrolled[dindex]}</p>
                 </div>)}
             </div>
             <div className="header-day relative overflow-x-auto" onScroll={fnHandleScrollCalendar} onScrollCapture={fnHandleScrollCalendar}>
@@ -119,21 +119,24 @@ export default function Home() {
               </div>
 
               <div className="pl-16 inline-flex ">
-                  {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)}
+                  {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 pl-3 border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950/40'>{time.toString().padStart(2, '0')}:00</span>)}
+                  {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
               </div>
 
               {days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
                   {times_m.map((time,tindex)=><span key={tindex} className={`relative flex flex-col items-center w-32 h-20 py-2 justify-center border-l-2 ${dindex+1 < days.length && "border-b-2"} border-black/5`}>
-                    <p className=''>{dindex}:{tindex}</p>
+                    <p className='opacity-10'>{dindex}:{tindex}</p>
                     {test_data.map((data,dataindex)=>{
                       return dindex == getDayIndex(data.time) && tindex == getHourIndex(data.time) ?
                         <div key={"d-"+dataindex} className="absolute w-full h-full">
-                          <div className={`relative h-full z-40 p-2`} style={{width: (calculateScale(data.time)*100)+"%"}}>
-                            <div className={`rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md ${getColorCode(data.code)}`}>
+                          
+                          <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(data.time)*100)+"%"}}>
+                            <div className={`transition-all duration-200 rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)}`}>
                               <p className='text-sm'>({data.credit}) {data.code} sec {data.sec}</p>
                               <p className='pt-3 text-sm'>{getTimeRange(data.time)}</p>
                             </div>
                           </div>
+
                         </div> : <></>
                     })}
                   </span>)}
