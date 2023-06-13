@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=K2D:wght@100;200;300;400;500;600;700;800&display=swap');
 
 // :root {
 //   --foreground-rgb: 0, 0, 0;
@@ -16,6 +17,10 @@
 //   }
 // }
 
+* {
+  font-family: 'K2D', sans-serif;
+}
+
 body {
   height: 100vh;
   // color: rgb(var(--foreground-rgb));
@@ -25,4 +30,11 @@ body {
   //     rgb(var(--background-end-rgb))
   //   )
   //   rgb(var(--background-start-rgb));
+}
+
+.smooth {
+  @apply transition-all duration-300;
+}
+.smooth-out {
+  @apply transition-all duration-300 ease-out;
 }
