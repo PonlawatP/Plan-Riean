@@ -1,17 +1,16 @@
 'use client'
 import Image from 'next/image'
 import Calendar from '../../components/calendar'
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { WebMainReducer } from '../../reducers/webmainred';
 import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faClose, faFilter } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
   const days_scrolled = ["M", "T", "W", "Th", "F"];
-  
-  const times = ["08:00"];
+
   const times_m = [8,9,10,11,12,13,14,15,16,17,18,19];
 
   const [scrolled, setScrolled] = useState(0);
@@ -183,15 +182,12 @@ export default function Home() {
     }
   };
 
-  const fnHandleClickedOnCalendar = (x:number, y:number) => {
-    toggleScheduleSpectate(true);
-  }
-
   // use useReducer to reduce components reload
   const initialState = {
     webReady: false,
     viewSchedule: false,
     swipedLocated: 0,
+    scrollableIndex: 0,
     filter: {
       popupToggle: false,
       days: ["M"],
@@ -227,6 +223,15 @@ export default function Home() {
     setWebReady(true);
   },[])
 
+  const fnHandleClickedOnCalendar = (x:number, y:number) => {
+    if(state.viewSchedule){
+      toggleScheduleSpectate(false);
+      return
+    }
+    
+    toggleScheduleSpectate(true);
+  }
+
 // handlering for swipable
   const handlers = useSwipeable({
     onSwiping: (event) => {
@@ -236,11 +241,11 @@ export default function Home() {
       setSwipeLocation(0);
     },
     onSwiped: (eventData) => {
-      // if(eventData.dir === 'Down' && eventData.deltaY > 100){
-      //   toggleScheduleSpectate(false)
-      // }
+      if(eventData.dir === 'Down' && eventData.deltaY > 100){
+        toggleScheduleSpectate(false)
+      }
 
-      if(eventData.dir === 'Up' && eventData.deltaY < -200){
+      if(eventData.dir === 'Up' && eventData.deltaY < -80){
         toggleScheduleSpectate(true)
       }
     },
@@ -260,10 +265,29 @@ export default function Home() {
     },
   });
 
+// Component subject card
+  function SubjectCard(props: any){
+    let slide = 0;
+    const handlerSubject = useSwipeable({
+      onSwiping: (event) => {
+        slide = event.deltaX;
+      },
+      onTouchEndOrOnMouseUp: (event) => {
+        slide = 0;
+      },
+    });
+
+    return <div className={`mt-3 h-20 rounded-xl bg-red-300`} style={{transform: 'translateX('+slide+'px)'}} {...handlerSubject}></div>
+  }
+
   return (
-    <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`} {...handlers}>
-      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`}>
-      <div className={`absolute w-full bottom-4 animate-bounce flex justify-center items-center text-slate-500`}> {!state.viewSchedule && "เลื่อนขึ้น"} </div> 
+    <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
+      <div className={`absolute bottom-5 right-6 aspect-square w-12 flex justify-center items-center rounded-full bg-slate-200 shadow-lg z-50 hover:bg-slate-300 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
+        <FontAwesomeIcon icon={faCalendar} style={{color: "#73787e"}}/>
+      </div>
+
+      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) toggleScheduleSpectate(false);}} {...handlers}>
+      {/* <div className={`absolute w-full bottom-4 animate-bounce flex justify-center items-center text-slate-500`}> {!state.viewSchedule && "เลื่อนขึ้น"} </div> */}
 
       {/* Summary Calendar section */}
         <div className={`calendar-container smooth-out overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
@@ -293,7 +317,7 @@ export default function Home() {
                       <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
 
                             <div className={`relative h-full p-1 group`} style={{width: "100%"}}>
-                              <div onClick={()=>fnHandleClickedOnCalendar(dindex,tindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center hover:opacity-100 hover:duration-100`}>
+                              <div onClick={()=>fnHandleClickedOnCalendar(dindex,tindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
                                 <p className='text-sm'>กดเพื่อดูรายวิชา</p>
                               </div>
                             </div>
@@ -323,19 +347,19 @@ export default function Home() {
       </div>
 
     {/* Subject selected Section */}
-      <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-80)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
+      <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-65)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
         <div className="px-5 h-full relative">
           <section id="header" className="w-full pt-6 pb-2 px-1 flex justify-between border-b-2 border-slate-300/50" {...handlersHeader}>
             <div className="relative">
               <h1 className='font-bold'>เลือกวิชาเรียน</h1>
               <h1 className='text-sm text-black/50'>จันทร์ ตั้งแต่ 08:00 ไม่เกิน 10:00</h1>
             </div>
-            <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faFilter} style={{color: "#73787e"}}/></span>
+            <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
           </section>
           <section id="subjects" className='w-full h-full overflow-y-auto'>
             {test_data.map((data, index)=>{
 
-              return <div key={index} className={`mt-3 h-20 rounded-xl bg-red-300`}></div>
+              return <SubjectCard key={index} />
             })}
           </section>
         </div>

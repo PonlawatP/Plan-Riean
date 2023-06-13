@@ -20,9 +20,14 @@
 * {
   font-family: 'K2D', sans-serif;
 }
+html {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
 
 body {
-  height: 100vh;
+  height: 100dvh;
+  overscroll-behavior: none;
   // color: rgb(var(--foreground-rgb));
   // background: linear-gradient(
   //     to bottom,

@@ -20,6 +20,11 @@ export const WebMainReducer = (state:any, action:any) => {
                 ...state,
                 swipedBlocked: action.payload,
               };
+              case 'ADD_SCROLL_ELEM':
+                return {
+                  ...state,
+                  scrollableIndex: action.payload,
+                };
       default:
         return state;
     }
