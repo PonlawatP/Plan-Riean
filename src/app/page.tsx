@@ -5,7 +5,7 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { CardReducer, WebMainReducer } from '../../reducers/webmainred';
 import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faClose, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faCirclePlus, faClose, faFilter } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
 async function getData() {
@@ -25,6 +25,59 @@ async function getData() {
 export default function Home({props} :any) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
   const days_scrolled = ["M", "T", "W", "Th", "F"];
+  const ge_subject_group_name = [
+    {
+      type: "GE-1",
+      code: "0041",
+      name: "ทักษะการเรียนรู้ตลอดชีวิต",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-2",
+      code: "0042",
+      name: "คุณภาพชีวิตและสิ่งแวดล้อม",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-3",
+      code: "0043",
+      name: "นวัตกรรมและการสร้างสรรค์",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-4",
+      code: "0044",
+      name: "พลเมืองเข้มแข็ง",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-5",
+      code: "0045",
+      name: "วิถีสังคม",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    }
+  ];
+
 
   const times_m = [8,9,10,11,12,13,14,15,16,17,18,19];
 
@@ -33,6 +86,7 @@ export default function Home({props} :any) {
   const [my_plan_index, setPlanIndex] = useState(0); //TODO: use useReducer
   const [my_plan, setPlan] = useState<any>({0: {data: []}}); //TODO: use useReducer
   const [subjectData, setSubjectData] = useState([]);
+  const [subjectShowData, setSubjectShowData] = useState([]);
 
   function fnHandleScrollCalendar(e:any){
     const scr = e.target.scrollLeft;
@@ -139,10 +193,12 @@ export default function Home({props} :any) {
   const initialState = {
     webReady: false,
     viewSchedule: false,
+    subjectViewType: "subject",
     swipedLocated: 0,
     scrollableIndex: 0,
     filter: {
       popupToggle: false,
+      groups: [],
       days: ["M"],
       times: [8,10]
     }
@@ -158,8 +214,18 @@ export default function Home({props} :any) {
   };
 
   const toggleScheduleSpectate = (status:boolean) => {
+    if(!status){
+      toggleScheduleFilter(false);
+    }
     dispatch({
       type: 'SET_SCHEDULE_TOGGLE',
+      payload: status,
+    });
+  };
+
+  const toggleScheduleFilter = (status:boolean) => {
+    dispatch({
+      type: 'SET_FILTER_POPUP',
       payload: status,
     });
   };
@@ -193,16 +259,22 @@ export default function Home({props} :any) {
     
     toggleScheduleSpectate(true);
   }
+  const fnHandleClickedOnFilter = () => {
+    if(state.filter.popupToggle){
+      toggleScheduleFilter(false);
+      return
+    }
+    
+    toggleScheduleFilter(true);
+  }
 
 // handlering for swipable
   const handlers = useSwipeable({
     onSwiping: (event) => {
       setSwipeLocation(event.deltaY);
     },
-    onTouchEndOrOnMouseUp: (event) => {
-      setSwipeLocation(0);
-    },
     onSwiped: (eventData) => {
+      setSwipeLocation(0);
       if(eventData.dir === 'Down' && eventData.deltaY > 100){
         toggleScheduleSpectate(false)
       }
@@ -217,10 +289,8 @@ export default function Home({props} :any) {
     onSwiping: (event) => {
       setSwipeLocation(event.deltaY);
     },
-    onTouchEndOrOnMouseUp: (event) => {
-      setSwipeLocation(0);
-    },
     onSwiped: (eventData) => {
+      setSwipeLocation(0);
       if(eventData.dir === 'Down' && eventData.deltaY > 100){
         toggleScheduleSpectate(false)
       }
@@ -253,6 +323,62 @@ export default function Home({props} :any) {
 
 // Component subject card
   function SubjectCard(props: any){
+    const {data} = props;
+    const cardInitialState = {
+      index: 0,
+      smooth: false,
+      status: "not-select"
+    };
+
+    const [cardState, cardDispatch] = useReducer(CardReducer, cardInitialState);
+
+    const fnHandleClickedCard = () => {
+      // // if already had subject in schedule
+      // if(checkSubjectSchedule(data)){
+      //   const new_plan = removeSubjectFromPlan(data);
+      //   const updated = {[my_plan_index]: new_plan}
+      //   setPlan((prev:any) => ({...prev, ...updated}))
+      //   return
+      // }
+
+      // if(checkSubjectCollapsed(data)){
+      //   return
+      // }
+
+      // // add new subject
+      // const old_plan = getCurrentPlan();
+      // old_plan.data.push(data);
+      // const updated = {[my_plan_index]: old_plan}
+      // setPlan((prev:any) => ({...prev, ...updated}))
+    }
+
+
+    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden bg-slate-100 relative border-[2px] cursor-pointer border-black/10`} onClick={fnHandleClickedCard}>
+      <span className="flex absolute left-0 top-0">
+        <span className={`px-3 py-[2px] border-b-2 border-r-2 border-black/20 rounded-br-xl text-black/90 ${getColorCode(data.code)}`}>
+          <h3 className='text-center opacity-80 text-[13px]'>หมวดหมู่ที่ {data.type.split("-")[1]}</h3>
+        </span>
+        {/* <p className='text-black/40 text-[12px] pt-1 pl-2'>หมวดหมู่ที่ {data.type.split("-")[1]}</p> */}
+      </span>
+      <span className='absolute top-1 right-2 text-sm text-black/40'>
+        24 วิชา
+      </span>
+      <div className='absolute bottom-1 left-0 px-2 w-full text-sm '>
+        <p className='text-black/60'>{data.name}</p>
+        <div className="">
+          <span className='flex gap-4 items-center pt-1 relative'>
+            <span className='bg-slate-400/30 px-2 rounded-lg'>ทั้งหมด {data.detail.opened}</span>
+            <span className='bg-slate-400/30 px-2 rounded-lg'>หมวดย่อย {data.detail.sub}</span>
+            <span className='bg-slate-400/30 px-2 rounded-lg'>บังคับ {data.detail.forced}</span>
+            {/* <div className="absolute right-0">
+              <span className='bg-slate-400/30 px-2 rounded-lg'>{date.room}</span>
+            </div> */}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+  function SubjectSectCard(props: any){
     const {data} = props;
     const cardInitialState = {
       index: 0,
@@ -357,7 +483,7 @@ export default function Home({props} :any) {
       {/* <div className={`absolute w-full bottom-4 animate-bounce flex justify-center items-center text-slate-500`}> {!state.viewSchedule && "เลื่อนขึ้น"} </div> */}
 
       {/* Summary Calendar section */}
-        <div className={`calendar-container smooth-out overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
+        <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
             <div className="days absolute h-full w-16 z-50 transition-all duration-300" style={{transform: 'translateX(-'+scrolled+'px)'}}>
               <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
                 {days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < days.length && "border-b-2"} border-white/10`}>
@@ -378,7 +504,7 @@ export default function Home({props} :any) {
 
               {days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
                   {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < days.length && "border-b-2"} border-black/5`}>
-                    <p className='opacity-10'>dev-{dindex}:{tindex}</p>
+                    <p className='opacity-0'>{dindex}:{tindex}</p>
                     {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
                     {state.webReady &&
                       <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
@@ -416,17 +542,84 @@ export default function Home({props} :any) {
     {/* Subject selected Section */}
       <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-65)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
         <div className="px-5 h-full grid grid-rows-[auto_1fr] relative">
-          <section id="header" className="w-full pt-6 pb-2 px-1 flex justify-between border-b-2 border-slate-300/50" {...handlersHeader}>
-            <div className="relative">
-              <h1 className='font-bold'>เลือกวิชาเรียน</h1>
-              <h1 className='text-sm text-black/50'>จันทร์ ตั้งแต่ 08:00 ไม่เกิน 10:00</h1>
+          <section id="header" className="relative w-full pt-6 pb-2 px-1 flex justify-between border-b-2 border-slate-300/50">
+            <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
+              <div className="w-fit">
+                <h1 className='font-bold'>เลือกรายวิชา</h1>
+                <h1 className='text-sm text-black/50'>ไม่ได้คัดกรอง</h1>
+              </div>
             </div>
-            <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
+            <div className="">
+              <div className="flex gap-4">
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faFilter} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
+              </div>
+            </div>
+            <div className={`absolute top-full left-0 w-full h-fit max-h-[30dvh] overflow-auto pb-6 px-3 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
+              <div className="">
+                <div className="pt-6">
+                  หมวดหมู่รายวิชา
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>หมวด {gsg.type.split("-")[1]}</span>)}
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
+                  </span>
+                </div>
+                <div className="pt-6">
+                  เฉพาะวิชาที่เลือก
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    <span className='w-16 text-center text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
+                    {/* {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} className='bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 rounded-lg cursor-pointer text-sm'>หมวด {gsg.type.split("-")[1]}</span>)} */}
+                  </span>
+                </div>
+              </div>
+              <div className="">
+                <div className="pt-6">
+                  วันที่เรียน
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>จันทร์</span>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>อังคาร</span>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>พุธ</span>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>พฤหัสฯ</span>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ศุกร์</span>
+                  </span>
+                </div>
+                <div className="pt-6">
+                  เวลาที่เริ่มเรียน
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ทั้งหมด</span>
+                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
+                    {/* {times_m.map((time,tindex)=><span key={tindex} className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>{time.toString().padStart(2, '0')}:00</span>)} */}
+                  </span>
+                </div>
+              </div>
+            </div>
           </section>
           <section id="subjects" className='w-full h-full overflow-y-auto'>
+            {subjectShowData.length > 0 ?
+              subjectShowData.map((data, index)=>{
+                return <div key={index} className={`${index == subjectShowData.length-1 ? "mb-3" : ""}`}>
+                  <SubjectSectCard data={data}/>
+                </div>
+              })
+            :
+            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+              <FontAwesomeIcon icon={faFilter} style={{color: "rgb(148 163 184)"}} size='6x'/>
+              <div className="pt-8 text-center">
+                ยังไม่ได้เลือกการกรองข้อมูล
+                <br />
+                โปรดคัดกรองข้อมูลก่อน
+                <br />
+                แต่ตอนนี้เลื่อนลงไปดูก่อนได้
+              </div>
+            </div>
+            }
             {subjectData.map((data, index)=>{
               return <div key={index} className={`${index == subjectData.length-1 ? "mb-3" : ""}`}>
-                <SubjectCard data={data}/>
+                <SubjectSectCard data={data}/>
               </div>
             })}
           </section>

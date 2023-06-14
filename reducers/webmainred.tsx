@@ -10,21 +10,31 @@ export const WebMainReducer = (state:any, action:any) => {
           ...state,
           viewSchedule: action.payload,
         };
-        case 'SET_SWIPED_LOCATE':
+        case 'SET_SUBJECT_VIEW_TYPE':
           return {
             ...state,
-            swipedLocated: action.payload,
+            subjectViewType: action.payload,
           };
-          case 'SET_SWIPED_BLOCKED':
+          case 'SET_SWIPED_LOCATE':
             return {
               ...state,
-              swipedBlocked: action.payload,
+              swipedLocated: action.payload,
             };
-            case 'ADD_SCROLL_ELEM':
+            case 'SET_SWIPED_BLOCKED':
               return {
                 ...state,
-                scrollableIndex: action.payload,
+                swipedBlocked: action.payload,
               };
+              case 'ADD_SCROLL_ELEM':
+                return {
+                  ...state,
+                  scrollableIndex: action.payload,
+                };
+                case 'SET_FILTER_POPUP':
+                  return {
+                    ...state,
+                    filter: {...state, popupToggle: action.payload},
+                  };
     default:
       return state;
   }
