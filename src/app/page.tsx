@@ -7,8 +7,6 @@ import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import { ge_subject_group_name, name_days } from '../../components/shared/variables';
-import SubjectView from '../../components/subjectView';
 
 interface Ifilter {
   firstFilter:boolean,
@@ -52,12 +50,110 @@ async function getData(filter:Ifilter, signal:any) {
 }
 
 export default function Home({props} :any) {
+  const ge_subject_group_name = [
+    {
+      type: "GE-1",
+      code: "0041",
+      name: "ทักษะการเรียนรู้ตลอดชีวิต",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-2",
+      code: "0042",
+      name: "คุณภาพชีวิตและสิ่งแวดล้อม",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-3",
+      code: "0043",
+      name: "นวัตกรรมและการสร้างสรรค์",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-4",
+      code: "0044",
+      name: "พลเมืองเข้มแข็ง",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    },
+    {
+      type: "GE-5",
+      code: "0045",
+      name: "วิถีสังคม",
+      detail: {
+        forced: 3,
+        opened: 21,
+        sub: 2
+      }
+    }
+  ];
+  const name_days = [
+    {
+      date_th: "จันทร์",
+      date_3: "Mon",
+      date_2: "Mo",
+      date_1: "M",
+    },
+    {
+      date_th: "อังคาร",
+      date_3: "Tue",
+      date_2: "Tu",
+      date_1: "t",
+    },
+    {
+      date_th: "พุธ",
+      date_3: "Wed",
+      date_2: "We",
+      date_1: "W",
+    },
+    {
+      date_th: "พฤหัสฯ",
+      date_3: "Thu",
+      date_2: "Th",
+      date_1: "Th",
+    },
+    {
+      date_th: "ศุกร์",
+      date_3: "Fri",
+      date_2: "Fr",
+      date_1: "F",
+    }
+  ];
 
+
+  const times_m = [8,9,10,11,12,13,14,15,16,17,18,19];
+
+  const [scrolled, setScrolled] = useState(0);
 
   const [my_plan_index, setPlanIndex] = useState(0); //TODO: use useReducer
   const [my_plan, setPlan] = useState<any>({0: {data: []}}); //TODO: use useReducer
   const [subjectData, setSubjectData] = useState([]);
   const [subjectShowData, setSubjectShowData] = useState([]);
+
+  function fnHandleScrollCalendar(e:any){
+    const scr = e.target.scrollLeft;
+    if(scr < 40){
+      setScrolled(0)
+    } else {
+      setScrolled(38)
+    }
+    // console.log(e.target.scrollLeft/(e.target.scrollWidth-e.target.offsetWidth))
+  }
 
   const calculateScale = (str:string) => {
     const timeRange = str.match(/\d{2}:\d{2}-\d{2}:\d{2}/);
@@ -221,6 +317,15 @@ export default function Home({props} :any) {
 
     return (()=>{})
   },[])
+
+  const fnHandleClickedOnCalendar = (x:number, y:number) => {
+    if(state.viewSchedule){
+      toggleScheduleSpectate(false);
+      return
+    }
+    
+    toggleScheduleSpectate(true);
+  }
   const fnHandleClickedOnFilter = () => {
     if(state.filter.popupToggle){
       toggleScheduleFilter(false);
@@ -360,6 +465,99 @@ export default function Home({props} :any) {
       </div>
     </div>
   }
+  function SubjectSectCard(props: any){
+    const {data} = props;
+    const cardInitialState = {
+      index: 0,
+      smooth: false,
+      status: "not-select"
+    };
+
+    const [cardState, cardDispatch] = useReducer(CardReducer, cardInitialState);
+
+    // TODO: Next-Phase - swipe to options
+    // const setSlide = (index:number) => {
+    //   cardDispatch({
+    //     type: 'SET_SLIDE_INDEX',
+    //     payload: index,
+    //   });
+    // };
+    // const toggleSmooth = (status:boolean) => {
+    //   cardDispatch({
+    //     type: 'SET_SLIDE_SMOOTH',
+    //     payload: status,
+    //   });
+    // };
+
+    // const handlerSubject = useSwipeable({
+    //   onSwiping: (event) => {
+    //     setSlide(event.deltaX*.15);
+    //   },
+    //   onTouchEndOrOnMouseUp: (event) => {
+    //     setSlide(0)
+    //     toggleSmooth(true)
+    //   },
+    //   onTouchStartOrOnMouseDown: (event) => {
+    //     toggleSmooth(false)
+    //   },
+    // });
+
+    // return <div className={`${cardState.smooth && "smooth-out"} mt-3 h-20 rounded-xl overflow-hidden bg-slate-100 relative border-[2px] border-black/10`} style={{transform: 'translateX('+cardState.index+'px)'}}>
+
+    const setStatus = (status:string) => {
+      cardDispatch({
+        type: 'SET_SLIDE_FOCUS',
+        payload: status,
+      });
+    };
+
+    const fnHandleClickedCard = () => {
+      // if already had subject in schedule
+      if(checkSubjectSchedule(data)){
+        removeSubjectFromPlan(data)
+        return
+      }
+
+      if(checkSubjectCollapsed(data)){
+        return
+      }
+
+      // add new subject
+      const old_plan = getCurrentPlan();
+      old_plan.data.push(data);
+      const updated = {[my_plan_index]: old_plan}
+      setPlan((prev:any) => ({...prev, ...updated}))
+      updateUserStorage();
+    }
+
+    const dateData = getSplitedData(data.time);
+
+    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedCard}>
+      <span className="flex absolute left-0 top-0">
+        <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
+          <h3 className='text-center opacity-80'>sec {data.sec}</h3>
+        </span>
+        <p className='text-black/40 text-[12px] pt-1 pl-2'>{data.code} {data.name}</p>
+      </span>
+      <span className='absolute top-1 right-2 text-sm text-black/40'>
+        รับ {data.receive} ที่นั่ง
+      </span>
+      <div className='pt-[1.8rem] pb-1 px-2 w-full text-sm'>
+        {data.lecturer.split("-").map((lect:any,lindex:any)=><p key={lindex} className='text-black/40'>{lect}</p>)}
+        <div className="">
+          {dateData.map((date,dateindex)=>
+            <span key={dateindex} className='flex gap-4 items-center pt-1 relative'>
+              <span className={date.dayColor+' px-2 rounded-lg text-center w-16'}>{date.dayName}</span>
+              <span className='bg-slate-400/30 px-2 rounded-lg'>{date.from} - {date.to}</span>
+              <div className="absolute right-0">
+                <span className='bg-slate-400/30 px-2 rounded-lg'>{date.room}</span>
+              </div>
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  }
 
 // filter
   const [filter, setFilter] = useState<Ifilter>({
@@ -440,7 +638,34 @@ export default function Home({props} :any) {
     localStorage.setItem("plans", JSON.stringify(my_plan));
   }
 
+  const ScheduleCard = (props:any) => {
+    const {data, time} = props
+    // const [clicked, setClicked] = useState(false);
 
+    function fnHandleClickedOnScheduleCard(){
+      // setClicked(!clicked)
+      if(!state.viewSchedule) removeSubjectFromPlan(data)
+    }
+
+    return (
+      <div className="absolute w-full h-full">
+
+        <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(time)*100)+"%"}}>
+          <div onClick={fnHandleClickedOnScheduleCard} className={`z-10 relative cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
+            <p className='text-sm'>({data.credit.split(" ")[0].trim()}) {data.code} sec {data.sec}</p>
+            <p className='pt-3 text-sm'>{getTimeRange(time)}</p>
+          </div>
+          {/* <div className={`smooth absolute left-0 ${clicked ? "bottom-full pointer-events-none" : "bottom-1/3 opacity-0"} w-full h-12 flex justify-center`}>
+            <div className="bg-white rounded-md h-full aspect-square shadow-md p-1 pointer-events-auto border-2 border-black/10">
+              <div className="smooth bg-red-500 hover:bg-red-600 rounded-md h-full aspect-square shadow-sm cursor-pointer flex justify-center items-center border-2 border-black/10">
+              x
+              </div>
+            </div>
+          </div> */}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
@@ -452,44 +677,148 @@ export default function Home({props} :any) {
       {/* <div className={`absolute w-full bottom-4 animate-bounce flex justify-center items-center text-slate-500`}> {!state.viewSchedule && "เลื่อนขึ้น"} </div> */}
 
       {/* Summary Calendar section */}
-        
-        <Calendar 
-          state={state} 
-          toggleScheduleSpectate={toggleScheduleSpectate} 
-          getCurrentPlan={getCurrentPlan} 
-          getSplitedData={getSplitedData} 
-          removeSubjectFromPlan={removeSubjectFromPlan} 
-          calculateScale={calculateScale} 
-          getTimeRange={getTimeRange} 
-          getColorCode={getColorCode} 
-          getDayIndex={getDayIndex} 
-          getHourIndex={getHourIndex}
-        ></Calendar>
+        <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
+            <div className="days absolute h-full w-16 z-50 transition-all duration-300" style={{transform: 'translateX(-'+scrolled+'px)'}}>
+              <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
+                {name_days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < name_days.length && "border-b-2"} border-white/10`}>
+                  <p className='transition-all duration-300 pl-4 text-white' style={{opacity: 1-(scrolled/38)}}>{d.date_3}</p>
+                  <p className='transition-all duration-300 pl-[2.55rem] text-white absolute' style={{opacity: scrolled/38}}>{d.date_1}</p>
+                </div>)}
+            </div>
+            <div className="header-day relative overflow-x-auto w-auto" onScroll={fnHandleScrollCalendar} onScrollCapture={fnHandleScrollCalendar}>
+
+              <div className="days absolute h-full w-16 ">
+              <div className="border-b-2 border-black/5 bg-yellow-400"><p className='opacity-0 py-2'>a</p></div>
+              </div>
+
+              <div className="pl-16 inline-flex ">
+                  {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-24 py-2 pl-3 border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950/40'>{time.toString().padStart(2, '0')}:00</span>)}
+                  {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
+              </div>
+
+              {name_days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
+                  {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < name_days.length && "border-b-2"} border-black/5`}>
+                    <p className='opacity-0'>{dindex}:{tindex}</p>
+                    {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
+                    {state.webReady &&
+                      <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
+
+                            <div className={`relative h-full p-1 group`} style={{width: "100%"}}>
+                              <div onClick={()=>fnHandleClickedOnCalendar(dindex,tindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
+                                <p className='text-sm'>กดเพื่อดูรายวิชา</p>
+                              </div>
+                            </div>
+
+                      </div>
+                    }
+
+                    {/* schedule data to show */}
+                    {getCurrentPlan().data.map((data:any,dataindex:any)=>{
+                      return getSplitedData(data.time).map((split_date, spindex)=>{
+                        return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
+                        <ScheduleCard key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
+                        : null
+                      })
+                    })}
+                  </span>)}
+              </div>)}
+            </div>
+        </div>
 
       </div>
 
     {/* Subject selected Section */}
-      <SubjectView 
-        state={state} 
-        handlersHeader={handlersHeader} 
-        fnHandleChangeFilterType={fnHandleChangeFilterType} 
-        fnHandleClickedOnFilter={fnHandleClickedOnFilter} 
-        toggleScheduleSpectate={toggleScheduleSpectate} 
-        fnHandleChangeFilterDate={fnHandleChangeFilterDate} 
-        checkFilterDateSelected={checkFilterDateSelected} 
-        filter={filter} 
-        setFilter={setFilter} 
-        subjectShowData={subjectShowData} 
-        checkSubjectSchedule={checkSubjectSchedule} 
-        removeSubjectFromPlan={removeSubjectFromPlan} 
-        checkSubjectCollapsed={checkSubjectCollapsed} 
-        getCurrentPlan={getCurrentPlan} 
-        my_plan={my_plan} 
-        my_plan_index={my_plan_index} 
-        setPlan={setPlan} 
-        getSplitedData={getSplitedData} 
-        updateUserStorage={updateUserStorage}
-      ></SubjectView>
+      <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-65)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
+        <div className="px-5 h-full grid grid-rows-[auto_1fr] relative">
+          <section id="header" className="relative w-full pt-6 pb-2 px-1 flex justify-between border-b-2 border-slate-300/50">
+            <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
+              <div className="w-fit">
+                <h1 className='font-bold'>เลือกรายวิชา</h1>
+                <h1 className='text-sm text-black/50'>ไม่ได้คัดกรอง</h1>
+              </div>
+            </div>
+            <div className="">
+              <div className="flex gap-4">
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
+              </div>
+            </div>
+            <div className={`absolute top-full left-0 w-full h-fit max-h-[30dvh] overflow-auto pb-6 px-3 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
+              <div className="">
+                <div className="pt-6">
+                  หมวดหมู่รายวิชา
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${filter.type === gsg.type ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
+                    {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
+                  </span>
+                </div>
+                <div className="pt-6">
+                  เฉพาะวิชาที่เลือก
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    <span className='w-16 text-center text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
+                    {/* {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} className='bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 rounded-lg cursor-pointer text-sm'>หมวด {gsg.type.split("-")[1]}</span>)} */}
+                  </span>
+                </div>
+              </div>
+              <div className="">
+                <div className="pt-6">
+                  วันที่เรียน
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    {name_days.map((item, iin)=><span key={iin} onClick={()=>fnHandleChangeFilterDate(item.date_2, checkFilterDateSelected(item.date_2))} className={`smooth w-16 text-center ${checkFilterDateSelected(item.date_2) ? "bg-slate-700/60 text-white" : "bg-slate-400/30"} lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>{item.date_th}</span>)}
+                  </span>
+                </div>
+                <div className="pt-6">
+                  เวลาที่เริ่มเรียน
+
+                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                    <span className='w-16 text-center bg-slate-400/30 lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ทั้งหมด</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="subjects" className='w-full h-full overflow-y-auto'>
+            {
+            !filter.firstFilter ? 
+            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+              <FontAwesomeIcon icon={faLayerGroup} style={{color: "rgb(148 163 184)"}} size='6x'/>
+              <div className="pt-8 text-center">
+                ยังไม่ได้เลือกการกรองข้อมูล
+                <br />
+                โปรดคัดกรองข้อมูลก่อน
+              </div>
+            </div> 
+            :
+            !state.dataLoaded ?
+            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+              <FontAwesomeIcon className='animate-spin' icon={faSpinner} style={{color: "rgb(148 163 184)"}} size='4x'/>
+            </div> 
+            :
+            subjectShowData.length > 0 ?
+              subjectShowData.map((data, index)=>{
+                return <div key={index} className={`${index == subjectShowData.length-1 ? "mb-3" : ""}`}>
+                  <SubjectSectCard data={data}/>
+                </div>
+              })
+            :
+            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+              <FontAwesomeIcon icon={faExclamationCircle} style={{color: "rgb(148 163 184)"}} size='6x'/>
+              <div className="pt-8 text-center">
+                ไม่มีข้อมูล
+              </div>
+            </div> 
+            }
+            {/* {subjectData.map((data, index)=>{
+              return <div key={index} className={`${index == subjectData.length-1 ? "mb-3" : ""}`}>
+                <SubjectSectCard data={data}/>
+              </div>
+            })} */}
+          </section>
+        </div>
+      </div>
 
     </div>
   )
