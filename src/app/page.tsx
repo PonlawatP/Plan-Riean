@@ -543,7 +543,7 @@ export default function Home({props} :any) {
         รับ {data.receive} ที่นั่ง
       </span>
       <div className='pt-[1.8rem] pb-1 px-2 w-full text-sm'>
-        {data.lecturer.split("-").map((lect:any,lindex)=><p key={lindex} className='text-black/40'>{lect}</p>)}
+        {data.lecturer.split("-").map((lect:any,lindex:any)=><p key={lindex} className='text-black/40'>{lect}</p>)}
         <div className="">
           {dateData.map((date,dateindex)=>
             <span key={dateindex} className='flex gap-4 items-center pt-1 relative'>
@@ -617,7 +617,7 @@ export default function Home({props} :any) {
       const res = await getData(check_filt, abortController.signal); // Pass the signal to the getData function
   
       setSubjectShowData(res);
-    } catch (error) {
+    } catch (error:any) {
       if (error.name === 'AbortError') {
         // Request was aborted, handle cancellation as needed
         console.log('Request was cancelled.');
