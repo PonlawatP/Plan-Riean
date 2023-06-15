@@ -372,10 +372,16 @@ export default function Home({props} :any) {
     const plan = getCurrentPlan();
     return plan.data.filter((data:any) => data.code.trim() === subject.code.trim() && data.sec === subject.sec).length > 0
   }
-  const removeSubjectFromPlan = (subject: any) => {
+  const preRemoveSubjectFromPlan = (subject: any) => {
     const plan = getCurrentPlan();
     plan.data = plan.data.filter((data:any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec)
     return plan
+  }
+  const removeSubjectFromPlan = (data: any) => {
+    const new_plan = preRemoveSubjectFromPlan(data);
+    const updated = {[my_plan_index]: new_plan}
+    setPlan((prev:any) => ({...prev, ...updated}))
+    updateUserStorage();
   }
   // getDayIndex getHourIndex calculateScale
   const checkSubjectCollapsed = (subject: any) => {
@@ -416,7 +422,7 @@ export default function Home({props} :any) {
     const fnHandleClickedCard = () => {
       // // if already had subject in schedule
       // if(checkSubjectSchedule(data)){
-      //   const new_plan = removeSubjectFromPlan(data);
+      //   const new_plan = preRemoveSubjectFromPlan(data);
       //   const updated = {[my_plan_index]: new_plan}
       //   setPlan((prev:any) => ({...prev, ...updated}))
       //   return
@@ -508,10 +514,7 @@ export default function Home({props} :any) {
     const fnHandleClickedCard = () => {
       // if already had subject in schedule
       if(checkSubjectSchedule(data)){
-        const new_plan = removeSubjectFromPlan(data);
-        const updated = {[my_plan_index]: new_plan}
-        setPlan((prev:any) => ({...prev, ...updated}))
-        updateUserStorage();
+        removeSubjectFromPlan(data)
         return
       }
 
@@ -635,6 +638,35 @@ export default function Home({props} :any) {
     localStorage.setItem("plans", JSON.stringify(my_plan));
   }
 
+  const ScheduleCard = (props:any) => {
+    const {data, time} = props
+    // const [clicked, setClicked] = useState(false);
+
+    function fnHandleClickedOnScheduleCard(){
+      // setClicked(!clicked)
+      if(!state.viewSchedule) removeSubjectFromPlan(data)
+    }
+
+    return (
+      <div className="absolute w-full h-full">
+
+        <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(time)*100)+"%"}}>
+          <div onClick={fnHandleClickedOnScheduleCard} className={`z-10 relative cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
+            <p className='text-sm'>({data.credit.split(" ")[0].trim()}) {data.code} sec {data.sec}</p>
+            <p className='pt-3 text-sm'>{getTimeRange(time)}</p>
+          </div>
+          {/* <div className={`smooth absolute left-0 ${clicked ? "bottom-full pointer-events-none" : "bottom-1/3 opacity-0"} w-full h-12 flex justify-center`}>
+            <div className="bg-white rounded-md h-full aspect-square shadow-md p-1 pointer-events-auto border-2 border-black/10">
+              <div className="smooth bg-red-500 hover:bg-red-600 rounded-md h-full aspect-square shadow-sm cursor-pointer flex justify-center items-center border-2 border-black/10">
+              x
+              </div>
+            </div>
+          </div> */}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
       <div className={`absolute bottom-5 right-6 aspect-square w-12 flex justify-center items-center rounded-full bg-slate-200 shadow-lg z-50 hover:bg-slate-300 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
@@ -684,16 +716,8 @@ export default function Home({props} :any) {
                     {getCurrentPlan().data.map((data:any,dataindex:any)=>{
                       return getSplitedData(data.time).map((split_date, spindex)=>{
                         return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
-                        <div key={"d-"+dataindex} className="absolute w-full h-full">
-
-                          <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(split_date.fullDate)*100)+"%"}}>
-                            <div className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
-                              <p className='text-sm'>({data.credit.split(" ")[0].trim()}) {data.code} sec {data.sec}</p>
-                              <p className='pt-3 text-sm'>{getTimeRange(split_date.fullDate)}</p>
-                            </div>
-                          </div>
-
-                        </div> : null
+                        <ScheduleCard key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
+                        : null
                       })
                     })}
                   </span>)}
