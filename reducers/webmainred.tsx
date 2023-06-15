@@ -35,6 +35,16 @@ export const WebMainReducer = (state:any, action:any) => {
                     ...state,
                     filter: {...state, popupToggle: action.payload},
                   };
+                  case 'SET_FILTER_DELAY':
+                    return {
+                      ...state,
+                      filter: {...state, popupDelay: action.payload},
+                    };
+                    case 'SET_DATA_LOADED':
+                      return {
+                        ...state,
+                        dataLoaded: action.payload,
+                      };
     default:
       return state;
   }

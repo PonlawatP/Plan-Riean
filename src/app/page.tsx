@@ -5,11 +5,38 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { CardReducer, WebMainReducer } from '../../reducers/webmainred';
 import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faCirclePlus, faClose, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
-async function getData() {
-  const res = await fetch('api/datamajor')
+interface Ifilter {
+  firstFilter:boolean,
+  type:string,
+  code:Array<string>,
+  date:Array<string>,
+  time:string
+}
+interface IsubjectSectDate 
+{
+  day: string
+  dayName: string
+  dayColor: string
+  from: string
+  to: string
+  room: string
+  fullDate:string
+}
+
+async function getData(filter:Ifilter, signal:any) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...filter
+    }),
+    signal
+  };
+
+  const res = await fetch('api/Filter', requestOptions)
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
  
@@ -23,8 +50,6 @@ async function getData() {
 }
 
 export default function Home({props} :any) {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-  const days_scrolled = ["M", "T", "W", "Th", "F"];
   const ge_subject_group_name = [
     {
       type: "GE-1",
@@ -75,6 +100,38 @@ export default function Home({props} :any) {
         opened: 21,
         sub: 2
       }
+    }
+  ];
+  const name_days = [
+    {
+      date_th: "จันทร์",
+      date_3: "Mon",
+      date_2: "Mo",
+      date_1: "M",
+    },
+    {
+      date_th: "อังคาร",
+      date_3: "Tue",
+      date_2: "Tu",
+      date_1: "t",
+    },
+    {
+      date_th: "พุธ",
+      date_3: "Wed",
+      date_2: "We",
+      date_1: "W",
+    },
+    {
+      date_th: "พฤหัสฯ",
+      date_3: "Thu",
+      date_2: "Th",
+      date_1: "Th",
+    },
+    {
+      date_th: "ศุกร์",
+      date_3: "Fri",
+      date_2: "Fr",
+      date_1: "F",
     }
   ];
 
@@ -144,47 +201,53 @@ export default function Home({props} :any) {
     }
   };
 
-  const getSplitedData = (str:string) => {
-    const room = str.substring(14);
-    let res = [
-        {
-          day: "",
-          dayName: "",
-          dayColor: "",
-          from: "",
-          to: "",
-          room
-        }
-      ]
+  const getSplitedData = (str_raw:string) => {
+    let res:Array<IsubjectSectDate> = []
+    
+    str_raw.split(" & ").map((str:string)=>{
+      let data_result:IsubjectSectDate = {
+        dayName: "",
+        dayColor: "",
+        day: "",
+        from: "",
+        to: "",
+        room: "",
+        fullDate: ""
+      }
 
-    const res_data = res[0];
+      const room = str.split(" ")[1];
 
-    switch (str.slice(0,2)) {
-      case 'Mo':
-        res_data.dayName = "จันทร์";
-        res_data.dayColor = "bg-[#ffd56b]";
-        break;
-      case 'Tu':
-        res_data.dayName = "อังคาร";
-        res_data.dayColor = "bg-[#ffa1a1]";
-        break;
-      case 'We':
-        res_data.dayName = "พุธ";
-        res_data.dayColor = "bg-[#c2f784]";
-        break;
-      case 'Th':
-        res_data.dayName = "พฤหัสฯ";
-        res_data.dayColor = "bg-[#f8a978]";
-        break;
-      default:
-        res_data.dayName = "ศุกร์";
-        res_data.dayColor = "bg-[#afc5ff]";
-        break;
-    }
+      switch (str.slice(0,2)) {
+        case 'Mo':
+          data_result.dayName = name_days[0].date_th;
+          data_result.dayColor = "bg-[#ffd56b]";
+          break;
+        case 'Tu':
+          data_result.dayName = name_days[1].date_th;
+          data_result.dayColor = "bg-[#ffa1a1]";
+          break;
+        case 'We':
+          data_result.dayName = name_days[2].date_th;
+          data_result.dayColor = "bg-[#c2f784]";
+          break;
+        case 'Th':
+          data_result.dayName = name_days[3].date_th;
+          data_result.dayColor = "bg-[#f8a978]";
+          break;
+        default:
+          data_result.dayName = name_days[4].date_th;
+          data_result.dayColor = "bg-[#afc5ff]";
+          break;
+      }
 
-    res_data.day = str.slice(0,2);
-    res_data.from = getTimeRange(str).split(" - ")[0];
-    res_data.to = getTimeRange(str).split(" - ")[1];
+      data_result.day = str.slice(0,2);
+      data_result.from = getTimeRange(str).split(" - ")[0];
+      data_result.to = getTimeRange(str).split(" - ")[1];
+      data_result.room = room;
+      data_result.fullDate = str;
+
+      res.push(data_result)
+    })
 
     return res;
   };
@@ -196,11 +259,10 @@ export default function Home({props} :any) {
     subjectViewType: "subject",
     swipedLocated: 0,
     scrollableIndex: 0,
+    dataLoaded: false,
     filter: {
       popupToggle: false,
-      groups: [],
-      days: ["M"],
-      times: [8,10]
+      popupDelay: 0
     }
   };
 
@@ -230,6 +292,13 @@ export default function Home({props} :any) {
     });
   };
 
+  const toggleDataLoaded = (status:boolean) => {
+    dispatch({
+      type: 'SET_DATA_LOADED',
+      payload: status
+    });
+  };
+
   const setSwipeLocation = (locate:number) => {
     dispatch({
       type: 'SET_SWIPED_LOCATE',
@@ -239,16 +308,14 @@ export default function Home({props} :any) {
 
 // set status if web is ready
   useEffect(()=>{
-    let test = true;
-    getData().then(res=>{
-      if(test){
-        setSubjectData(res);
-      }
-    })
+    if(localStorage.getItem("plans") != null && localStorage.getItem("plan_index") != null){
+      setPlanIndex(Number.parseInt(localStorage.getItem("plan_index") || "0"))
+      setPlan(JSON.parse(localStorage.getItem("plans") || "{0:{data:[]}}"))
+    }
 
     setWebReady(true);
 
-    return (()=>{test = false})
+    return (()=>{})
   },[])
 
   const fnHandleClickedOnCalendar = (x:number, y:number) => {
@@ -313,11 +380,25 @@ export default function Home({props} :any) {
   // getDayIndex getHourIndex calculateScale
   const checkSubjectCollapsed = (subject: any) => {
     const plan = getCurrentPlan();
-    return plan.data.filter((data:any) =>
-      (getDayIndex(data.time) == getDayIndex(subject.time))
-      &&
-      (getHourIndex(data.time) == getHourIndex(subject.time))
-    ).length > 0
+    const res = plan.data.filter((data:any) =>
+      getSplitedData(data.time).filter((df:IsubjectSectDate)=>
+        getSplitedData(subject.time).filter((sf:IsubjectSectDate)=>
+          getDayIndex(df.fullDate) == getDayIndex(sf.fullDate)
+          &&
+          (
+            getHourIndex(df.fullDate) == getHourIndex(sf.fullDate)
+            ||
+            (
+              getHourIndex(sf.fullDate)+(calculateScale(sf.fullDate)-1) > getHourIndex(df.fullDate)
+              &&
+              getHourIndex(df.fullDate)+(calculateScale(df.fullDate)-1) > getHourIndex(sf.fullDate)
+            )
+          )
+        ).length > 0
+      ).length > 0
+    )
+
+    return res.length > 0
   }
 
 
@@ -430,6 +511,7 @@ export default function Home({props} :any) {
         const new_plan = removeSubjectFromPlan(data);
         const updated = {[my_plan_index]: new_plan}
         setPlan((prev:any) => ({...prev, ...updated}))
+        updateUserStorage();
         return
       }
 
@@ -442,22 +524,23 @@ export default function Home({props} :any) {
       old_plan.data.push(data);
       const updated = {[my_plan_index]: old_plan}
       setPlan((prev:any) => ({...prev, ...updated}))
+      updateUserStorage();
     }
 
     const dateData = getSplitedData(data.time);
 
-    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedCard}>
+    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedCard}>
       <span className="flex absolute left-0 top-0">
         <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
           <h3 className='text-center opacity-80'>sec {data.sec}</h3>
         </span>
-        <p className='text-black/40 text-[12px] pt-1 pl-2'>{data.code}</p>
+        <p className='text-black/40 text-[12px] pt-1 pl-2'>{data.code} {data.name}</p>
       </span>
       <span className='absolute top-1 right-2 text-sm text-black/40'>
-        รับ {data.receive.trim()} ที่นั่ง
+        รับ {data.receive} ที่นั่ง
       </span>
-      <div className='absolute bottom-1 left-0 px-2 w-full text-sm '>
-        <p className='text-black/40'>{data.lecturer}</p>
+      <div className='pt-[1.8rem] pb-1 px-2 w-full text-sm'>
+        {data.lecturer.split("-").map((lect:any,lindex)=><p key={lindex} className='text-black/40'>{lect}</p>)}
         <div className="">
           {dateData.map((date,dateindex)=>
             <span key={dateindex} className='flex gap-4 items-center pt-1 relative'>
@@ -473,6 +556,85 @@ export default function Home({props} :any) {
     </div>
   }
 
+// filter
+  const [filter, setFilter] = useState<Ifilter>({
+      firstFilter: false,
+      type: "",
+      code: [],
+      date: [],
+      time: "total"
+    });
+
+  const fnHandleChangeFilterType = (type: string) => {
+    if(filter.type === type) return;
+    
+    const temp = {
+      ...filter,
+      type,
+      firstFilter: true
+    }
+    setFilter(temp);
+    
+    updateSubjectList(temp);
+  }
+
+  const fnHandleChangeFilterDate = (date: string, active = false) => {
+    let temp_date:Array<string> = filter.date;
+
+    if(active){
+      temp_date = temp_date.filter(idate => idate !== date)
+    } else {
+      temp_date.push(date)
+    }
+
+    const temp = {
+      ...filter,
+      date: temp_date,
+      firstFilter: true
+    }
+    setFilter(temp);
+
+    updateSubjectList(temp);
+  }
+
+  const checkFilterDateSelected = (date:string) => {
+    return filter.date.includes(date)
+  }
+  let abortController:any;
+  async function updateSubjectList(check_filt: Ifilter) {
+    if (abortController) {
+      // If there is an ongoing request, cancel it
+      abortController.abort();
+    }
+  
+    toggleDataLoaded(false);
+    abortController = new AbortController(); // Create a new AbortController instance
+  
+    try {
+      const res = await getData(check_filt, abortController.signal); // Pass the signal to the getData function
+  
+      setSubjectShowData(res);
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        // Request was aborted, handle cancellation as needed
+        console.log('Request was cancelled.');
+        return;
+      }
+  
+      // Handle other errors
+      console.error('An error occurred:', error);
+    } finally {
+      toggleDataLoaded(true);
+      abortController = null; // Reset the abortController variable
+    }
+  }
+
+// user storage
+  const updateUserStorage = () => {
+    localStorage.setItem("plan_index", JSON.stringify(my_plan_index));
+    localStorage.setItem("plans", JSON.stringify(my_plan));
+  }
+
   return (
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
       <div className={`absolute bottom-5 right-6 aspect-square w-12 flex justify-center items-center rounded-full bg-slate-200 shadow-lg z-50 hover:bg-slate-300 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
@@ -486,9 +648,9 @@ export default function Home({props} :any) {
         <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
             <div className="days absolute h-full w-16 z-50 transition-all duration-300" style={{transform: 'translateX(-'+scrolled+'px)'}}>
               <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
-                {days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < days.length && "border-b-2"} border-white/10`}>
-                  <p className='transition-all duration-300 pl-4 text-white' style={{opacity: 1-(scrolled/38)}}>{d}</p>
-                  <p className='transition-all duration-300 pl-[2.55rem] text-white absolute' style={{opacity: scrolled/38}}>{days_scrolled[dindex]}</p>
+                {name_days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < name_days.length && "border-b-2"} border-white/10`}>
+                  <p className='transition-all duration-300 pl-4 text-white' style={{opacity: 1-(scrolled/38)}}>{d.date_3}</p>
+                  <p className='transition-all duration-300 pl-[2.55rem] text-white absolute' style={{opacity: scrolled/38}}>{d.date_1}</p>
                 </div>)}
             </div>
             <div className="header-day relative overflow-x-auto w-auto" onScroll={fnHandleScrollCalendar} onScrollCapture={fnHandleScrollCalendar}>
@@ -502,8 +664,8 @@ export default function Home({props} :any) {
                   {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
               </div>
 
-              {days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
-                  {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < days.length && "border-b-2"} border-black/5`}>
+              {name_days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
+                  {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < name_days.length && "border-b-2"} border-black/5`}>
                     <p className='opacity-0'>{dindex}:{tindex}</p>
                     {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
                     {state.webReady &&
@@ -520,17 +682,19 @@ export default function Home({props} :any) {
 
                     {/* schedule data to show */}
                     {getCurrentPlan().data.map((data:any,dataindex:any)=>{
-                      return dindex == getDayIndex(data.time) && tindex == getHourIndex(data.time) ?
+                      return getSplitedData(data.time).map((split_date, spindex)=>{
+                        return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
                         <div key={"d-"+dataindex} className="absolute w-full h-full">
 
-                          <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(data.time)*100)+"%"}}>
+                          <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(split_date.fullDate)*100)+"%"}}>
                             <div className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
                               <p className='text-sm'>({data.credit.split(" ")[0].trim()}) {data.code} sec {data.sec}</p>
-                              <p className='pt-3 text-sm'>{getTimeRange(data.time)}</p>
+                              <p className='pt-3 text-sm'>{getTimeRange(split_date.fullDate)}</p>
                             </div>
                           </div>
 
                         </div> : null
+                      })
                     })}
                   </span>)}
               </div>)}
@@ -551,7 +715,7 @@ export default function Home({props} :any) {
             </div>
             <div className="">
               <div className="flex gap-4">
-                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faFilter} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
                 <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
               </div>
             </div>
@@ -561,8 +725,8 @@ export default function Home({props} :any) {
                   หมวดหมู่รายวิชา
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>หมวด {gsg.type.split("-")[1]}</span>)}
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
+                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${filter.type === gsg.type ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
+                    {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
                   </span>
                 </div>
                 <div className="pt-6">
@@ -579,27 +743,37 @@ export default function Home({props} :any) {
                   วันที่เรียน
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>จันทร์</span>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>อังคาร</span>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>พุธ</span>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>พฤหัสฯ</span>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ศุกร์</span>
+                    {name_days.map((item, iin)=><span key={iin} onClick={()=>fnHandleChangeFilterDate(item.date_2, checkFilterDateSelected(item.date_2))} className={`smooth w-16 text-center ${checkFilterDateSelected(item.date_2) ? "bg-slate-700/60 text-white" : "bg-slate-400/30"} lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>{item.date_th}</span>)}
                   </span>
                 </div>
                 <div className="pt-6">
                   เวลาที่เริ่มเรียน
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ทั้งหมด</span>
-                    <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
-                    {/* {times_m.map((time,tindex)=><span key={tindex} className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>{time.toString().padStart(2, '0')}:00</span>)} */}
+                    <span className='w-16 text-center bg-slate-400/30 lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ทั้งหมด</span>
                   </span>
                 </div>
               </div>
             </div>
           </section>
           <section id="subjects" className='w-full h-full overflow-y-auto'>
-            {subjectShowData.length > 0 ?
+            {
+            !filter.firstFilter ? 
+            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+              <FontAwesomeIcon icon={faLayerGroup} style={{color: "rgb(148 163 184)"}} size='6x'/>
+              <div className="pt-8 text-center">
+                ยังไม่ได้เลือกการกรองข้อมูล
+                <br />
+                โปรดคัดกรองข้อมูลก่อน
+              </div>
+            </div> 
+            :
+            !state.dataLoaded ?
+            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+              <FontAwesomeIcon className='animate-spin' icon={faSpinner} style={{color: "rgb(148 163 184)"}} size='4x'/>
+            </div> 
+            :
+            subjectShowData.length > 0 ?
               subjectShowData.map((data, index)=>{
                 return <div key={index} className={`${index == subjectShowData.length-1 ? "mb-3" : ""}`}>
                   <SubjectSectCard data={data}/>
@@ -607,21 +781,17 @@ export default function Home({props} :any) {
               })
             :
             <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
-              <FontAwesomeIcon icon={faFilter} style={{color: "rgb(148 163 184)"}} size='6x'/>
+              <FontAwesomeIcon icon={faExclamationCircle} style={{color: "rgb(148 163 184)"}} size='6x'/>
               <div className="pt-8 text-center">
-                ยังไม่ได้เลือกการกรองข้อมูล
-                <br />
-                โปรดคัดกรองข้อมูลก่อน
-                <br />
-                แต่ตอนนี้เลื่อนลงไปดูก่อนได้
+                ไม่มีข้อมูล
               </div>
-            </div>
+            </div> 
             }
-            {subjectData.map((data, index)=>{
+            {/* {subjectData.map((data, index)=>{
               return <div key={index} className={`${index == subjectData.length-1 ? "mb-3" : ""}`}>
                 <SubjectSectCard data={data}/>
               </div>
-            })}
+            })} */}
           </section>
         </div>
       </div>
