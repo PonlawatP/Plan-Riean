@@ -837,7 +837,6 @@ export default function Home({props} :any) {
 
   function checkGroupCodes(group:string) {
     const res = filter.code.map(e=>e.substring(0,4)).includes(group);
-    console.log(group, res);
     return res
   }
 
