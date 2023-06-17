@@ -940,7 +940,7 @@ export default function Home({props} :any) {
                   เฉพาะวิชาที่เลือก
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {filter.code.map((gcode,gindex)=><span key={gindex} className={`${getColorCode(gcode)} px-2 rounded-lg cursor-pointer text-sm text-black/60`} onClick={()=>{fnHandleToggleFilterSubjectCode(gcode)}}> {gcode}</span>)}
+                    {filter.code.map((gcode,gindex)=><span key={gindex} className={`${getColorCode(gcode)} px-2 py-1 rounded-lg cursor-pointer text-sm text-black/60`} onClick={()=>{fnHandleToggleFilterSubjectCode(gcode)}}> {gcode}</span>)}
                     <span className='w-16 text-center text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm' onClick={()=>{toggleScheduleNameFilter(true)}}>+</span>
                   </span>
                 </div>
