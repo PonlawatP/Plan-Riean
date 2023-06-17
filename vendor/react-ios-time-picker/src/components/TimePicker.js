@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Portal } from 'react-portal';
+import { Portal } from '../../../../node_modules/react-portal';
 import TimePickerSelection from './TimePickerSelection';
 import '../styles/react-ios-time-picker.css';
 
