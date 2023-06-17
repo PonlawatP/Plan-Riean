@@ -33,13 +33,28 @@ export const WebMainReducer = (state:any, action:any) => {
                 case 'SET_FILTER_POPUP':
                   return {
                     ...state,
-                    filter: {...state, popupToggle: action.payload},
+                    filter: {...state.filter, popupToggle: action.payload},
                   };
                   case 'SET_FILTER_DELAY':
                     return {
                       ...state,
-                      filter: {...state, popupDelay: action.payload},
+                      filter: {...state.filter, popupDelay: action.payload},
                     };
+                    case 'SET_FILTER_NAME_POPUP':
+                      return {
+                        ...state,
+                        filter: {...state.filter, popupNameToggle: action.payload},
+                      };
+                      case 'SET_FILTER_TIME_POPUP':
+                        return {
+                          ...state,
+                          filter: {...state.filter, popupTimeToggle: action.payload},
+                        };
+                    case 'ADD_FILTER_DELAY':
+                      return {
+                        ...state,
+                        filter: {...state.filter, popupDelay: state.filter.popupDelay + action.payload},
+                      };
                     case 'SET_DATA_LOADED':
                       return {
                         ...state,

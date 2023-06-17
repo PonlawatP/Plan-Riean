@@ -1,12 +1,13 @@
 'use client'
 import Image from 'next/image'
 import Calendar from '../../components/calendar'
-import { useEffect, useReducer, useRef, useState } from 'react';
+import React from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CardReducer, WebMainReducer } from '../../reducers/webmainred';
 import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import { faArrowUp, faCalendar, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
+import { TimePicker } from '../../vendor/react-ios-time-picker/src';
 
 interface Ifilter {
   firstFilter:boolean,
@@ -262,6 +263,8 @@ export default function Home({props} :any) {
     dataLoaded: false,
     filter: {
       popupToggle: false,
+      popupNameToggle: false,
+      popupTimeToggle: false,
       popupDelay: 0
     }
   };
@@ -290,6 +293,54 @@ export default function Home({props} :any) {
       type: 'SET_FILTER_POPUP',
       payload: status,
     });
+  };
+
+  const toggleScheduleNameFilter = (status:boolean) => {
+    dispatch({
+      type: 'SET_FILTER_NAME_POPUP',
+      payload: status,
+    });
+  };
+
+  const toggleScheduleTimeFilter = (status:boolean) => {
+    dispatch({
+      type: 'SET_FILTER_TIME_POPUP',
+      payload: status,
+    });
+  };
+
+  const [delay_id, setDelay_id] = useState<NodeJS.Timer | number>(-1);
+  const startFilterDelay = (next: () => void) => {
+    dispatch({
+      type: 'SET_FILTER_DELAY',
+      payload: 0,
+    });
+    let i = 1;
+
+    if(typeof delay_id === 'number' && delay_id >= 0){
+      clearInterval(delay_id)
+    }
+    
+    const x = setInterval(()=>{
+      dispatch({
+        type: 'ADD_FILTER_DELAY',
+        payload: 1,
+      });
+      i++;
+      
+      if(i > 4){
+        dispatch({
+          type: 'SET_FILTER_DELAY',
+          payload: -1,
+        });
+        clearInterval(x);
+      } else if(i > 3){
+        next();
+        setDelay_id(-1);
+      }
+    },1000)
+
+    setDelay_id(x);
   };
 
   const toggleDataLoaded = (status:boolean) => {
@@ -467,6 +518,7 @@ export default function Home({props} :any) {
   }
   function SubjectSectCard(props: any){
     const {data} = props;
+
     const cardInitialState = {
       index: 0,
       smooth: false,
@@ -474,35 +526,6 @@ export default function Home({props} :any) {
     };
 
     const [cardState, cardDispatch] = useReducer(CardReducer, cardInitialState);
-
-    // TODO: Next-Phase - swipe to options
-    // const setSlide = (index:number) => {
-    //   cardDispatch({
-    //     type: 'SET_SLIDE_INDEX',
-    //     payload: index,
-    //   });
-    // };
-    // const toggleSmooth = (status:boolean) => {
-    //   cardDispatch({
-    //     type: 'SET_SLIDE_SMOOTH',
-    //     payload: status,
-    //   });
-    // };
-
-    // const handlerSubject = useSwipeable({
-    //   onSwiping: (event) => {
-    //     setSlide(event.deltaX*.15);
-    //   },
-    //   onTouchEndOrOnMouseUp: (event) => {
-    //     setSlide(0)
-    //     toggleSmooth(true)
-    //   },
-    //   onTouchStartOrOnMouseDown: (event) => {
-    //     toggleSmooth(false)
-    //   },
-    // });
-
-    // return <div className={`${cardState.smooth && "smooth-out"} mt-3 h-20 rounded-xl overflow-hidden bg-slate-100 relative border-[2px] border-black/10`} style={{transform: 'translateX('+cardState.index+'px)'}}>
 
     const setStatus = (status:string) => {
       cardDispatch({
@@ -533,14 +556,16 @@ export default function Home({props} :any) {
     const dateData = getSplitedData(data.time);
 
     return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedCard}>
-      <span className="flex absolute left-0 top-0">
-        <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
-          <h3 className='text-center opacity-80'>sec {data.sec}</h3>
+      <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col grid-cols-[auto_5.5rem]">
+        <div className="relative grid grid-flow-col grid-cols-[auto_1fr]">
+          <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
+            <h3 className='text-center opacity-80'>sec {data.sec}</h3>
+          </span>
+          <p className='text-black text-[12px] pt-1 pl-2 overflow-hidden text-ellipsis whitespace-nowrap'>{data.code} {data.name}</p>
+        </div>
+        <span className='pt-1 pr-2 text-sm text-right text-black/40'>
+          รับ {data.receive} ที่นั่ง
         </span>
-        <p className='text-black/40 text-[12px] pt-1 pl-2'>{data.code} {data.name}</p>
-      </span>
-      <span className='absolute top-1 right-2 text-sm text-black/40'>
-        รับ {data.receive} ที่นั่ง
       </span>
       <div className='pt-[1.8rem] pb-1 px-2 w-full text-sm'>
         {data.lecturer.split("-").map((lect:any,lindex:any)=><p key={lindex} className='text-black/40'>{lect}</p>)}
@@ -558,7 +583,12 @@ export default function Home({props} :any) {
       </div>
     </div>
   }
-
+  
+  const SubjectSectCardList = subjectShowData.map((data: any, index: any) => (
+      <div key={index} className={`${index === subjectShowData.length - 1 ? 'mb-3' : ''}`}>
+        <SubjectSectCard data={data} />
+      </div>
+    ));
 // filter
   const [filter, setFilter] = useState<Ifilter>({
       firstFilter: false,
@@ -570,15 +600,17 @@ export default function Home({props} :any) {
 
   const fnHandleChangeFilterType = (type: string) => {
     if(filter.type === type) return;
-    
+
     const temp = {
       ...filter,
       type,
-      firstFilter: true
     }
     setFilter(temp);
-    
-    updateSubjectList(temp);
+
+    // startFilterDelay(()=>{
+    //   updateSubjectList(temp);
+    //   toggleScheduleFilter(false)
+    // });
   }
 
   const fnHandleChangeFilterDate = (date: string, active = false) => {
@@ -592,12 +624,39 @@ export default function Home({props} :any) {
 
     const temp = {
       ...filter,
-      date: temp_date,
-      firstFilter: true
+      date: temp_date
     }
     setFilter(temp);
 
-    updateSubjectList(temp);
+    // startFilterDelay(()=>{
+    //   updateSubjectList(temp);
+    //   toggleScheduleFilter(false)
+    // });
+  }
+  
+  const fnHandleChangeFilterTime = (time: string) => {
+    const r_time = time.split(":").length > 1 ? time.split(":")[0] : time
+    const temp = {
+      ...filter,
+      time: r_time,
+    }
+    setFilter(temp);
+
+    // startFilterDelay(()=>{
+    //   updateSubjectList(temp);
+    //   toggleScheduleFilter(false)
+    // });
+  }
+
+  const fnHandleSendFilterUpdate = () => {
+      updateSubjectList(filter);
+      toggleScheduleFilter(false)
+      
+      const temp = {
+        ...filter,
+        firstFilter: true
+      }
+      setFilter(temp);
   }
 
   const checkFilterDateSelected = (date:string) => {
@@ -669,14 +728,21 @@ export default function Home({props} :any) {
 
   return (
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
-      <div className={`absolute bottom-5 right-6 aspect-square w-12 flex justify-center items-center rounded-full bg-slate-200 shadow-lg z-50 hover:bg-slate-300 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
+      {/* slide up overlay */}
+      <div className={`absolute bottom-5 w-full w-12 flex flex-col gap-6 justify-center items-center rounded-full z-50 pointer-events-none lg:hidden ${state.viewSchedule && "hidden"}`}>
+        {/* <p className={`smooth text-slate-500 pt-4 ${state.webReady ? "opacity-100" : "opacity-0"} ${filter.firstFilter && "hidden"}`}>เลื่อนขึ้นเพื่อดูรายวิชา</p> */}
+        <FontAwesomeIcon className='animate-bounce' icon={faArrowUp} style={{color: "#73787e"}} size={"xl"}/>
+      </div>
+      {/* calendar button */}
+      <div className={`hidden lg:flex absolute bottom-5 right-6 aspect-square w-12 flex justify-center items-center rounded-full bg-slate-200 shadow-lg z-50 hover:bg-slate-300 cursor-pointer ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
         <FontAwesomeIcon icon={faCalendar} style={{color: "#73787e"}}/>
       </div>
 
-      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) toggleScheduleSpectate(false);}} {...handlers}>
+      {/* Summary Calendar section */}
+      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}>
       {/* <div className={`absolute w-full bottom-4 animate-bounce flex justify-center items-center text-slate-500`}> {!state.viewSchedule && "เลื่อนขึ้น"} </div> */}
 
-      {/* Summary Calendar section */}
+      {/* Summary Calendar Component */}
         <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
             <div className="days absolute h-full w-16 z-50 transition-all duration-300" style={{transform: 'translateX(-'+scrolled+'px)'}}>
               <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
@@ -727,10 +793,10 @@ export default function Home({props} :any) {
 
       </div>
 
-    {/* Subject selected Section */}
+      {/* Filter selection Section */}
       <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-65)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
-        <div className="px-5 h-full grid grid-rows-[auto_1fr] relative">
-          <section id="header" className="relative w-full pt-6 pb-2 px-1 flex justify-between border-b-2 border-slate-300/50">
+        <div className="h-full grid grid-rows-[auto_1fr] relative">
+          <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
             <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
               <div className="w-fit">
                 <h1 className='font-bold'>เลือกรายวิชา</h1>
@@ -739,17 +805,19 @@ export default function Home({props} :any) {
             </div>
             <div className="">
               <div className="flex gap-4">
-                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
-                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
+                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
               </div>
             </div>
-            <div className={`absolute top-full left-0 w-full h-fit max-h-[30dvh] overflow-auto pb-6 px-3 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
+            <div className={`absolute top-full left-0 h-1 bg-blue-400 z-20 drop-shadow-md rounded-r-xl shadow-blue-400 transition-opacity lg:hidden smooth`} style={{width: (state.filter.popupDelay == -1 ? 0 : (state.filter.popupDelay/3)*100)+"%"}}>
+            </div>
+            <div className={`absolute top-full left-0 w-full h-fit max-h-[40dvh] overflow-auto pb-6 px-8 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
               <div className="">
                 <div className="pt-6">
                   หมวดหมู่รายวิชา
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${filter.type === gsg.type ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
+                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${filter.type === gsg.type ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
                     {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
                   </span>
                 </div>
@@ -757,7 +825,7 @@ export default function Home({props} :any) {
                   เฉพาะวิชาที่เลือก
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    <span className='w-16 text-center text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span>
+                    <span className='w-16 text-center text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm' onClick={()=>{toggleScheduleNameFilter(true)}}>+</span>
                     {/* {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} className='bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 rounded-lg cursor-pointer text-sm'>หมวด {gsg.type.split("-")[1]}</span>)} */}
                   </span>
                 </div>
@@ -767,20 +835,27 @@ export default function Home({props} :any) {
                   วันที่เรียน
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {name_days.map((item, iin)=><span key={iin} onClick={()=>fnHandleChangeFilterDate(item.date_2, checkFilterDateSelected(item.date_2))} className={`smooth w-16 text-center ${checkFilterDateSelected(item.date_2) ? "bg-slate-700/60 text-white" : "bg-slate-400/30"} lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>{item.date_th}</span>)}
+                    {name_days.map((item, iin)=><span key={iin} onClick={()=>fnHandleChangeFilterDate(item.date_2, checkFilterDateSelected(item.date_2))} className={`smooth w-16 text-center ${checkFilterDateSelected(item.date_2) ? "bg-slate-700/60 text-white" : "bg-slate-400/30"} xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>{item.date_th}</span>)}
                   </span>
                 </div>
-                <div className="pt-6">
+                <div className="py-6">
                   เวลาที่เริ่มเรียน
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    <span className='w-16 text-center bg-slate-400/30 lg:hover:bg-slate-700/60 lg:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>ทั้งหมด</span>
+                    <span className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time == 'total' && "bg-slate-700/60 text-white"}`} onClick={()=>{fnHandleChangeFilterTime("total")}}>ทั้งหมด</span>
+                    <div className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time != 'total' && "bg-slate-700/60 text-white"}`}><TimePicker onChange={fnHandleChangeFilterTime} value={filter.time === 'total' ? undefined : filter.time} placeHolder={"เวลา"} isOpen={state.filter.popupTimeToggle}/></div>
                   </span>
+                  <span >
+                    <p className='text-black/40 pt-2 text-[13px]'>สามารถเลือกกำหนดเวลาเรียนได้ โดยการกดที่ช่อง &quot;เวลา&quot;</p>
+                  </span>
+                </div>
+                <div className='w-full flex justify-end'>
+                  <button className='bg-slate-700 text-white rounded-md py-1 px-8 cursor-pointer' onClick={()=>{fnHandleSendFilterUpdate()}}>คัดกรอง</button>
                 </div>
               </div>
             </div>
           </section>
-          <section id="subjects" className='w-full h-full overflow-y-auto'>
+          <section id="subjects" className={`px-5 w-full h-full overflow-y-auto smooth ${state.filter.popupToggle && "blur-[2px]"}`} style={{opacity: ((state.filter.popupDelay == -1 || state.filter.popupDelay == 3) && state.filter.popupToggle) || delay_id == -1 ? 1 : 1-((state.filter.popupDelay+1)/3)}} onScroll={()=>{if(state.filter.popupToggle) toggleScheduleFilter(false)}} onClick={()=>{if(state.filter.popupToggle) toggleScheduleFilter(false)}}>
             {
             !filter.firstFilter ? 
             <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
@@ -798,11 +873,7 @@ export default function Home({props} :any) {
             </div> 
             :
             subjectShowData.length > 0 ?
-              subjectShowData.map((data, index)=>{
-                return <div key={index} className={`${index == subjectShowData.length-1 ? "mb-3" : ""}`}>
-                  <SubjectSectCard data={data}/>
-                </div>
-              })
+              SubjectSectCardList
             :
             <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
               <FontAwesomeIcon icon={faExclamationCircle} style={{color: "rgb(148 163 184)"}} size='6x'/>
@@ -820,6 +891,27 @@ export default function Home({props} :any) {
         </div>
       </div>
 
+      {/* Name Filter Modal Section */}
+      <div className={`fixed smooth-out flex justify-center items-end w-full h-full ${state.filter.popupNameToggle && "bg-black/20"} z-50 rounded-t-3xl pointer-events-none`}>
+        <div className={`smooth-out overflow-hidden pointer-events-auto fixed rounded-t-3xl w-[96%] h-[62dvh] bg-white ${state.filter.popupNameToggle ? "bottom-0" : "-bottom-full"}`}>
+          <div className="h-full grid grid-rows-[auto_1fr] relative">
+            <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
+              <div className="relative flex gap-6">
+                <div className="w-fit flex items-center">
+                  <h1 className='font-bold'>เลือกรายวิชา</h1>
+                </div>
+              </div>
+              <div className="">
+                <div className="flex gap-4">
+                  <span className='py-2 px-4 rounded-lg bg-slate-200/70 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 cursor-pointer' onClick={()=>toggleScheduleNameFilter(false)}>ถัดไป</span>
+                </div>
+              </div>
+            </section>
+            <section id="subjects" className={`px-5 w-full h-full overflow-y-auto smooth`}>
+            </section>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
