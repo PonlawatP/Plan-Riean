@@ -8,6 +8,7 @@ import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp, faCalendar, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
 import { TimePicker } from '../../vendor/react-ios-time-picker/src';
+import SubjectSelectorFilter from '../../components/modal/subjectSelectorFilter';
 
 interface Ifilter {
   firstFilter:boolean,
@@ -892,26 +893,7 @@ export default function Home({props} :any) {
       </div>
 
       {/* Name Filter Modal Section */}
-      <div className={`fixed smooth-out flex justify-center items-end w-full h-full ${state.filter.popupNameToggle && "bg-black/20"} z-50 rounded-t-3xl pointer-events-none`}>
-        <div className={`smooth-out overflow-hidden pointer-events-auto fixed rounded-t-3xl w-[96%] h-[62dvh] bg-white ${state.filter.popupNameToggle ? "bottom-0" : "-bottom-full"}`}>
-          <div className="h-full grid grid-rows-[auto_1fr] relative">
-            <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
-              <div className="relative flex gap-6">
-                <div className="w-fit flex items-center">
-                  <h1 className='font-bold'>เลือกรายวิชา</h1>
-                </div>
-              </div>
-              <div className="">
-                <div className="flex gap-4">
-                  <span className='py-2 px-4 rounded-lg bg-slate-200/70 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 cursor-pointer' onClick={()=>toggleScheduleNameFilter(false)}>ถัดไป</span>
-                </div>
-              </div>
-            </section>
-            <section id="subjects" className={`px-5 w-full h-full overflow-y-auto smooth`}>
-            </section>
-          </div>
-        </div>
-      </div>
+      <SubjectSelectorFilter state={state} closeBtn={()=>toggleScheduleNameFilter(false)}/>
     </div>
   )
 }
