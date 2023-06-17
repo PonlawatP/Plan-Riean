@@ -933,7 +933,7 @@ export default function Home({props} :any) {
                     {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
                   </span>
                   <span className={`${filter.code.length == 0 && "hidden"}`}>
-                    <p className='text-black/70 pt-2 text-[13px]'>หากเลือกเฉพาะวิชา จะไม่สามารถเลือกหมวดหมู่ได้</p>
+                    <p className='text-black/70 pt-2 text-[13px]'>หากเลือกเฉพาะวิชา จะไม่สามารถเลือกหมวดหมู่รายวิชาได้</p>
                   </span>
                 </div>
                 <div className="pt-6">
