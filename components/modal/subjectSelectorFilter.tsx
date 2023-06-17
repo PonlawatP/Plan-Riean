@@ -1,5 +1,5 @@
 "use client"
-export default function SubjectSelectorFilter(props:any){
+export default function SubjectSelectorFilter(props){
     const {
         state,
         closeBtn = () => {}

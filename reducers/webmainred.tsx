@@ -45,6 +45,16 @@ export const WebMainReducer = (state:any, action:any) => {
                         ...state,
                         filter: {...state.filter, popupNameToggle: action.payload},
                       };
+                      case 'SET_FILTER_NAME_HEADER':
+                        return {
+                          ...state,
+                          filter: {...state.filter, popupNameHeader: action.payload},
+                        };
+                        case 'SET_FILTER_NAME_DESC':
+                          return {
+                            ...state,
+                            filter: {...state.filter, popupNameDesc: action.payload},
+                          };
                       case 'SET_FILTER_TIME_POPUP':
                         return {
                           ...state,

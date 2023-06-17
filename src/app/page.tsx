@@ -6,7 +6,7 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CardReducer, WebMainReducer } from '../../reducers/webmainred';
 import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faCalendar, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faCalendar, faCircle, faCircleDot, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
 import { TimePicker } from '../../vendor/react-ios-time-picker/src';
 import SubjectSelectorFilter from '../../components/modal/subjectSelectorFilter';
 
@@ -282,6 +282,8 @@ export default function Home({props} :any) {
   const toggleScheduleSpectate = (status:boolean) => {
     if(!status){
       toggleScheduleFilter(false);
+      toggleScheduleNameFilter(false)
+      toggleScheduleTimeFilter(false)
     }
     dispatch({
       type: 'SET_SCHEDULE_TOGGLE',
@@ -726,6 +728,40 @@ export default function Home({props} :any) {
       </div>
     )
   }
+// Subject Name Filter
+  const fnHandleFilterSubjectSelected = (e:any) => {
+    const subjectsRect = e.target.getBoundingClientRect();
+    const childs = e.target.childNodes;
+
+    // console.log(e);
+    childs.forEach((cd)=>{
+      const typeRect = cd.getBoundingClientRect();
+
+      // Check if "type-ge-1" element reaches the top of "subjects" element
+      if (typeRect.top <= subjectsRect.top) {
+        const header = cd.children[0].children[0].textContent
+        const desc = cd.children[0].children[1].textContent
+
+        setScheduleNameFilterHeader(header);
+        setScheduleNameFilterDescription(desc);
+        // console.log('now is group: ' + header + " - " + desc);
+      }
+    })
+  }
+
+  const setScheduleNameFilterHeader = (msg:string) => {
+    dispatch({
+      type: 'SET_FILTER_NAME_HEADER',
+      payload: msg,
+    });
+  };
+
+  const setScheduleNameFilterDescription = (msg:string) => {
+    dispatch({
+      type: 'SET_FILTER_NAME_DESC',
+      payload: msg,
+    });
+  };
 
   return (
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
@@ -810,8 +846,6 @@ export default function Home({props} :any) {
                 <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
               </div>
             </div>
-            <div className={`absolute top-full left-0 h-1 bg-blue-400 z-20 drop-shadow-md rounded-r-xl shadow-blue-400 transition-opacity lg:hidden smooth`} style={{width: (state.filter.popupDelay == -1 ? 0 : (state.filter.popupDelay/3)*100)+"%"}}>
-            </div>
             <div className={`absolute top-full left-0 w-full h-fit max-h-[40dvh] overflow-auto pb-6 px-8 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
               <div className="">
                 <div className="pt-6">
@@ -893,7 +927,188 @@ export default function Home({props} :any) {
       </div>
 
       {/* Name Filter Modal Section */}
-      <SubjectSelectorFilter state={state} closeBtn={()=>toggleScheduleNameFilter(false)}/>
+      <div className={`fixed smooth-out flex justify-center items-end w-full h-full ${state.filter.popupNameToggle && "bg-black/20"} z-50 rounded-t-3xl pointer-events-none`}>
+            <div className={`smooth-out overflow-hidden pointer-events-auto fixed rounded-t-3xl w-[96%] h-[62dvh] bg-white ${state.filter.popupNameToggle ? "bottom-0" : "-bottom-full"}`}>
+            <div className="h-full grid grid-rows-[auto_1fr] relative">
+                <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
+                  <div className="relative flex gap-6">
+                      <div className="w-fit flex items-center">
+                      <h1 className='font-bold'>เลือกรายวิชา</h1>
+                      </div>
+                  </div>
+                  <div className="">
+                      <div className="flex gap-4">
+                      <span className='py-2 px-4 rounded-lg bg-slate-200/70 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 cursor-pointer' onClick={()=>toggleScheduleNameFilter(false)}>ถัดไป</span>
+                      </div>
+                  </div>
+                  <div className={`absolute top-full left-0 w-full h-fit max-h-[40dvh] overflow-auto sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-y-2 border-slate-300/30 smooth`}>
+                    <article className="pt-2 pb-2 px-5">
+                        <h1 className="font-bold">{state.filter.popupNameHeader}</h1>
+                        <p className="text-sm">{state.filter.popupNameDesc}</p>
+                    </article>
+                  </div>
+                </section>
+                <section id="subjects" onScroll={fnHandleFilterSubjectSelected} className={`px-5 w-full h-full overflow-y-auto smooth relative`}>
+                    <section id="type-ge-1">
+                        <article className="pt-4 pb-2">
+                            <h1 className="font-bold">หมวดหมู่ที่ 1</h1>
+                            <p className="text-sm">ชื่อหมวดหมู่วิชา</p>
+                        </article>
+                            <div className="border-b-2 border-slate-100 bg-green-200 rounded-md">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircleDot} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100 bg-green-200 rounded-md">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircleDot} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                    </section>
+                    <section id="type-ge-2">
+                        <article className="pt-4 pb-2 border-b-2 border-slate-200">
+                            <h1 className="font-bold">หมวดหมู่ที่ 2</h1>
+                            <p className="text-sm">ชื่อหมวดหมู่วิชา</p>
+                        </article>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-orange-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                            <div className="border-b-2 border-slate-100">
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className='text-blue-400' icon={faCircle} />
+                                  <p>0041001 - วิชาทดสอบ</p>
+                                </button>
+                            </div>
+                    </section>
+                </section>
+            </div>
+            </div>
+        </div>
     </div>
   )
 }
