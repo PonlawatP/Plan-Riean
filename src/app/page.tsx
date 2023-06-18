@@ -418,8 +418,9 @@ export default function Home({props} :any) {
     }
     
     toggleScheduleSpectate(true);
-    console.log((9+x).toString().padStart(2, "0")+":00");
-    fnHandleChangeFilterTime((9+x).toString().padStart(2, "0")+":00")
+
+    // TODO: filter real time
+    // fnHandleChangeFilterTime((9+x).toString().padStart(2, "0")+":00")
   }
   const fnHandleClickedOnFilter = () => {
     if(state.filter.popupToggle){
@@ -703,6 +704,17 @@ export default function Home({props} :any) {
       setFilter(temp);
   }
 
+  const fnHandleClearFilter = () => {
+    const temp = {
+      firstFilter: false,
+      type: "",
+      code: [],
+      date: [],
+      time: "total"
+    }
+    setFilter(temp);
+  }
+
   const checkFilterDateSelected = (date:string) => {
     return filter.date.includes(date)
   }
@@ -875,19 +887,25 @@ export default function Home({props} :any) {
 
   return (
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
+      {/* introduce */}
+      <div className={`smooth absolute w-full top-3 left-3 z-50 ${state.viewSchedule ? "opacity-0 pointer-events-none" : ""}`}>
+        <p className='text-black/40'>เวอร์ชั่นทดสอบ 0.1.1</p>
+        <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a>
+      </div>
       {/* slide up overlay */}
-      <div className={`absolute bottom-5 w-full w-12 flex flex-col gap-6 justify-center items-center rounded-full z-50 pointer-events-none lg:hidden ${state.viewSchedule && "hidden"}`}>
-        {/* <p className={`smooth text-slate-500 pt-4 ${state.webReady ? "opacity-100" : "opacity-0"} ${filter.firstFilter && "hidden"}`}>เลื่อนขึ้นเพื่อดูรายวิชา</p> */}
+      <div className={`absolute bottom-5 w-full flex flex-col gap-3 justify-center items-center rounded-full z-50 pointer-events-none lg:hidden ${state.viewSchedule && "hidden"}`}>
+        <p className={`smooth text-slate-500 ${state.webReady ? "opacity-100" : "opacity-0"} ${filter.firstFilter && "hidden"}`}>เลื่อนขึ้นเพื่อดูรายวิชา</p>
         <FontAwesomeIcon className='animate-bounce' icon={faArrowUp} style={{color: "#73787e"}} size={"xl"}/>
       </div>
       {/* calendar button */}
-      <div className={`hidden lg:flex absolute bottom-5 right-6 aspect-square w-12 flex justify-center items-center rounded-full bg-slate-200 shadow-lg z-50 hover:bg-slate-300 cursor-pointer ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
-        <FontAwesomeIcon icon={faCalendar} style={{color: "#73787e"}}/>
+      <div className={`hidden lg:flex justify-center absolute bottom-5 w-full z-50 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
+        <div className="h-12 px-4 flex gap-2 justify-center items-center rounded-2xl shadow-lg bg-slate-200 hover:bg-slate-300 cursor-pointer">
+          <FontAwesomeIcon icon={faCalendar} style={{color: "#73787e"}}/><span className='text-sm text-black/60'>เลือกวิชาเรียน</span>
+        </div>
       </div>
 
       {/* Summary Calendar section */}
       <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}>
-      {/* <div className={`absolute w-full bottom-4 animate-bounce flex justify-center items-center text-slate-500`}> {!state.viewSchedule && "เลื่อนขึ้น"} </div> */}
 
       {/* Summary Calendar Component */}
         <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
@@ -947,12 +965,12 @@ export default function Home({props} :any) {
             <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
               <div className="w-fit">
                 <h1 className='font-bold'>เลือกรายวิชา</h1>
-                <h1 className='text-sm text-black/50'>{getMessageOfFilters()}</h1>
+                <h1 className='text-sm text-black/50 hidden'>{getMessageOfFilters()}</h1>
               </div>
             </div>
             <div className="">
               <div className="flex gap-4">
-                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e", transform: "rotate(0deg)"}}/></span>
+                <span className='p-2 rounded-lg bg-slate-200/70 w-24 h-8 overflow-hidden flex gap-2 justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e"}}/> <span className='text-sm text-black/60'>คัดกรอง</span></span>
                 <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
               </div>
             </div>
@@ -997,7 +1015,10 @@ export default function Home({props} :any) {
                     <p className='text-black/40 pt-2 text-[13px]'>สามารถเลือกกำหนดเวลาเรียนได้ โดยการกดที่ช่อง &quot;เวลา&quot;</p>
                   </span>
                 </div>
-                <div className='w-full flex justify-end'>
+                <div className='w-full flex justify-end gap-4'>
+                  <div className='border-2 border-black/20 rounded-md overflow-hidden'>
+                    <button className='bg-white hover:bg-black/10 text-black/60 py-1 px-8 cursor-pointer' onClick={()=>{fnHandleClearFilter()}}>ล้าง</button>
+                  </div>
                   <button className='bg-slate-700 text-white rounded-md py-1 px-8 cursor-pointer' onClick={()=>{fnHandleSendFilterUpdate()}}>คัดกรอง</button>
                 </div>
               </div>

@@ -12,8 +12,8 @@ config.autoAddCss = false;
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Long Riean',
-  description: 'มาลงเรียนกันเถอะ',
+  title: 'Plan Riean',
+  description: 'มาวางแผนการเรียนกันเถอะ',
 }
 
 export default function RootLayout({
