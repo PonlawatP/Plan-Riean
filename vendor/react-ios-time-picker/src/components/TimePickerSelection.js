@@ -21,7 +21,7 @@ function TimePickerSelection({
 }) {
    const initialTimeValue = use12Hours ? initialValue.slice(0, 5) : initialValue;
    const [value, setValue] = useState(
-      initialValue === null ? pickerDefaultValue : initialTimeValue,
+      initialValue === '' ? pickerDefaultValue : initialTimeValue,
    );
    const [hourFormat, setHourFormat] = useState({
       mount: false,
@@ -92,9 +92,6 @@ function TimePickerSelection({
                }}
             />
             <HourWheel {...params} />
-            {seperator && <div className="react-ios-time-picker-colon">:</div>}
-            <MinuteWheel {...params} />
-            {use12Hours && <HourFormat {...params} />}
          </div>
       </div>
    );

@@ -122,7 +122,7 @@ function HourWheel({ height, value, setValue, use12Hours }) {
                if (finalValue > height) finalValue = height;
             } else {
                if (finalValue < height * -69) finalValue = height * -69;
-               if (finalValue > height * 2) finalValue = height * 2;
+               if (finalValue > height) finalValue = height;
             }
 
             mainListRef.current.style.transform = `translateY(${finalValue}px)`;
@@ -135,8 +135,10 @@ function HourWheel({ height, value, setValue, use12Hours }) {
                if (finalValue > height) finalValue = height;
             } else {
                if (finalValue < height * -69) finalValue = height * -69;
-               if (finalValue > height * 2) finalValue = height * 2;
+               if (finalValue > height) finalValue = height;
             }
+            
+
             mainListRef.current.style.transform = `translateY(${finalValue}px)`;
             setCurrentTranslatedValue(finalValue);
          }
@@ -171,6 +173,9 @@ function HourWheel({ height, value, setValue, use12Hours }) {
 
    // handle click to select number
    const handleClickToSelect = (e) => {
+      setCursorPosition(0);
+      setDragDuration(0)
+
       if (cursorPosition === 0) {
          setCurrentTranslatedValue(parseInt(e.target.dataset.translatedValue));
       }
@@ -236,7 +241,7 @@ function HourWheel({ height, value, setValue, use12Hours }) {
                      onClick={handleClickToSelect}
                      data-translated-value={hourObj.translatedValue}
                   >
-                     {hourObj.number}
+                     {hourObj.number} : 00
                   </div>
                </div>
             ))}

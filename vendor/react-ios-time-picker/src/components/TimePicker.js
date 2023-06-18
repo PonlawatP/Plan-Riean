@@ -1,11 +1,12 @@
+'use client'
 import React, { useEffect, useState } from 'react';
 import { Portal } from '../../../../node_modules/react-portal';
 import TimePickerSelection from './TimePickerSelection';
 import '../styles/react-ios-time-picker.css';
 
 function TimePicker({
-   value = "null",
-   cellHeight = 28,
+   value = "",
+   cellHeight = 26,
    placeHolder = 'Select Time',
    pickerDefaultValue = '10:00',
    onChange = (time) => {},
@@ -28,11 +29,12 @@ function TimePicker({
    inputClassName = null,
 }) {
 
-   let initialValue = value === "null" ? null : value;
-
    const [isOpen, setIsOpen] = useState(initialIsOpenValue);
    const [height, setHeight] = useState(cellHeight);
-   const [inputValue, setInputValue] = useState(initialValue);
+
+   function setInputValue(val){
+      value = val;
+   }
 
    const handleClick = () => {
       setIsOpen(!isOpen);
@@ -43,11 +45,11 @@ function TimePicker({
       onOpen();
    };
 
-   let finalValue = inputValue;
+   let finalValue = value;
 
-   if (initialValue === null && use12Hours) {
+   if (value === "" && use12Hours) {
       finalValue = `${pickerDefaultValue} AM`;
-   } else if (initialValue === null && !use12Hours) {
+   } else if (value === "" && !use12Hours) {
       finalValue = pickerDefaultValue;
    }
 
@@ -75,7 +77,7 @@ function TimePicker({
                id={id}
                name={name}
                className={`react-ios-time-picker-input ${inputClassName || ''}`}
-               value={inputValue === null ? '' : inputValue}
+               value={value === '' ? '' : value+":00"}
                type="text"
                placeholder={placeHolder}
                readOnly

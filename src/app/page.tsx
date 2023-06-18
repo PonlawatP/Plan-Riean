@@ -51,17 +51,14 @@ async function getData(filter:Ifilter, signal:any) {
   return res.json()
 }
 
-async function getGroupOfSubjectData(filter:Ifilter, signal:any) {
+async function getGroupOfSubjectData(group:string, signal:any) {
   const requestOptions = {
-    method: 'POST',
+    method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ...filter
-    }),
     signal
   };
 
-  const res = await fetch('api/Filter', requestOptions)
+  const res = await fetch('api/seccount/'+group , requestOptions)
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
  
@@ -169,6 +166,7 @@ export default function Home({props} :any) {
   const [my_plan, setPlan] = useState<any>({0: {data: []}}); //TODO: use useReducer
   const [subjectData, setSubjectData] = useState([]);
   const [subjectShowData, setSubjectShowData] = useState([]);
+  const [subjectGroupData, setSubjectGroupData] = useState<any>({});
 
   function fnHandleScrollCalendar(e:any){
     const scr = e.target.scrollLeft;
@@ -306,7 +304,9 @@ export default function Home({props} :any) {
       popupToggle: false,
       popupNameToggle: false,
       popupTimeToggle: false,
-      popupDelay: 0
+      popupDelay: 0,
+      popupNameHeader: "",
+      popupNameDesc: "",
     }
   };
 
@@ -408,10 +408,9 @@ export default function Home({props} :any) {
     }
 
     setWebReady(true);
-
     return (()=>{})
   },[])
-
+  
   const fnHandleClickedOnCalendar = (x:number, y:number) => {
     if(state.viewSchedule){
       toggleScheduleSpectate(false);
@@ -419,6 +418,8 @@ export default function Home({props} :any) {
     }
     
     toggleScheduleSpectate(true);
+    console.log((9+x).toString().padStart(2, "0")+":00");
+    fnHandleChangeFilterTime((9+x).toString().padStart(2, "0")+":00")
   }
   const fnHandleClickedOnFilter = () => {
     if(state.filter.popupToggle){
@@ -733,6 +734,38 @@ export default function Home({props} :any) {
       abortController = null; // Reset the abortController variable
     }
   }
+  let abortSubjController:any;
+  async function updateSubjectGroupList() {
+    if (abortSubjController) {
+      // If there is an ongoing request, cancel it
+      abortSubjController.abort();
+    }
+  
+    abortSubjController = new AbortController(); // Create a new AbortController instance
+  
+    try {
+      let res_data = {...subjectGroupData};
+
+      await ge_subject_group_name.forEach((ge, index)=>{
+        getGroupOfSubjectData(ge.type, abortSubjController.signal).then(res=>{
+          setSubjectGroupData(prev=>({...prev, [index]: res}));
+          // console.log(subjectGroupData);
+        })
+      })
+
+    } catch (error:any) {
+      if (error.name === 'AbortError') {
+        // Request was aborted, handle cancellation as needed
+        console.log('Request was cancelled.');
+        return;
+      }
+  
+      // Handle other errors
+      console.error('An error occurred:', error);
+    } finally {
+      abortSubjController = null; // Reset the abortController variable
+    }
+  }
 
 // user storage
   const updateUserStorage = () => {
@@ -941,7 +974,7 @@ export default function Home({props} :any) {
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
                     {filter.code.map((gcode,gindex)=><span key={gindex} className={`${getColorCode(gcode)} px-2 py-1 rounded-lg cursor-pointer text-sm text-black/60`} onClick={()=>{fnHandleToggleFilterSubjectCode(gcode)}}> {gcode}</span>)}
-                    <span className='w-16 text-center text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm' onClick={()=>{toggleScheduleNameFilter(true)}}>+</span>
+                    <span className='w-16 text-center text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm' onClick={()=>{toggleScheduleNameFilter(true); updateSubjectGroupList()}}>+</span>
                   </span>
                 </div>
               </div>
@@ -958,7 +991,7 @@ export default function Home({props} :any) {
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
                     <span className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time == 'total' && "bg-slate-700/60 text-white"}`} onClick={()=>{fnHandleChangeFilterTime("total")}}>ทั้งหมด</span>
-                    <div className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time != 'total' && "bg-slate-700/60 text-white"}`}><TimePicker onChange={fnHandleChangeFilterTime} value={filter.time === 'total' ? undefined : filter.time} placeHolder={"เวลา"} isOpen={state.filter.popupTimeToggle}/></div>
+                    <div className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time != 'total' && "bg-slate-700/60 text-white"}`}><TimePicker onChange={fnHandleChangeFilterTime} value={filter.time === 'total' ? '' : filter.time} placeHolder={"เวลา"} isOpen={state.filter.popupTimeToggle}/></div>
                   </span>
                   <span >
                     <p className='text-black/40 pt-2 text-[13px]'>สามารถเลือกกำหนดเวลาเรียนได้ โดยการกดที่ช่อง &quot;เวลา&quot;</p>
@@ -995,7 +1028,7 @@ export default function Home({props} :any) {
               <div className="pt-8 text-center">
                 ไม่มีข้อมูล
               </div>
-            </div> 
+            </div>
             }
             {/* {subjectData.map((data, index)=>{
               return <div key={index} className={`${index == subjectData.length-1 ? "mb-3" : ""}`}>
@@ -1021,7 +1054,7 @@ export default function Home({props} :any) {
                       <span className='py-2 px-4 rounded-lg bg-slate-200/70 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 cursor-pointer' onClick={()=>toggleScheduleNameFilter(false)}>ถัดไป</span>
                       </div>
                   </div>
-                  <div className={`absolute top-full left-0 w-full h-fit max-h-[40dvh] overflow-auto sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-y-2 border-slate-300/30 smooth`}>
+                  <div className={`absolute top-full left-0 w-full h-[4rem] overflow-auto grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-y-2 border-slate-300/30 smooth ${state.filter.popupNameHeader == '' ? "hidden" : "sm:grid"}`}>
                     <article className="pt-2 pb-2 px-5">
                         <h1 className="font-bold">{state.filter.popupNameHeader}</h1>
                         <p className="text-sm">{state.filter.popupNameDesc}</p>
@@ -1036,7 +1069,15 @@ export default function Home({props} :any) {
                               <h1 className="font-bold">หมวดหมู่ที่ {sgn.code.substring(3,4)}</h1>
                               <p className="text-sm">{sgn.name}</p>
                           </article>
-                              <div className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains("0041001") && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode("0041001")}} >
+                          {subjectGroupData[sgnindex]?.map((sjg, sjindex)=>
+                            <div key={sjindex} className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains(sjg.code) && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode(sjg.code)}} >
+                              <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
+                                <p>{sjg.code} - {sjg.name}</p>
+                              </button>
+                            </div>
+                          )}
+                              {/* <div className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains("0041001") && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode("0041001")}} >
                                   <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
                                     <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
                                     <p>0041001 - ทดสอบคลิก</p>
@@ -1053,7 +1094,7 @@ export default function Home({props} :any) {
                                     <FontAwesomeIcon className={`${getTextColorCode(sgn.code)} opacity-60`} icon={faCircleDot} />
                                     <p>0041001 - วิชาเลือกเรียน</p>
                                   </button>
-                              </div>
+                              </div> */}
                       </section>
                     )
                   }

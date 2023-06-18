@@ -34,35 +34,21 @@ export const initialNumbersValue = (heightValue = 54, numbersLength = 24, value 
             continue;
          }
          if (index === 1 && j === value) {
-            if (j.toString().length === 1) {
                arrayOfSelectedValue.push({
-                  number: `0${j.toString()}`,
+                  number: j.toString().padStart(2,"0"),
                   translatedValue: `-${count}`,
                   selected: true,
                });
-            } else {
-               arrayOfSelectedValue.push({
-                  number: j.toString(),
-                  translatedValue: `-${count}`,
-                  selected: true,
-               });
-            }
             count += heightValue;
             continue;
          }
-         if (j.toString().length === 1) {
+         
             arrayOfSelectedValue.push({
-               number: `0${j.toString()}`,
+               number: j.toString().padStart(2,"0"),
                translatedValue: `-${count}`,
                selected: false,
             });
-         } else {
-            arrayOfSelectedValue.push({
-               number: j.toString(),
-               translatedValue: `-${count}`,
-               selected: false,
-            });
-         }
+         
 
          count += heightValue;
       }
@@ -90,19 +76,13 @@ export const returnSelectedValue = (heightValue = 54, numbersLength = 24) => {
          if ((index === 0 && j < 2) || (numbersLength === 13 && j === 0)) {
             continue;
          }
-         if (j.toString().length === 1) {
+         
             arrayOfSelectedValue.push({
-               number: `0${j.toString()}`,
+               number: j.toString().padStart(2,"0"),
                translatedValue: `-${count}`,
                selected: false,
             });
-         } else {
-            arrayOfSelectedValue.push({
-               number: j.toString(),
-               translatedValue: `-${count}`,
-               selected: false,
-            });
-         }
+         
 
          count += heightValue;
       }
