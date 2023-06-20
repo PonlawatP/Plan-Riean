@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
+
+console.log(process.env.API_SUBJECT_DATABASE)
+
 const nextConfig = {
     async rewrites() {
       return [
         {
           source: '/api/:path*',
-          destination: 'https://hilarious-crab-sheath-dress.cyclic.app/:path*'
+          destination: process.env.API_SUBJECT_DATABASE + '/:path*'
         },
       ]
     }}
