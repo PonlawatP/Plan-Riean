@@ -53,12 +53,32 @@ async function getData(filter:Ifilter, signal:any) {
 
 async function getGroupOfSubjectData(group:string, signal:any) {
   const requestOptions = {
-    method: 'GET',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal
   };
 
   const res = await fetch('api/seccount/'+group , requestOptions)
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+ 
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error('Failed to fetch data')
+  }
+ 
+  return res.json()
+}
+
+async function getUpdatedData(signal:any) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal
+  };
+
+  const res = await fetch('api/updated/' , requestOptions)
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
  
@@ -166,6 +186,7 @@ export default function Home({props} :any) {
   const [my_plan_index, setPlanIndex] = useState(0); //TODO: use useReducer
   const [my_plan, setPlan] = useState<any>({0: {data: []}}); //TODO: use useReducer
   const [subjectData, setSubjectData] = useState([]);
+  const [subjectUpdatedData, setSubjectUpdatedData] = useState("none");
   const [subjectShowData, setSubjectShowData] = useState([]);
   const [subjectGroupData, setSubjectGroupData] = useState<any>({});
 
@@ -422,7 +443,7 @@ export default function Home({props} :any) {
 
     // TODO: filter real time
     fnHandleChangeFilterDate(name_days[y].date_2)
-    fnHandleChangeFilterTime((9+x).toString().padStart(2, "0")+":00")
+    fnHandleChangeFilterTime((8+x).toString().padStart(2, "0")+":00")
     toggleScheduleFilter(true)
   }
   const fnHandleClickedOnFilter = () => {
@@ -609,14 +630,11 @@ export default function Home({props} :any) {
           <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
             <h3 className='text-center opacity-80'>sec {data.sec}</h3>
           </span>
-          {/* {data.note.trim() !== "" &&
+          {data.note.trim() !== "" && data.note.includes("+") &&
             (
-              data.note.includes("+") ?
               <FontAwesomeIcon className='pl-2 pt-1' icon={faLock} style={{color: "#73787e"}}/>
-              :
-              <FontAwesomeIcon className='pl-2 pt-1' icon={faCircleExclamation} style={{color: "#73787e"}}/>
             )
-          } */}
+          }
           <p className='text-black text-[12px] pt-1 pl-2 overflow-hidden text-ellipsis whitespace-nowrap'>{data.code} {data.name}</p>
         </div>
         <span className={`pt-1 pr-2 text-sm text-right ${data.remain > 10 ? "text-black/40" : data.remain != 0 ? "text-orange-600" : "text-red-700"}`}>
@@ -624,6 +642,9 @@ export default function Home({props} :any) {
         </span>
       </span>
       <div className='pt-[1.8rem] pb-1 px-2 w-full text-sm'>
+        {data.note.trim() !== "" && (
+          <p className='text-slate-700/40 text-[10px]'>{data.note.trim()}</p>
+        )}
         {data.lecturer.split("-").map((lect:any,lindex:any)=><p key={lindex} className='text-black/40'>{lect}</p>)}
         <div className="">
           {dateData.map((date,dateindex)=>
@@ -736,6 +757,7 @@ export default function Home({props} :any) {
     return filter.date.includes(date)
   }
   let abortController:any;
+  let abortUpdateController:any;
   async function updateSubjectList(check_filt: Ifilter) {
     if (abortController) {
       // If there is an ongoing request, cancel it
@@ -749,6 +771,17 @@ export default function Home({props} :any) {
       const res = await getData(check_filt, abortController.signal); // Pass the signal to the getData function
   
       setSubjectShowData(res);
+
+      abortUpdateController = new AbortController(); // Create a new AbortController instance
+      await getUpdatedData(abortUpdateController.signal).then(res=> {
+        
+        if (abortUpdateController) {
+          // If there is an ongoing request, cancel it
+          abortUpdateController.abort();
+        }
+
+        setSubjectUpdatedData(res);
+      });
     } catch (error:any) {
       if (error.name === 'AbortError') {
         // Request was aborted, handle cancellation as needed
@@ -763,6 +796,7 @@ export default function Home({props} :any) {
       abortController = null; // Reset the abortController variable
     }
   }
+
   let abortSubjController:any;
   async function updateSubjectGroupList() {
     if (abortSubjController) {
@@ -773,7 +807,6 @@ export default function Home({props} :any) {
     abortSubjController = new AbortController(); // Create a new AbortController instance
   
     try {
-      let res_data = {...subjectGroupData};
 
       await ge_subject_group_name.forEach((ge, index)=>{
         getGroupOfSubjectData(ge.type, abortSubjController.signal).then(res=>{
@@ -952,7 +985,7 @@ export default function Home({props} :any) {
                       <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
 
                             <div className={`relative h-full p-1 group`} style={{width: "100%"}}>
-                              <div onClick={()=>fnHandleClickedOnCalendar(dindex,tindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
+                              <div onClick={()=>fnHandleClickedOnCalendar(tindex,dindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
                                 <p className='text-sm'>กดเพื่อดูรายวิชา</p>
                               </div>
                             </div>
@@ -982,7 +1015,8 @@ export default function Home({props} :any) {
             <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
               <div className="w-fit">
                 <h1 className='font-bold'>เลือกรายวิชา</h1>
-                <h1 className='text-sm text-black/50 hidden'>{getMessageOfFilters()}</h1>
+                <h1 className={`text-sm text-black/50 ${subjectUpdatedData === "none" && "hidden"}`}>อัพเดตล่าสุด: {subjectUpdatedData}</h1>
+                {/* <h1 className='text-sm text-black/50 hidden'>{getMessageOfFilters()}</h1> */}
               </div>
             </div>
             <div className="">
