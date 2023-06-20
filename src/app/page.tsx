@@ -1002,6 +1002,9 @@ export default function Home({props} :any) {
                   <span className={`${filter.code.length == 0 && "hidden"}`}>
                     <p className='text-black/70 pt-2 text-[13px]'>หากเลือกเฉพาะวิชา จะไม่สามารถเลือกหมวดหมู่รายวิชาได้</p>
                   </span>
+                  <span className={`${(filter.code.length != 0 || filter.date.length != 0) && "hidden"}`}>
+                    <p className='text-black/40 pt-2 text-[13px]'>หากเลือกเฉพาะหมวดหมู่รายวิชาอย่างเดียว เว็บจะช้ามาก</p>
+                  </span>
                 </div>
                 <div className="pt-6">
                   เฉพาะวิชาที่เลือก
