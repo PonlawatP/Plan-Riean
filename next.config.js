@@ -4,7 +4,7 @@ const nextConfig = {
       return [
         {
           source: '/api/:path*',
-          destination: 'https://real-blue-antelope-tie.cyclic.app/:path*'
+          destination: 'https://hilarious-crab-sheath-dress.cyclic.app/:path*'
         },
       ]
     }}
