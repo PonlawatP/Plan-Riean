@@ -6,13 +6,13 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CardReducer, WebMainReducer } from '../../reducers/webmainred';
 import { useSwipeable } from 'react-swipeable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faCalendar, faCircle, faCircleDot, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faCalendar, faCircle, faCircleDot, faCircleExclamation, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faLock, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
 import { TimePicker } from '../../vendor/react-ios-time-picker/src';
 import SubjectSelectorFilter from '../../components/modal/subjectSelectorFilter';
 
 interface Ifilter {
   firstFilter:boolean,
-  type:string,
+  type:Array<string>,
   code:Array<string>,
   date:Array<string>,
   time:string
@@ -420,7 +420,9 @@ export default function Home({props} :any) {
     toggleScheduleSpectate(true);
 
     // TODO: filter real time
-    // fnHandleChangeFilterTime((9+x).toString().padStart(2, "0")+":00")
+    fnHandleChangeFilterDate(name_days[y].date_2)
+    fnHandleChangeFilterTime((9+x).toString().padStart(2, "0")+":00")
+    toggleScheduleFilter(true)
   }
   const fnHandleClickedOnFilter = () => {
     if(state.filter.popupToggle){
@@ -601,15 +603,23 @@ export default function Home({props} :any) {
     const dateData = getSplitedData(data.time);
 
     return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedCard}>
-      <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col grid-cols-[auto_5.5rem]">
+      <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col">
         <div className="relative grid grid-flow-col grid-cols-[auto_1fr]">
           <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
             <h3 className='text-center opacity-80'>sec {data.sec}</h3>
           </span>
+          {/* {data.note.trim() !== "" &&
+            (
+              data.note.includes("+") ?
+              <FontAwesomeIcon className='pl-2 pt-1' icon={faLock} style={{color: "#73787e"}}/>
+              :
+              <FontAwesomeIcon className='pl-2 pt-1' icon={faCircleExclamation} style={{color: "#73787e"}}/>
+            )
+          } */}
           <p className='text-black text-[12px] pt-1 pl-2 overflow-hidden text-ellipsis whitespace-nowrap'>{data.code} {data.name}</p>
         </div>
-        <span className='pt-1 pr-2 text-sm text-right text-black/40'>
-          รับ {data.receive} ที่นั่ง
+        <span className={`pt-1 pr-2 text-sm text-right ${data.remain > 10 ? "text-black/40" : data.remain != 0 ? "text-orange-600" : "text-red-700"}`}>
+        {data.remain}/{data.receive} ที่นั่ง
         </span>
       </span>
       <div className='pt-[1.8rem] pb-1 px-2 w-full text-sm'>
@@ -637,18 +647,24 @@ export default function Home({props} :any) {
 // filter
   const [filter, setFilter] = useState<Ifilter>({
       firstFilter: false,
-      type: "",
+      type: [],
       code: [],
       date: [],
       time: "total"
     });
 
   const fnHandleChangeFilterType = (type: string) => {
-    if(filter.type === type) return;
+    let temp_type:Array<string> = filter.type;
+
+    if(temp_type.includes(type)){
+      temp_type = temp_type.filter(subj => subj !== type)
+    } else {
+      temp_type.push(type)
+    }
 
     const temp = {
       ...filter,
-      type,
+      type: temp_type
     }
     setFilter(temp);
 
@@ -707,7 +723,7 @@ export default function Home({props} :any) {
   const fnHandleClearFilter = () => {
     const temp = {
       firstFilter: false,
-      type: "",
+      type: [],
       code: [],
       date: [],
       time: "total"
@@ -865,7 +881,7 @@ export default function Home({props} :any) {
 
     const temp = {
       ...filter,
-      type: temp_code.length == 0 ? "" : filter.type,
+      type: temp_code.length == 0 ? [] : filter.type,
       code: temp_code
     }
     setFilter(temp);
@@ -889,7 +905,7 @@ export default function Home({props} :any) {
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
       {/* introduce */}
       <div className={`smooth absolute w-full top-3 left-3 z-50 ${state.viewSchedule ? "opacity-0 pointer-events-none" : ""}`}>
-        <p className='text-black/40'>เวอร์ชั่นทดสอบ 0.1.1</p>
+        <p className='text-black/40'>เวอร์ชั่นทดสอบ 0.1.2</p>
         <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a>
       </div>
       {/* slide up overlay */}
@@ -980,7 +996,7 @@ export default function Home({props} :any) {
                   หมวดหมู่รายวิชา
 
                   <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${(filter.code.length == 0 && filter.type === gsg.type) || checkGroupCodes(gsg.code) ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg ${filter.code.length > 0 ? "pointer-events-none" : "cursor-pointer"} text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
+                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${(filter.code.length == 0 && filter.type.includes(gsg.type)) || checkGroupCodes(gsg.code) ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg ${filter.code.length > 0 ? "pointer-events-none" : "cursor-pointer"} text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
                     {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
                   </span>
                   <span className={`${filter.code.length == 0 && "hidden"}`}>
@@ -1033,6 +1049,7 @@ export default function Home({props} :any) {
                 ยังไม่ได้เลือกการกรองข้อมูล
                 <br />
                 โปรดคัดกรองข้อมูลก่อน
+                <p className='underline cursor-pointer hover:text-slate-600 active:text-slate-700' onClick={fnHandleClickedOnFilter}>คัดกรองข้อมูล</p>
               </div>
             </div> 
             :
@@ -1048,6 +1065,7 @@ export default function Home({props} :any) {
               <FontAwesomeIcon icon={faExclamationCircle} style={{color: "rgb(148 163 184)"}} size='6x'/>
               <div className="pt-8 text-center">
                 ไม่มีข้อมูล
+                <p className='underline cursor-pointer hover:text-slate-600 active:text-slate-700' onClick={fnHandleClickedOnFilter}>คัดกรองใหม่</p>
               </div>
             </div>
             }
