@@ -72,6 +72,7 @@ async function getGroupOfSubjectData(group:string, signal:any) {
 }
 
 export default function Home({props} :any) {
+  const app_version = "0.1.3"
   const ge_subject_group_name = [
     {
       type: "GE-1",
@@ -905,7 +906,7 @@ export default function Home({props} :any) {
     <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
       {/* introduce */}
       <div className={`smooth absolute w-full top-3 left-3 z-50 ${state.viewSchedule ? "opacity-0 pointer-events-none" : ""}`}>
-        <p className='text-black/40'>เวอร์ชั่นทดสอบ 0.1.2</p>
+        <p className='text-black/40'>เวอร์ชั่นทดสอบ {app_version}</p>
         <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a>
       </div>
       {/* slide up overlay */}
