@@ -585,46 +585,32 @@ export default function Home({props} :any) {
       </div>
     </div>
   }
+  
+
+  const fnHandleClickedSubjectCard = (data:any) => {
+    // if already had subject in schedule
+    if(checkSubjectSchedule(data)){
+      removeSubjectFromPlan(data)
+      return
+    }
+
+    if(checkSubjectCollapsed(data)){
+      return
+    }
+
+    // add new subject
+    const old_plan = getCurrentPlan();
+    old_plan.data.push(data);
+    const updated = {[my_plan_index]: old_plan}
+    setPlan((prev:any) => ({...prev, ...updated}))
+    updateUserStorage();
+  }
   function SubjectSectCard(props: any){
     const {data} = props;
 
-    const cardInitialState = {
-      index: 0,
-      smooth: false,
-      status: "not-select"
-    };
-
-    const [cardState, cardDispatch] = useReducer(CardReducer, cardInitialState);
-
-    const setStatus = (status:string) => {
-      cardDispatch({
-        type: 'SET_SLIDE_FOCUS',
-        payload: status,
-      });
-    };
-
-    const fnHandleClickedCard = () => {
-      // if already had subject in schedule
-      if(checkSubjectSchedule(data)){
-        removeSubjectFromPlan(data)
-        return
-      }
-
-      if(checkSubjectCollapsed(data)){
-        return
-      }
-
-      // add new subject
-      const old_plan = getCurrentPlan();
-      old_plan.data.push(data);
-      const updated = {[my_plan_index]: old_plan}
-      setPlan((prev:any) => ({...prev, ...updated}))
-      updateUserStorage();
-    }
-
     const dateData = getSplitedData(data.time);
 
-    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedCard}>
+    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedSubjectCard(data)}>
       <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col">
         <div className="relative grid grid-flow-col grid-cols-[auto_1fr]">
           <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
@@ -835,30 +821,23 @@ export default function Home({props} :any) {
     localStorage.setItem("plans", JSON.stringify(my_plan));
   }
 
-  const ScheduleCard = (props:any) => {
-    const {data, time} = props
-    // const [clicked, setClicked] = useState(false);
+  function fnHandleClickedOnScheduleCard(data){
+    // setClicked(!clicked)
+    if(!state.viewSchedule) removeSubjectFromPlan(data)
+  }
 
-    function fnHandleClickedOnScheduleCard(){
-      // setClicked(!clicked)
-      if(!state.viewSchedule) removeSubjectFromPlan(data)
-    }
+  const ScheduleCard = (props:any) => {
+    const {data, time, position} = props
+    // const [clicked, setClicked] = useState(false);
 
     return (
       <div className="absolute w-full h-full">
 
         <div className={`relative h-full z-40 p-2 group`} style={{width: (calculateScale(time)*100)+"%"}}>
-          <div onClick={fnHandleClickedOnScheduleCard} className={`z-10 relative cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
+          <div onClick={fnHandleClickedOnScheduleCard(data)} className={`z-10 relative cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
             <p className='text-sm'>({data.credit.split(" ")[0].trim()}) {data.code} sec {data.sec}</p>
             <p className='pt-3 text-sm'>{getTimeRange(time)}</p>
           </div>
-          {/* <div className={`smooth absolute left-0 ${clicked ? "bottom-full pointer-events-none" : "bottom-1/3 opacity-0"} w-full h-12 flex justify-center`}>
-            <div className="bg-white rounded-md h-full aspect-square shadow-md p-1 pointer-events-auto border-2 border-black/10">
-              <div className="smooth bg-red-500 hover:bg-red-600 rounded-md h-full aspect-square shadow-sm cursor-pointer flex justify-center items-center border-2 border-black/10">
-              x
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     )
@@ -997,7 +976,7 @@ export default function Home({props} :any) {
                     {getCurrentPlan().data.map((data:any,dataindex:any)=>{
                       return getSplitedData(data.time).map((split_date, spindex)=>{
                         return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
-                        <ScheduleCard key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
+                        <ScheduleCard position={{x:tindex, y:dindex}} key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
                         : null
                       })
                     })}
