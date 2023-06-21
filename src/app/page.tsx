@@ -610,7 +610,7 @@ export default function Home({props} :any) {
 
     const dateData = getSplitedData(data.time);
 
-    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={fnHandleClickedSubjectCard(data)}>
+    return <div className={`mt-3 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-slate-100 relative border-[2px] cursor-pointer ${checkSubjectSchedule(data) ? "border-green-400/90 shadow-green-400/40 shadow-md" : "border-black/10"} ${checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? "opacity-40 brightness-75" : "opacity-100 brightness-100"}`} onClick={()=>{fnHandleClickedSubjectCard(data)}}>
       <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col">
         <div className="relative grid grid-flow-col grid-cols-[auto_1fr]">
           <span className='w-16 border-b-2 border-r-2 border-black/20 rounded-br-xl bg-slate-500 text-white/90'>
