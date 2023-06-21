@@ -645,7 +645,7 @@ export default function Home({props} :any) {
         {data.note.trim() !== "" && (
           <p className='text-slate-700/40 text-[10px]'>{data.note.trim()}</p>
         )}
-        {data.lecturer.split("-").map((lect:any,lindex:any)=><p key={lindex} className='text-black/40'>{lect}</p>)}
+        {data.lecturer.split(" / ").map((lect:any,lindex:any)=><p key={lindex} className='text-black/40'>{lect}</p>)}
         <div className="">
           {dateData.map((date,dateindex)=>
             <span key={dateindex} className='flex gap-4 items-center pt-1 relative'>
