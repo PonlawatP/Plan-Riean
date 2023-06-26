@@ -1,3 +1,20 @@
+export const initWebReducerState = {
+  webReady: false,
+  viewSchedule: false,
+  subjectViewType: "subject",
+  swipedLocated: 0,
+  scrollableIndex: 0,
+  dataLoaded: false,
+  filter: {
+    popupToggle: false,
+    popupNameToggle: false,
+    popupTimeToggle: false,
+    popupDelay: 0,
+    popupNameHeader: "",
+    popupNameDesc: "",
+  }
+};
+
 export const WebMainReducer = (state:any, action:any) => {
   switch (action.type) {
     case 'SET_WEB_READY':
@@ -75,24 +92,69 @@ export const WebMainReducer = (state:any, action:any) => {
   }
 };
 
-export const CardReducer = (state:any, action:any) => {
-  switch (action.type) {
-    case 'SET_SLIDE_INDEX':
-      return {
-        ...state,
-        index: action.payload,
-      };
-      case 'SET_SLIDE_SMOOTH':
-        return {
-          ...state,
-          smooth: action.payload,
-        };
-        case 'SET_SLIDE_STATUS':
-            return {
-              ...state,
-              status: action.payload,
-            };
-    default:
-      return state;
+export const WebMainFunctions = (dispatch: (payload: any) => void) => {
+  const setWebReady = (status:boolean) => {
+    dispatch({
+      type: 'SET_WEB_READY',
+      payload: status,
+    });
+  };
+
+  const toggleScheduleFilter = (status:boolean) => {
+    dispatch({
+      type: 'SET_FILTER_POPUP',
+      payload: status,
+    });
+  };
+
+  const toggleScheduleNameFilter = (status:boolean) => {
+    dispatch({
+      type: 'SET_FILTER_NAME_POPUP',
+      payload: status,
+    });
+  };
+
+  const toggleScheduleTimeFilter = (status:boolean) => {
+    dispatch({
+      type: 'SET_FILTER_TIME_POPUP',
+      payload: status,
+    });
+  };
+
+  const toggleScheduleSpectate = (status:boolean) => {
+    if(!status){
+      toggleScheduleFilter(false);
+      toggleScheduleNameFilter(false)
+      toggleScheduleTimeFilter(false)
+    }
+    dispatch({
+      type: 'SET_SCHEDULE_TOGGLE',
+      payload: status,
+    });
+  };
+
+  const toggleDataLoaded = (status:boolean) => {
+    dispatch({
+      type: 'SET_DATA_LOADED',
+      payload: status
+    });
+  };
+
+  const setSwipeLocation = (locate:number) => {
+    dispatch({
+      type: 'SET_SWIPED_LOCATE',
+      payload: locate*.08,
+    });
+  };
+  
+  //returns
+  return {
+    setWebReady,
+    toggleScheduleFilter,
+    toggleScheduleNameFilter,
+    toggleScheduleTimeFilter,
+    toggleScheduleSpectate,
+    toggleDataLoaded,
+    setSwipeLocation,
   }
-};
+}
