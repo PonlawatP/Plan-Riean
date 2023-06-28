@@ -91,97 +91,7 @@ async function getUpdatedData(signal:any) {
   return res.json()
 }
 
-export default function Home({props} :any) {
-  const app_version = "0.1.3"
-  const ge_subject_group_name = [
-    {
-      type: "GE-1",
-      code: "0041",
-      name: "ทักษะการเรียนรู้ตลอดชีวิต",
-      detail: {
-        forced: 3,
-        opened: 21,
-        sub: 2
-      }
-    },
-    {
-      type: "GE-2",
-      code: "0042",
-      name: "คุณภาพชีวิตและสิ่งแวดล้อม",
-      detail: {
-        forced: 3,
-        opened: 21,
-        sub: 2
-      }
-    },
-    {
-      type: "GE-3",
-      code: "0043",
-      name: "นวัตกรรมและการสร้างสรรค์",
-      detail: {
-        forced: 3,
-        opened: 21,
-        sub: 2
-      }
-    },
-    {
-      type: "GE-4",
-      code: "0044",
-      name: "พลเมืองเข้มแข็ง",
-      detail: {
-        forced: 3,
-        opened: 21,
-        sub: 2
-      }
-    },
-    {
-      type: "GE-5",
-      code: "0045",
-      name: "วิถีสังคม",
-      detail: {
-        forced: 3,
-        opened: 21,
-        sub: 2
-      }
-    }
-  ];
-  const name_days = [
-    {
-      date_th: "จันทร์",
-      date_3: "Mon",
-      date_2: "Mo",
-      date_1: "M",
-    },
-    {
-      date_th: "อังคาร",
-      date_3: "Tue",
-      date_2: "Tu",
-      date_1: "t",
-    },
-    {
-      date_th: "พุธ",
-      date_3: "Wed",
-      date_2: "We",
-      date_1: "W",
-    },
-    {
-      date_th: "พฤหัสฯ",
-      date_3: "Thu",
-      date_2: "Th",
-      date_1: "Th",
-    },
-    {
-      date_th: "ศุกร์",
-      date_3: "Fri",
-      date_2: "Fr",
-      date_1: "F",
-    }
-  ];
-
-
-  const times_m = [8,9,10,11,12,13,14,15,16,17,18,19];
-
-  const [scrolled, setScrolled] = useState(0);
+export default function HomeMoving({props} :any) {
 
   const [my_plan_index, setPlanIndex] = useState(0); //TODO: use useReducer
   const [my_plan, setPlan] = useState<any>({0: {data: []}}); //TODO: use useReducer
@@ -190,15 +100,6 @@ export default function Home({props} :any) {
   const [subjectShowData, setSubjectShowData] = useState([]);
   const [subjectGroupData, setSubjectGroupData] = useState<any>({});
 
-  function fnHandleScrollCalendar(e:any){
-    const scr = e.target.scrollLeft;
-    if(scr < 40){
-      setScrolled(0)
-    } else {
-      setScrolled(38)
-    }
-    // console.log(e.target.scrollLeft/(e.target.scrollWidth-e.target.offsetWidth))
-  }
 
   const calculateScale = (str:string) => {
     const timeRange = str.match(/\d{2}:\d{2}-\d{2}:\d{2}/);

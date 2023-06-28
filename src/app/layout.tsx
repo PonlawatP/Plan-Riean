@@ -1,5 +1,4 @@
 import './globals.scss'
-import { Inter } from 'next/font/google'
 // import Font Awesome CSS
 import "@fortawesome/fontawesome-svg-core/styles.css"; 
 
@@ -8,8 +7,6 @@ import Head from 'next/head';
 // Tell Font Awesome to skip adding the CSS automatically 
 // since it's already imported above
 config.autoAddCss = false; 
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Plan Riean',
@@ -23,7 +20,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="HandheldFriendly" content="true" />
+      </Head>
+      <body>{children}</body>
     </html>
   )
 }

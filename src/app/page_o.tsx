@@ -91,7 +91,7 @@ async function getUpdatedData(signal:any) {
   return res.json()
 }
 
-export default function Home({props} :any) {
+export default function HomeOld({props} :any) {
   const app_version = "0.1.3"
   const ge_subject_group_name = [
     {
