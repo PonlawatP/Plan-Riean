@@ -246,19 +246,6 @@ export default function HomeMoving({props} :any) {
     return (()=>{})
   },[])
 
-  const fnHandleClickedOnCalendar = (x:number, y:number) => {
-    if(state.viewSchedule){
-      toggleScheduleSpectate(false);
-      return
-    }
-    
-    toggleScheduleSpectate(true);
-
-    // TODO: filter real time
-    fnHandleChangeFilterDate(name_days[y].date_2)
-    fnHandleChangeFilterTime((8+x).toString().padStart(2, "0")+":00")
-    toggleScheduleFilter(true)
-  }
   const fnHandleClickedOnFilter = () => {
     if(state.filter.popupToggle){
       toggleScheduleFilter(false);
@@ -486,27 +473,6 @@ export default function HomeMoving({props} :any) {
     const temp = {
       ...filter,
       type: temp_type
-    }
-    setFilter(temp);
-
-    // startFilterDelay(()=>{
-    //   updateSubjectList(temp);
-    //   toggleScheduleFilter(false)
-    // });
-  }
-
-  const fnHandleChangeFilterDate = (date: string, active = false) => {
-    let temp_date:Array<string> = filter.date;
-
-    if(active){
-      temp_date = temp_date.filter(idate => idate !== date)
-    } else {
-      temp_date.push(date)
-    }
-
-    const temp = {
-      ...filter,
-      date: temp_date
     }
     setFilter(temp);
 

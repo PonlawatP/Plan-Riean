@@ -12,6 +12,13 @@ export const initWebReducerState = {
     popupDelay: 0,
     popupNameHeader: "",
     popupNameDesc: "",
+    data: {
+      firstFilter: false,
+      type: [],
+      code: [],
+      date: [],
+      time: "total"
+    }
   }
 };
 
@@ -82,11 +89,46 @@ export const WebMainReducer = (state:any, action:any) => {
                         ...state,
                         filter: {...state.filter, popupDelay: state.filter.popupDelay + action.payload},
                       };
-                    case 'SET_DATA_LOADED':
-                      return {
-                        ...state,
-                        dataLoaded: action.payload,
-                      };
+                      case 'SET_DATA_LOADED':
+                        return {
+                          ...state,
+                          dataLoaded: action.payload,
+                        };
+                        case 'SET_FILTERDATA_FIRST':
+                          return {
+                            ...state,
+                            filter: {...state.filter, data: {...state.filter.data, firstFilter: action.payload}},
+                          };
+                          case 'SET_FILTERDATA_TYPE':
+                            return {
+                              ...state,
+                              filter: {...state.filter, data: {...state.filter.data, type: action.payload}},
+                            };
+                            case 'SET_FILTERDATA_DODE':
+                              return {
+                                ...state,
+                                filter: {...state.filter, data: {...state.filter.data, code: action.payload}},
+                              };
+                              case 'SET_FILTERDATA_DATE_TOGGLE':
+                                let temp_date:Array<string> = state.filter.data.date;
+
+                                if(action.payload.active){
+                                  temp_date = temp_date.filter(idate => idate !== action.payload.date)
+                                } else {
+                                  temp_date.push(action.payload.date)
+                                }
+
+                                return {
+                                  ...state,
+                                  filter: {...state.filter, data: {...state.filter.data, date: temp_date}},
+                                };
+                                case 'SET_FILTERDATA_TIME':
+                                  const r_time = action.payload.split(":").length > 1 ? action.payload.split(":")[0] : action.payload
+                                  
+                                  return {
+                                    ...state,
+                                    filter: {...state.filter, data: {...state.filter.data, time: r_time}},
+                                  };
     default:
       return state;
   }
@@ -145,7 +187,7 @@ export const WebMainFunctions = (dispatch: (payload: any) => void) => {
       type: 'SET_SWIPED_LOCATE',
       payload: locate*.08,
     });
-  };
+  }
   
   //returns
   return {
@@ -156,5 +198,30 @@ export const WebMainFunctions = (dispatch: (payload: any) => void) => {
     toggleScheduleSpectate,
     toggleDataLoaded,
     setSwipeLocation,
+    ...WebFilterFunctions(dispatch)
+  }
+}
+
+const WebFilterFunctions = (dispatch: (payload: any) => void) => {
+  const filterChangeDate = (date: string, active = false) => {
+    dispatch({
+      type: 'SET_FILTERDATA_DATE_TOGGLE',
+      payload: {
+        active,
+        date
+      },
+    });
+  }
+
+  const filterChangeTime = (time: string) => {
+    dispatch({
+      type: 'SET_FILTERDATA_TIME',
+      payload: time,
+    });
+  }
+
+  return {
+    filterChangeDate,
+    filterChangeTime
   }
 }

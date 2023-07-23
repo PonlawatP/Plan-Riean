@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { name_days, times_m } from '../helpers/global_variables';
+import { getDayIndex, getHourIndex } from '@/helpers/globalFn';
+import ScheduleCard from './cards/scheduleCard';
 
 export default function CalendarView(props) {
   const {state, fnState} = props;
@@ -28,6 +30,19 @@ export default function CalendarView(props) {
 
     // console.log(e.target.scrollLeft/(e.target.scrollWidth-e.target.offsetWidth))
   }
+  const fnHandleClickedOnCalendar = (x:number, y:number) => {
+    // if(state.viewSchedule){
+    //   fnState.toggleScheduleSpectate(false);
+    //   return
+    // }
+    
+    fnState.toggleScheduleSpectate(true);
+
+    // TODO: filter real time
+    fnState.filterChangeDate(name_days[y].date_2)
+    fnState.filterChangeTime((8+x).toString().padStart(2, "0")+":00")
+    fnState.toggleScheduleFilter(true)
+  }
 
   // handlering for swipable
   const swipeHandlers = useSwipeable({
@@ -49,9 +64,10 @@ export default function CalendarView(props) {
   return (
     <>
       {/* Summary Calendar section */}
-      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {fnState.toggleScheduleSpectate(false); fnState.toggleScheduleNameFilter(false); fnState.toggleScheduleTimeFilter(false); }}} {...swipeHandlers}>
+      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] lg:w-full lg:h-[100dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {fnState.toggleScheduleSpectate(false); fnState.toggleScheduleNameFilter(false); fnState.toggleScheduleTimeFilter(false); }}} {...swipeHandlers}>
       {/* Summary Calendar Component */}
-        <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 border-slate-200 shadow-2xl backdrop-blur-md`}>
+
+        <div className={`calendar-container overflow-clip rounded-2xl absolute ${state.viewSchedule ? "w-min scale-[.24] sm:scale-[.5] lg:scale-100 lg:w-11/12" : "w-11/12 smooth-out"} max-w-min border-2 border-slate-200 shadow-2xl backdrop-blur-md`}>
             
             <div className="days absolute h-full w-16 z-50 transition-all duration-200 ease-out" style={{transform: 'translateX(-'+scrolled+'px)'}}>
               <div className="border-b-2 border-black/5 "><p className='invisible py-2'>a</p></div>
@@ -63,12 +79,11 @@ export default function CalendarView(props) {
             <div className="header-day relative overflow-x-auto w-auto" onScroll={fnHandleScrollCalendar} onScrollCapture={fnHandleScrollCalendar}>
 
               <div className="days absolute h-full w-16 ">
-              <div className="border-b-2 border-black/5 bg-yellow-400"><p className='invisible py-2'>a</p></div>
+                <div className="border-b-2 border-black/5 bg-yellow-400"><p className='invisible py-2'>a</p></div>
               </div>
 
               <div className="pl-16 inline-flex ">
                   {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-24 py-2 pl-3 border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950/40'>{time.toString().padStart(2, '0')}:00</span>)}
-                  {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
               </div>
 
               {name_days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex bg-white/60">
@@ -79,30 +94,14 @@ export default function CalendarView(props) {
                       <div className="absolute w-full h-full" key={"dt-"+dindex+":"+tindex}>
 
                         <div className={`relative h-full z-40 p-2`} style={{width: "200%"}}>
-                          <div className={`cursor-pointer h-full w-full p-1 group`} onClick={()=>alert("Test -> " + d.date_th + " " + (tindex+8).toString().padStart(2, "0") + ":00" + " - " + (tindex+9).toString().padStart(2, "0") + ":00")}>
-                          {/* <div className={`cursor-pointer h-full w-full p-1`} onClick={()=>state.fnHandleClickedOnCalendar(tindex,dindex)}> */}
+                          {/* <div className={`cursor-pointer h-full w-full p-1 group`} onClick={()=>alert("Test -> " + d.date_th + " " + (tindex+8).toString().padStart(2, "0") + ":00" + " - " + (tindex+9).toString().padStart(2, "0") + ":00")}> */}
+                          <div className={`cursor-pointer h-full w-full p-1 group`} onClick={()=>fnHandleClickedOnCalendar(tindex,dindex)}>
                             <div className={`rounded-lg border-2 border-white/25 text-white/95 bg-black/40 text-center shadow-md w-full h-full flex items-center justify-center opacity-0 transition-all duration-500 ${!state.viewSchedule && "group-hover:opacity-100"} group-hover:duration-100`}>
                               <p className='text-sm'>กดเพื่อดูรายวิชา</p>
                             </div>
                           </div>
-                          {/* <div onClick={()=>{state.fnHandleClickedOnCalendar(tindex,dindex)}} className={`z-10 relative cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md hover:text-white/95 ${getColorCode(data.code)} transition-all duration-200`}>
-                            <p className='text-sm'>({data.credit.split(" ")[0].trim()}) {data.code} sec {data.sec}</p>
-                            <p className='pt-3 text-sm'>{getTimeRange(time)}</p>
-                          </div> */}
                         </div>
                       </div>
-                      // <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
-
-                      //       <div className={`relative h-full p-1 group`} style={{width: "200%"}}
-                      //        >
-                      //         <div className={`cursor-pointer h-full w-full p-1`} onClick={()=>state.fnHandleClickedOnCalendar(tindex,dindex)}>
-                      //           <div className={`rounded-lg border-2 border-white/25 text-white/95 bg-black/40 text-center shadow-md w-full h-full flex items-center justify-center opacity-0 transition-all duration-500 ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
-                      //             <p className='text-sm'>กดเพื่อดูรายวิชา</p>
-                      //           </div>
-                      //         </div>
-                      //       </div>
-
-                      // </div>
                     }
 
                     {/* schedule data to show */}
@@ -117,7 +116,6 @@ export default function CalendarView(props) {
               </div>)}
             </div>
         </div>
-
       </div>
     </>
   );
