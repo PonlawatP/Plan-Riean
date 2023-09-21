@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: planriean_db_uat
+    environment:
+      POSTGRES_DB: planriean_uat
+      POSTGRES_USER: myplan
+      POSTGRES_PASSWORD: My7Ho!c3
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    external: true

@@ -188,7 +188,9 @@ export const WebMainFunctions = (dispatch: (payload: any) => void) => {
       payload: locate*.08,
     });
   }
-  
+
+  const isMobile = false;
+
   //returns
   return {
     setWebReady,
@@ -198,6 +200,7 @@ export const WebMainFunctions = (dispatch: (payload: any) => void) => {
     toggleScheduleSpectate,
     toggleDataLoaded,
     setSwipeLocation,
+    isMobile,
     ...WebFilterFunctions(dispatch)
   }
 }

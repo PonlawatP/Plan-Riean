@@ -64,7 +64,7 @@ export default function CalendarView(props) {
   return (
     <>
       {/* Summary Calendar section */}
-      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] lg:w-full lg:h-[100dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {fnState.toggleScheduleSpectate(false); fnState.toggleScheduleNameFilter(false); fnState.toggleScheduleTimeFilter(false); }}} {...swipeHandlers}>
+      <div className={`smooth-out w-full h-[100dvh] ${state.viewSchedule ? "overflow-hidden" : ""} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {fnState.toggleScheduleSpectate(false); fnState.toggleScheduleNameFilter(false); fnState.toggleScheduleTimeFilter(false); }}} {...swipeHandlers}>
       {/* Summary Calendar Component */}
 
         <div className={`calendar-container overflow-clip rounded-2xl absolute ${state.viewSchedule ? "w-min scale-[.24] sm:scale-[.5] lg:scale-100 lg:w-11/12" : "w-11/12 smooth-out"} max-w-min border-2 border-slate-200 shadow-2xl backdrop-blur-md`}>
