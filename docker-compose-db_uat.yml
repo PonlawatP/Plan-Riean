@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   postgres:
+    profiles:
+      - posgres
     image: postgres:latest
     container_name: planriean_db_uat
     environment:
@@ -10,6 +12,15 @@ services:
       POSTGRES_PASSWORD: My7Ho!c3
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  nginx:
+    profiles:
+      - nginx
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    container_name: nginx-proxy
 
 volumes:
   postgres_data:
