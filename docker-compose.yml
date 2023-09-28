@@ -21,6 +21,8 @@ services:
     image: nginx_custom:latest
     restart: unless-stopped
     container_name: nginx-proxy
+    ports:
+      - "80:80"
     networks:
       - planriean
 
@@ -30,4 +32,3 @@ volumes:
 
 networks:
   planriean:
-    external: true
