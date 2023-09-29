@@ -28,8 +28,8 @@ services:
     networks:
       - planriean
     volumes_from:
-      - vnmsuapi-1
-      - vnmsuapi-2
+      - container:vnmsuapi-1
+      - container:vnmsuapi-2
 
 volumes:
   postgres_data:
