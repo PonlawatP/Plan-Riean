@@ -27,12 +27,6 @@ services:
       VIRTUAL_HOST: "*.lvh.me"
     networks:
       - planriean
-    depends_on:
-      - vnmsuapi-1
-      - vnmsuapi-2
-    volumes_from:
-      - vnmsuapi-1
-      - vnmsuapi-2
 
 volumes:
   postgres_data:
