@@ -32,6 +32,8 @@ services:
       - container:vnmsuapi-2
 
 volumes:
+  vnmsuapi-1:
+  vnmsuapi-2:
   postgres_data:
     external: true
 
