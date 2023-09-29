@@ -27,13 +27,14 @@ services:
       VIRTUAL_HOST: "*.lvh.me"
     networks:
       - planriean
+    depends_on:
+      - vnmsuapi-1
+      - vnmsuapi-2
     volumes_from:
-      - container:vnmsuapi-1
-      - container:vnmsuapi-2
+      - vnmsuapi-1
+      - vnmsuapi-2
 
 volumes:
-  vnmsuapi-1:
-  vnmsuapi-2:
   postgres_data:
     external: true
 
