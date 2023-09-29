@@ -5,7 +5,9 @@ services:
     profiles:
       - posgres
     image: postgres:latest
-    container_name: planriean_db_uat
+    container_name: planriean_db
+    hostname: planriean_db
+    domainname: dev
     environment:
       POSTGRES_DB: planriean_uat
       POSTGRES_USER: myplan
