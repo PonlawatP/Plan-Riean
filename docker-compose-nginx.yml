@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - planriean
+    volumes:
+      - "/etc/nginx/vhost.d"
+      - "/usr/share/nginx/html"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "nginx_certs:/etc/nginx/certs:rw"
+  h1:
+    build:
+    context: ./docker/nginx/
+    dockerfile: Dockerfile
+    networks:
+      - planriean
+    volumes_from:
+      - data
+    environment:
+      VIRTUAL_HOST: www.host1.com
+
+volumes:
+  postgres_data:
+    external: true
+
+networks:
+  planriean:
