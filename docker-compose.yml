@@ -26,7 +26,7 @@ services:
     ports:
       - "80:80"
     environment:
-      VIRTUAL_HOST: "*.lvh.me"
+      VIRTUAL_HOST: "lvh.me,*.lvh.me"
     networks:
       - planriean
 
