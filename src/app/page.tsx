@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp, faCalendar, faCircle, faCircleDot, faCircleExclamation, faCirclePlus, faClose, faExclamationCircle, faFilter, faLayerGroup, faLock, faPaperPlane, faPaperclip, faPencil, faSpinner, faWind } from '@fortawesome/free-solid-svg-icons';
 import { TimePicker } from '../../vendor/react-ios-time-picker/src';
 import SubjectSelectorFilter from '../../components/modal/subjectSelectorFilter';
+import { GoogleAnalytics } from 'nextjs-google-analytics';
 
 interface Ifilter {
   firstFilter:boolean,
@@ -915,249 +916,252 @@ export default function Home({props} :any) {
   }
 
   return (
-    <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
-      {/* introduce */}
-      <div className={`smooth absolute w-full top-3 left-3 z-50 ${state.viewSchedule ? "opacity-0 pointer-events-none" : ""}`}>
-        <p className='text-black/40'>เวอร์ชั่นทดสอบ {app_version}</p>
-        <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a>
-      </div>
-      {/* slide up overlay */}
-      <div className={`absolute bottom-5 w-full flex flex-col gap-3 justify-center items-center rounded-full z-50 pointer-events-none lg:hidden ${state.viewSchedule && "hidden"}`}>
-        <p className={`smooth text-slate-500 ${state.webReady ? "opacity-100" : "opacity-0"} ${filter.firstFilter && "hidden"}`}>เลื่อนขึ้นเพื่อดูรายวิชา</p>
-        <FontAwesomeIcon className='animate-bounce' icon={faArrowUp} style={{color: "#73787e"}} size={"xl"}/>
-      </div>
-      {/* calendar button */}
-      <div className={`hidden lg:flex justify-center absolute bottom-5 w-full z-50 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
-        <div className="h-12 px-4 flex gap-2 justify-center items-center rounded-2xl shadow-lg bg-slate-200 hover:bg-slate-300 cursor-pointer">
-          <FontAwesomeIcon icon={faCalendar} style={{color: "#73787e"}}/><span className='text-sm text-black/60'>เลือกวิชาเรียน</span>
+    <>
+      <GoogleAnalytics strategy="lazyOnload" trackPageViews={true} />
+      <div className={`transition-all duration-1000 w-full h-full relative ${state.viewSchedule ? "bg-black/70" : "bg-slate-300"}`}>
+        {/* introduce */}
+        <div className={`smooth absolute w-full top-3 left-3 z-50 ${state.viewSchedule ? "opacity-0 pointer-events-none" : ""}`}>
+          <p className='text-black/40'>เวอร์ชั่นทดสอบ {app_version}</p>
+          <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a>
         </div>
-      </div>
+        {/* slide up overlay */}
+        <div className={`absolute bottom-5 w-full flex flex-col gap-3 justify-center items-center rounded-full z-50 pointer-events-none lg:hidden ${state.viewSchedule && "hidden"}`}>
+          <p className={`smooth text-slate-500 ${state.webReady ? "opacity-100" : "opacity-0"} ${filter.firstFilter && "hidden"}`}>เลื่อนขึ้นเพื่อดูรายวิชา</p>
+          <FontAwesomeIcon className='animate-bounce' icon={faArrowUp} style={{color: "#73787e"}} size={"xl"}/>
+        </div>
+        {/* calendar button */}
+        <div className={`hidden lg:flex justify-center absolute bottom-5 w-full z-50 ${state.viewSchedule && "hidden"}`} onClick={()=>toggleScheduleSpectate(true)}>
+          <div className="h-12 px-4 flex gap-2 justify-center items-center rounded-2xl shadow-lg bg-slate-200 hover:bg-slate-300 cursor-pointer">
+            <FontAwesomeIcon icon={faCalendar} style={{color: "#73787e"}}/><span className='text-sm text-black/60'>เลือกวิชาเรียน</span>
+          </div>
+        </div>
 
-      {/* Summary Calendar section */}
-      <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}>
+        {/* Summary Calendar section */}
+        <div className={`smooth-out ${state.viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}>
 
-      {/* Summary Calendar Component */}
-        <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
-            <div className="days absolute h-full w-16 z-50 transition-all duration-300" style={{transform: 'translateX(-'+scrolled+'px)'}}>
-              <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
-                {name_days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < name_days.length && "border-b-2"} border-white/10`}>
-                  <p className='transition-all duration-300 pl-4 text-white' style={{opacity: 1-(scrolled/38)}}>{d.date_3}</p>
-                  <p className='transition-all duration-300 pl-[2.55rem] text-white absolute' style={{opacity: scrolled/38}}>{d.date_1}</p>
+        {/* Summary Calendar Component */}
+          <div className={`calendar-container overflow-hidden rounded-2xl ${state.viewSchedule ? "absolute w-min scale-[.24] sm:scale-[.5]" : "relative w-11/12 smooth-out"} xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}>
+              <div className="days absolute h-full w-16 z-50 transition-all duration-300" style={{transform: 'translateX(-'+scrolled+'px)'}}>
+                <div className="border-b-2 border-black/5 "><p className='opacity-0 py-2'>a</p></div>
+                  {name_days.map((d,dindex)=><div key={dindex} className={`bg-slate-700 h-20 flex items-center shadow-lg ${dindex+1 < name_days.length && "border-b-2"} border-white/10`}>
+                    <p className='transition-all duration-300 pl-4 text-white' style={{opacity: 1-(scrolled/38)}}>{d.date_3}</p>
+                    <p className='transition-all duration-300 pl-[2.55rem] text-white absolute' style={{opacity: scrolled/38}}>{d.date_1}</p>
+                  </div>)}
+              </div>
+              <div className="header-day relative overflow-x-auto w-auto" onScroll={fnHandleScrollCalendar} onScrollCapture={fnHandleScrollCalendar}>
+
+                <div className="days absolute h-full w-16 ">
+                <div className="border-b-2 border-black/5 bg-yellow-400"><p className='opacity-0 py-2'>a</p></div>
+                </div>
+
+                <div className="pl-16 inline-flex ">
+                    {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-24 py-2 pl-3 border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950/40'>{time.toString().padStart(2, '0')}:00</span>)}
+                    {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
+                </div>
+
+                {name_days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
+                    {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < name_days.length && "border-b-2"} border-black/5`}>
+                      <p className='opacity-0'>{dindex}:{tindex}</p>
+                      {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
+                      {state.webReady &&
+                        <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
+
+                              <div className={`relative h-full p-1 group`} style={{width: "100%"}}>
+                                <div onClick={()=>fnHandleClickedOnCalendar(tindex,dindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
+                                  <p className='text-sm'>กดเพื่อดูรายวิชา</p>
+                                </div>
+                              </div>
+
+                        </div>
+                      }
+
+                      {/* schedule data to show */}
+                      {getCurrentPlan().data.map((data:any,dataindex:any)=>{
+                        return getSplitedData(data.time).map((split_date, spindex)=>{
+                          return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
+                          <ScheduleCard position={{x:tindex, y:dindex}} key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
+                          : null
+                        })
+                      })}
+                    </span>)}
                 </div>)}
-            </div>
-            <div className="header-day relative overflow-x-auto w-auto" onScroll={fnHandleScrollCalendar} onScrollCapture={fnHandleScrollCalendar}>
-
-              <div className="days absolute h-full w-16 ">
-              <div className="border-b-2 border-black/5 bg-yellow-400"><p className='opacity-0 py-2'>a</p></div>
               </div>
+          </div>
 
-              <div className="pl-16 inline-flex ">
-                  {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-24 py-2 pl-3 border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950/40'>{time.toString().padStart(2, '0')}:00</span>)}
-                  {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
+        </div>
+
+        {/* Filter selection Section */}
+        <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-65)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
+          <div className="h-full grid grid-rows-[auto_1fr] relative">
+            <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
+              <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
+                <div className="w-fit">
+                  <h1 className='font-bold'>เลือกรายวิชา</h1>
+                  <h1 className={`text-sm text-black/50 ${subjectUpdatedData === "none" && "hidden"}`}>อัพเดตล่าสุด: {subjectUpdatedData}</h1>
+                  {/* <h1 className='text-sm text-black/50 hidden'>{getMessageOfFilters()}</h1> */}
+                </div>
               </div>
+              <div className="">
+                <div className="flex gap-4">
+                  <span className='p-2 rounded-lg bg-slate-200/70 w-24 h-8 overflow-hidden flex gap-2 justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e"}}/> <span className='text-sm text-black/60'>คัดกรอง</span></span>
+                  <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
+                </div>
+              </div>
+              <div className={`absolute top-full left-0 w-full h-fit max-h-[40dvh] overflow-auto pb-6 px-8 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
+                <div className="">
+                  <div className={`pt-6 ${filter.code.length > 0 && "opacity-50"}`}>
+                    หมวดหมู่รายวิชา
 
-              {name_days.map((d,dindex)=><div key={dindex} className="pl-16 inline-flex">
-                  {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < name_days.length && "border-b-2"} border-black/5`}>
-                    <p className='opacity-0'>{dindex}:{tindex}</p>
-                    {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
-                    {state.webReady &&
-                      <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
+                    <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                      {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${(filter.code.length == 0 && filter.type.includes(gsg.type)) || checkGroupCodes(gsg.code) ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg ${filter.code.length > 0 ? "pointer-events-none" : "cursor-pointer"} text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
+                      {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
+                    </span>
+                    <span className={`${filter.code.length == 0 && "hidden"}`}>
+                      <p className='text-black/70 pt-2 text-[13px]'>หากเลือกเฉพาะวิชา จะไม่สามารถเลือกหมวดหมู่รายวิชาได้</p>
+                    </span>
+                    <span className={`${(filter.code.length != 0 || filter.date.length != 0) && "hidden"}`}>
+                      <p className='text-black/40 pt-2 text-[13px]'>หากเลือกเฉพาะหมวดหมู่รายวิชาอย่างเดียว เว็บจะช้ามาก</p>
+                    </span>
+                  </div>
+                  <div className="pt-6">
+                    เฉพาะวิชาที่เลือก
 
-                            <div className={`relative h-full p-1 group`} style={{width: "100%"}}>
-                              <div onClick={()=>fnHandleClickedOnCalendar(tindex,dindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
-                                <p className='text-sm'>กดเพื่อดูรายวิชา</p>
+                    <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                      {filter.code.map((gcode,gindex)=><span key={gindex} className={`${getColorCode(gcode)} px-2 py-1 rounded-lg cursor-pointer text-sm text-black/60`} onClick={()=>{fnHandleToggleFilterSubjectCode(gcode)}}> {gcode}</span>)}
+                      <span className='w-16 text-center text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm' onClick={()=>{toggleScheduleNameFilter(true); updateSubjectGroupList()}}>+</span>
+                    </span>
+                  </div>
+                </div>
+                <div className="">
+                  <div className="pt-6">
+                    วันที่เรียน
+
+                    <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                      {name_days.map((item, iin)=><span key={iin} onClick={()=>fnHandleChangeFilterDate(item.date_2, checkFilterDateSelected(item.date_2))} className={`smooth w-16 text-center ${checkFilterDateSelected(item.date_2) ? "bg-slate-700/60 text-white" : "bg-slate-400/30"} xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>{item.date_th}</span>)}
+                    </span>
+                  </div>
+                  <div className="py-6">
+                    เวลาที่เริ่มเรียน
+
+                    <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
+                      <span className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time == 'total' && "bg-slate-700/60 text-white"}`} onClick={()=>{fnHandleChangeFilterTime("total")}}>ทั้งหมด</span>
+                      <div className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time != 'total' && "bg-slate-700/60 text-white"}`}><TimePicker onChange={fnHandleChangeFilterTime} value={filter.time === 'total' ? '' : filter.time} placeHolder={"เวลา"} isOpen={state.filter.popupTimeToggle}/></div>
+                    </span>
+                    <span >
+                      <p className='text-black/40 pt-2 text-[13px]'>สามารถเลือกกำหนดเวลาเรียนได้ โดยการกดที่ช่อง &quot;เวลา&quot;</p>
+                    </span>
+                  </div>
+                  <div className='w-full flex justify-end gap-4'>
+                    <div className='border-2 border-black/20 rounded-md overflow-hidden'>
+                      <button className='bg-white hover:bg-black/10 text-black/60 py-1 px-8 cursor-pointer' onClick={()=>{fnHandleClearFilter()}}>ล้าง</button>
+                    </div>
+                    <button className='bg-slate-700 text-white rounded-md py-1 px-8 cursor-pointer' onClick={()=>{fnHandleSendFilterUpdate()}}>คัดกรอง</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section id="subjects" className={`px-5 w-full h-full overflow-y-auto smooth ${state.filter.popupToggle && "blur-[2px]"}`} style={{opacity: ((state.filter.popupDelay == -1 || state.filter.popupDelay == 3) && state.filter.popupToggle) || delay_id == -1 ? 1 : 1-((state.filter.popupDelay+1)/3)}} onScroll={()=>{if(state.filter.popupToggle) toggleScheduleFilter(false)}} onClick={()=>{if(state.filter.popupToggle) toggleScheduleFilter(false)}}>
+              {
+              !filter.firstFilter ? 
+              <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+                <FontAwesomeIcon icon={faLayerGroup} style={{color: "rgb(148 163 184)"}} size='6x'/>
+                <div className="pt-8 text-center">
+                  ยังไม่ได้เลือกการกรองข้อมูล
+                  <br />
+                  โปรดคัดกรองข้อมูลก่อน
+                  <p className='underline cursor-pointer hover:text-slate-600 active:text-slate-700' onClick={fnHandleClickedOnFilter}>คัดกรองข้อมูล</p>
+                </div>
+              </div> 
+              :
+              !state.dataLoaded ?
+              <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+                <FontAwesomeIcon className='animate-spin' icon={faSpinner} style={{color: "rgb(148 163 184)"}} size='4x'/>
+              </div> 
+              :
+              subjectShowData.length > 0 ?
+                SubjectSectCardList
+              :
+              <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
+                <FontAwesomeIcon icon={faExclamationCircle} style={{color: "rgb(148 163 184)"}} size='6x'/>
+                <div className="pt-8 text-center">
+                  ไม่มีข้อมูล
+                  <p className='underline cursor-pointer hover:text-slate-600 active:text-slate-700' onClick={fnHandleClickedOnFilter}>คัดกรองใหม่</p>
+                </div>
+              </div>
+              }
+              {/* {subjectData.map((data, index)=>{
+                return <div key={index} className={`${index == subjectData.length-1 ? "mb-3" : ""}`}>
+                  <SubjectSectCard data={data}/>
+                </div>
+              })} */}
+            </section>
+          </div>
+        </div>
+
+        {/* Name Filter Modal Section */}
+        <div className={`fixed smooth-out flex justify-center items-end w-full h-full ${state.filter.popupNameToggle && "bg-black/20"} z-50 rounded-t-3xl pointer-events-none`}>
+              <div className={`smooth-out overflow-hidden pointer-events-auto fixed rounded-t-3xl w-[96%] h-[62dvh] bg-white ${state.filter.popupNameToggle ? "bottom-0" : "-bottom-full"}`}>
+              <div className="h-full grid grid-rows-[auto_1fr] relative">
+                  <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
+                    <div className="relative flex gap-6">
+                        <div className="w-fit flex items-center">
+                        <h1 className='font-bold'>เลือกรายวิชา</h1>
+                        </div>
+                    </div>
+                    <div className="">
+                        <div className="flex gap-4">
+                        <span className='py-2 px-4 rounded-lg bg-slate-200/70 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 cursor-pointer' onClick={()=>toggleScheduleNameFilter(false)}>ถัดไป</span>
+                        </div>
+                    </div>
+                    <div className={`absolute top-full left-0 w-full h-[4rem] overflow-auto grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-y-2 border-slate-300/30 smooth ${state.filter.popupNameHeader == '' ? "hidden" : "sm:grid"}`}>
+                      <article className="pt-2 pb-2 px-5">
+                          <h1 className="font-bold">{state.filter.popupNameHeader}</h1>
+                          <p className="text-sm">{state.filter.popupNameDesc}</p>
+                      </article>
+                    </div>
+                  </section>
+                  <section id="subjects" onScroll={fnHandleFilterSubjectSelected} className={`px-5 w-full h-full overflow-y-auto smooth relative`}>
+                    {
+                      ge_subject_group_name.map((sgn, sgnindex)=>
+                        <section key={sgnindex} id={"type-"+sgn.type} className={`${sgnindex+1 == ge_subject_group_name.length && "mb-6"}`}>
+                            <article className="pt-4 pb-2">
+                                <h1 className="font-bold">หมวดหมู่ที่ {sgn.code.substring(3,4)}</h1>
+                                <p className="text-sm">{sgn.name}</p>
+                            </article>
+                            {subjectGroupData[sgnindex]?.map((sjg, sjindex)=>
+                              <div key={sjindex} className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains(sjg.code) && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode(sjg.code)}} >
+                                <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                  <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
+                                  <p>{sjg.code} - {sjg.name}</p>
+                                </button>
                               </div>
-                            </div>
-
-                      </div>
+                            )}
+                                {/* <div className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains("0041001") && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode("0041001")}} >
+                                    <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                      <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
+                                      <p>0041001 - ทดสอบคลิก</p>
+                                    </button>
+                                </div>
+                                <div className="border-b-2 border-slate-100 rounded-md">
+                                    <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                      <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
+                                      <p>0041001 - วิชาบังคับ</p>
+                                    </button>
+                                </div>
+                                <div className="border-b-2 border-slate-100 rounded-md">
+                                    <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
+                                      <FontAwesomeIcon className={`${getTextColorCode(sgn.code)} opacity-60`} icon={faCircleDot} />
+                                      <p>0041001 - วิชาเลือกเรียน</p>
+                                    </button>
+                                </div> */}
+                        </section>
+                      )
                     }
-
-                    {/* schedule data to show */}
-                    {getCurrentPlan().data.map((data:any,dataindex:any)=>{
-                      return getSplitedData(data.time).map((split_date, spindex)=>{
-                        return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
-                        <ScheduleCard position={{x:tindex, y:dindex}} key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
-                        : null
-                      })
-                    })}
-                  </span>)}
-              </div>)}
-            </div>
-        </div>
-
+                  </section>
+              </div>
+              </div>
+          </div>
       </div>
-
-      {/* Filter selection Section */}
-      <div className={`fixed smooth-out overflow-hidden w-full h-[65dvh] ${state.viewSchedule ? "bottom-0" : "-bottom-full"} bg-white rounded-t-3xl z-50`} style={{bottom: (!state.viewSchedule ? (-65)-state.swipedLocated : 0-state.swipedLocated < 0 ? 0-state.swipedLocated : 0) + "%"}}>
-        <div className="h-full grid grid-rows-[auto_1fr] relative">
-          <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
-            <div className="relative w-[inherit] flex gap-6" {...handlersHeader}>
-              <div className="w-fit">
-                <h1 className='font-bold'>เลือกรายวิชา</h1>
-                <h1 className={`text-sm text-black/50 ${subjectUpdatedData === "none" && "hidden"}`}>อัพเดตล่าสุด: {subjectUpdatedData}</h1>
-                {/* <h1 className='text-sm text-black/50 hidden'>{getMessageOfFilters()}</h1> */}
-              </div>
-            </div>
-            <div className="">
-              <div className="flex gap-4">
-                <span className='p-2 rounded-lg bg-slate-200/70 w-24 h-8 overflow-hidden flex gap-2 justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>fnHandleClickedOnFilter()}><FontAwesomeIcon icon={faLayerGroup} style={{color: "#73787e"}}/> <span className='text-sm text-black/60'>คัดกรอง</span></span>
-                <span className='p-2 rounded-lg aspect-square bg-slate-200/70 w-8 h-8 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 hover:border-0 cursor-pointer' onClick={()=>toggleScheduleSpectate(false)}><FontAwesomeIcon icon={faClose} style={{color: "#73787e"}}/></span>
-              </div>
-            </div>
-            <div className={`absolute top-full left-0 w-full h-fit max-h-[40dvh] overflow-auto pb-6 px-8 sm:grid grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-b-2 border-slate-300/30 smooth ${!state.filter.popupToggle &&"opacity-0 pointer-events-none"}`}>
-              <div className="">
-                <div className={`pt-6 ${filter.code.length > 0 && "opacity-50"}`}>
-                  หมวดหมู่รายวิชา
-
-                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {ge_subject_group_name.map((gsg,gindex)=><span key={gindex} onClick={()=>fnHandleChangeFilterType(gsg.type)} className={`smooth w-16 text-center ${(filter.code.length == 0 && filter.type.includes(gsg.type)) || checkGroupCodes(gsg.code) ? "bg-slate-700/60 text-white" : "bg-slate-400/30" } xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg ${filter.code.length > 0 ? "pointer-events-none" : "cursor-pointer"} text-sm`}>หมวด {gsg.type.split("-")[1]}</span>)}
-                    {/* <span className='w-16 text-center bg-slate-400/30 hover:bg-slate-700/60 hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm'>+</span> */}
-                  </span>
-                  <span className={`${filter.code.length == 0 && "hidden"}`}>
-                    <p className='text-black/70 pt-2 text-[13px]'>หากเลือกเฉพาะวิชา จะไม่สามารถเลือกหมวดหมู่รายวิชาได้</p>
-                  </span>
-                  <span className={`${(filter.code.length != 0 || filter.date.length != 0) && "hidden"}`}>
-                    <p className='text-black/40 pt-2 text-[13px]'>หากเลือกเฉพาะหมวดหมู่รายวิชาอย่างเดียว เว็บจะช้ามาก</p>
-                  </span>
-                </div>
-                <div className="pt-6">
-                  เฉพาะวิชาที่เลือก
-
-                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {filter.code.map((gcode,gindex)=><span key={gindex} className={`${getColorCode(gcode)} px-2 py-1 rounded-lg cursor-pointer text-sm text-black/60`} onClick={()=>{fnHandleToggleFilterSubjectCode(gcode)}}> {gcode}</span>)}
-                    <span className='w-16 text-center text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm' onClick={()=>{toggleScheduleNameFilter(true); updateSubjectGroupList()}}>+</span>
-                  </span>
-                </div>
-              </div>
-              <div className="">
-                <div className="pt-6">
-                  วันที่เรียน
-
-                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    {name_days.map((item, iin)=><span key={iin} onClick={()=>fnHandleChangeFilterDate(item.date_2, checkFilterDateSelected(item.date_2))} className={`smooth w-16 text-center ${checkFilterDateSelected(item.date_2) ? "bg-slate-700/60 text-white" : "bg-slate-400/30"} xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm`}>{item.date_th}</span>)}
-                  </span>
-                </div>
-                <div className="py-6">
-                  เวลาที่เริ่มเรียน
-
-                  <span className='flex flex-wrap gap-2 items-center pt-1 relative'>
-                    <span className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time == 'total' && "bg-slate-700/60 text-white"}`} onClick={()=>{fnHandleChangeFilterTime("total")}}>ทั้งหมด</span>
-                    <div className={`w-16 text-center bg-slate-400/30 xl:hover:bg-slate-700/60 xl:hover:text-white px-2 py-1 rounded-lg cursor-pointer text-sm ${filter.time != 'total' && "bg-slate-700/60 text-white"}`}><TimePicker onChange={fnHandleChangeFilterTime} value={filter.time === 'total' ? '' : filter.time} placeHolder={"เวลา"} isOpen={state.filter.popupTimeToggle}/></div>
-                  </span>
-                  <span >
-                    <p className='text-black/40 pt-2 text-[13px]'>สามารถเลือกกำหนดเวลาเรียนได้ โดยการกดที่ช่อง &quot;เวลา&quot;</p>
-                  </span>
-                </div>
-                <div className='w-full flex justify-end gap-4'>
-                  <div className='border-2 border-black/20 rounded-md overflow-hidden'>
-                    <button className='bg-white hover:bg-black/10 text-black/60 py-1 px-8 cursor-pointer' onClick={()=>{fnHandleClearFilter()}}>ล้าง</button>
-                  </div>
-                  <button className='bg-slate-700 text-white rounded-md py-1 px-8 cursor-pointer' onClick={()=>{fnHandleSendFilterUpdate()}}>คัดกรอง</button>
-                </div>
-              </div>
-            </div>
-          </section>
-          <section id="subjects" className={`px-5 w-full h-full overflow-y-auto smooth ${state.filter.popupToggle && "blur-[2px]"}`} style={{opacity: ((state.filter.popupDelay == -1 || state.filter.popupDelay == 3) && state.filter.popupToggle) || delay_id == -1 ? 1 : 1-((state.filter.popupDelay+1)/3)}} onScroll={()=>{if(state.filter.popupToggle) toggleScheduleFilter(false)}} onClick={()=>{if(state.filter.popupToggle) toggleScheduleFilter(false)}}>
-            {
-            !filter.firstFilter ? 
-            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
-              <FontAwesomeIcon icon={faLayerGroup} style={{color: "rgb(148 163 184)"}} size='6x'/>
-              <div className="pt-8 text-center">
-                ยังไม่ได้เลือกการกรองข้อมูล
-                <br />
-                โปรดคัดกรองข้อมูลก่อน
-                <p className='underline cursor-pointer hover:text-slate-600 active:text-slate-700' onClick={fnHandleClickedOnFilter}>คัดกรองข้อมูล</p>
-              </div>
-            </div> 
-            :
-            !state.dataLoaded ?
-            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
-              <FontAwesomeIcon className='animate-spin' icon={faSpinner} style={{color: "rgb(148 163 184)"}} size='4x'/>
-            </div> 
-            :
-            subjectShowData.length > 0 ?
-              SubjectSectCardList
-            :
-            <div className='w-full h-full flex flex-col justify-center items-center text-slate-400'>
-              <FontAwesomeIcon icon={faExclamationCircle} style={{color: "rgb(148 163 184)"}} size='6x'/>
-              <div className="pt-8 text-center">
-                ไม่มีข้อมูล
-                <p className='underline cursor-pointer hover:text-slate-600 active:text-slate-700' onClick={fnHandleClickedOnFilter}>คัดกรองใหม่</p>
-              </div>
-            </div>
-            }
-            {/* {subjectData.map((data, index)=>{
-              return <div key={index} className={`${index == subjectData.length-1 ? "mb-3" : ""}`}>
-                <SubjectSectCard data={data}/>
-              </div>
-            })} */}
-          </section>
-        </div>
-      </div>
-
-      {/* Name Filter Modal Section */}
-      <div className={`fixed smooth-out flex justify-center items-end w-full h-full ${state.filter.popupNameToggle && "bg-black/20"} z-50 rounded-t-3xl pointer-events-none`}>
-            <div className={`smooth-out overflow-hidden pointer-events-auto fixed rounded-t-3xl w-[96%] h-[62dvh] bg-white ${state.filter.popupNameToggle ? "bottom-0" : "-bottom-full"}`}>
-            <div className="h-full grid grid-rows-[auto_1fr] relative">
-                <section id="header" className="relative w-full pt-6 pb-2 px-6 flex justify-between border-b-2 border-slate-300/50">
-                  <div className="relative flex gap-6">
-                      <div className="w-fit flex items-center">
-                      <h1 className='font-bold'>เลือกรายวิชา</h1>
-                      </div>
-                  </div>
-                  <div className="">
-                      <div className="flex gap-4">
-                      <span className='py-2 px-4 rounded-lg bg-slate-200/70 overflow-hidden flex justify-center items-center border-b-2 border-slate-300 hover:bg-slate-300 cursor-pointer' onClick={()=>toggleScheduleNameFilter(false)}>ถัดไป</span>
-                      </div>
-                  </div>
-                  <div className={`absolute top-full left-0 w-full h-[4rem] overflow-auto grid-cols-2 gap-4 backdrop-blur-md z-10 bg-white/80 border-y-2 border-slate-300/30 smooth ${state.filter.popupNameHeader == '' ? "hidden" : "sm:grid"}`}>
-                    <article className="pt-2 pb-2 px-5">
-                        <h1 className="font-bold">{state.filter.popupNameHeader}</h1>
-                        <p className="text-sm">{state.filter.popupNameDesc}</p>
-                    </article>
-                  </div>
-                </section>
-                <section id="subjects" onScroll={fnHandleFilterSubjectSelected} className={`px-5 w-full h-full overflow-y-auto smooth relative`}>
-                  {
-                    ge_subject_group_name.map((sgn, sgnindex)=>
-                      <section key={sgnindex} id={"type-"+sgn.type} className={`${sgnindex+1 == ge_subject_group_name.length && "mb-6"}`}>
-                          <article className="pt-4 pb-2">
-                              <h1 className="font-bold">หมวดหมู่ที่ {sgn.code.substring(3,4)}</h1>
-                              <p className="text-sm">{sgn.name}</p>
-                          </article>
-                          {subjectGroupData[sgnindex]?.map((sjg, sjindex)=>
-                            <div key={sjindex} className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains(sjg.code) && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode(sjg.code)}} >
-                              <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
-                                <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
-                                <p>{sjg.code} - {sjg.name}</p>
-                              </button>
-                            </div>
-                          )}
-                              {/* <div className={`smooth border-b-2 border-slate-100 ${checkFilterSubjectCodeContains("0041001") && "bg-green-200"} rounded-md cursor-pointer`} onClick={()=>{fnHandleToggleFilterSubjectCode("0041001")}} >
-                                  <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
-                                    <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
-                                    <p>0041001 - ทดสอบคลิก</p>
-                                  </button>
-                              </div>
-                              <div className="border-b-2 border-slate-100 rounded-md">
-                                  <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
-                                    <FontAwesomeIcon className={`${getTextColorCode(sgn.code)}`} icon={faCircle} />
-                                    <p>0041001 - วิชาบังคับ</p>
-                                  </button>
-                              </div>
-                              <div className="border-b-2 border-slate-100 rounded-md">
-                                  <button className="pl-2 w-full py-2 text-left flex gap-2 items-center">
-                                    <FontAwesomeIcon className={`${getTextColorCode(sgn.code)} opacity-60`} icon={faCircleDot} />
-                                    <p>0041001 - วิชาเลือกเรียน</p>
-                                  </button>
-                              </div> */}
-                      </section>
-                    )
-                  }
-                </section>
-            </div>
-            </div>
-        </div>
-    </div>
+    </>
   )
 }
