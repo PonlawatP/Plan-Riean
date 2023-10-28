@@ -922,7 +922,9 @@ export default function Home({props} :any) {
         {/* introduce */}
         <div className={`smooth absolute w-full top-3 left-3 z-50 ${state.viewSchedule ? "opacity-0 pointer-events-none" : ""}`}>
           <p className='text-black/40'>เวอร์ชั่นทดสอบ {app_version}</p>
-          <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a>
+          
+          <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://forms.gle/VuMvvSLD2FtZm3Mn7'>แจ้งปัญหา / เสนอไอเดีย</a>
+          {/* <a className='smooth text-black/60 font-bold hover:pl-2 hover:text-black/80' href='https://linktr.ee/plutopon'>แจ้งปัญหา / เสนอไอเดีย</a> */}
         </div>
         {/* slide up overlay */}
         <div className={`absolute bottom-5 w-full flex flex-col gap-3 justify-center items-center rounded-full z-50 pointer-events-none lg:hidden ${state.viewSchedule && "hidden"}`}>
