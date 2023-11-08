@@ -1,6 +1,8 @@
 import GoogleAnalytics from '@/GoogleAnalytics'
+import { ThemeContext } from '@/providers'
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans_Thai } from 'next/font/google'
+import { useContext } from 'react'
 
 const font = IBM_Plex_Sans_Thai({ 
   weight: ["300", "500", "600"],
@@ -17,10 +19,21 @@ export default function Layout({
 }: {
   children: React.ReactNode
 }) {
+  const {theme} = useContext(ThemeContext)
   return (
-    <div className={font.className}>
+    <>
+    <style jsx global>{`
+        body {
+          background: ${theme === 'day' ? "#E6EDF3" : "#2A3035"};
+        }
+    `}</style>
+
+    <div className={
+      'pr-main w-[100dvw] h-[100dvh] '+font.className
+      }>
         {/* <GoogleAnalytics /> */}
       {children}
     </div>
+    </>
   )
 }
