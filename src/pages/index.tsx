@@ -23,18 +23,18 @@ export default function Home() {
 
   return (
     <CalendarContext.Provider value={{viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled}}>
-      <div className={`w-full h-full relative ${viewSchedule ? "bg-black/70" : ""}`}>
+      <div className={`relative w-full h-full ${viewSchedule ? "bg-black/70" : ""}`}>
         {/* <Link href={"test"}>
         <button>Test</button>
         </Link> */}
         {/* <button onClick={toggleTheme}>Dark</button> */}
 
 
-        <div className={`smooth-out ${viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-[100dvh]"} flex justify-center items-center relative`} 
+        <div className={`smooth-out ${viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-full"} flex justify-center items-center relative`} 
           // onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}
         >
           {/* Summary Calendar Component */}
-            <PRCalendarSubject/>
+            {/* <PRCalendarSubject/> */}
           </div>
         </div>
     </CalendarContext.Provider>

@@ -14,7 +14,14 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors: {
-        'pr-bg': "#E6EDF3"
+        'pr-bg': "#E6EDF3",
+        'pr-gray-1': '#696969',
+        'pr-msu-1': "#FFC736",
+        'pr-msu-2': "#253445",
+        'pr-msu-1-60': "#96741c",
+      },
+      dropShadow: {
+        'pr-shadow-text': '0 2px 0px rgba(0, 0, 0, 0.2)'
       }
     },
   },

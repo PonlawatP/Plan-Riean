@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/react-gtm-module": "^2.0.2",
+    "boxicons": "^2.1.4",
     "next": "latest",
     "nextjs-google-analytics": "^2.3.3",
     "react": "latest",

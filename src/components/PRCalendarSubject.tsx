@@ -97,7 +97,7 @@ export default function PRCalendarSubject(props: any) {
         ))}
       </div>
       <div
-        className="header-day relative overflow-x-auto w-auto"
+        className="header-day relative overflow-x-auto"
         onScroll={fnHandleScrollCalendar}
         onScrollCapture={fnHandleScrollCalendar}
       >
