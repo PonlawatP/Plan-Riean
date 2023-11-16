@@ -1,5 +1,5 @@
 import { CalendarContext } from "@/providers/calendarProvider";
-import { useContext } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export default function PRCalendarSubject(props: any) {
   const {
@@ -43,7 +43,18 @@ export default function PRCalendarSubject(props: any) {
     },
   ];
 
-  const times_m = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+
+  const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
+
+  function getTimeTable(added: number = 18){
+    const times_m: Array<number> = [];
+    for (let i = 8; i <= added; i++) {
+      times_m.push(i);
+    }
+    return times_m;
+  }
+
+  const memoizedTimeTable = useMemo(() => getTimeTable(MAX_SUBJECT_TIME), [MAX_SUBJECT_TIME]);
 
   function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
     alert("test");
@@ -58,6 +69,81 @@ export default function PRCalendarSubject(props: any) {
         : e.target.scrollLeft
     );
   }
+
+  const canvasElemRef = useRef<HTMLElement | null>(null);
+  const planElemRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const canvasElem = document.querySelector(".p-canvas-plan");
+    const planElem = document.querySelector(".p-planmain");
+    
+    if (canvasElem && canvasElem instanceof HTMLElement && planElem && planElem instanceof HTMLElement) {
+      canvasElemRef.current = canvasElem;
+      planElemRef.current = planElem;
+    }
+
+    resizePlan()
+  }, []);
+  
+  const resizePlan = () => {
+    const canvasElem = canvasElemRef.current
+    const planElem = planElemRef.current
+    if(canvasElem instanceof HTMLElement && planElem instanceof HTMLElement){
+      const canvas = canvasElem?.offsetWidth || 0
+      const plan = planElem?.offsetWidth || 0
+
+      if(canvas/plan <= 1){
+        setPlanSize(canvas/plan)
+        setPlanWidth(canvas)
+      } else {
+        setPlanSize(1)
+        setPlanWidth(-1)
+      }
+    }
+  };
+
+  const [planSize, setPlanSize] = useState(1);
+  const [planWidth, setPlanWidth] = useState(1);
+  useEffect(() => {
+  
+    window.addEventListener('resize', resizePlan);
+  
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', resizePlan);
+    };
+  });
+
+  return <>
+    <div className={`
+      p-canvas-plan relative w-full h-full m-8 md:ml-0 flex justify-center items-center overflow-hidden  drop-shadow-xl
+    `}
+    >
+      <div className="absolute flex flex-col gap-8 items-center" style={{width: planWidth > 0 ? planWidth+"px" : undefined}}>
+        {/* main schedule */}
+        <div className="p-planmain select-none min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip" style={{scale: planSize.toString()}}>
+          
+          {/* row for timer */}
+          <span className="grid grid-flow-col">
+            <span className="w-16 bg-pr-msu-1 border-b-2 border-black/10"></span>
+            {memoizedTimeTable.map((t,tindex)=><span className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10">{t.toString().padStart(2, "0")}:00</span>)}
+          </span>
+
+
+        </div>
+        {/* summary plan detail */}
+        <span className="p-plandetail select-none flex gap-10 text-black/40">
+          <span>0 วิชา</span>
+          <span>0/21 หน่วยกิต</span>
+        </span>
+        {/* action button */}
+        <span className="p-planaction absolute bottom-0 right-0 flex gap-4 text-black/30">
+          <button className="hover:text-black/60"><i className="text-2xl bx bx-download"></i></button>
+          <button className="hover:text-black/60"><i className="text-2xl bx bx-share"></i></button>
+        </span>
+      </div>
+    </div>
+  </>
 
   return (
     <div

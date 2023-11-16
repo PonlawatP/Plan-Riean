@@ -34,7 +34,7 @@ export default function Home() {
           // onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}
         >
           {/* Summary Calendar Component */}
-            {/* <PRCalendarSubject/> */}
+            <PRCalendarSubject/>
           </div>
         </div>
     </CalendarContext.Provider>
