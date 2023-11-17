@@ -1,4 +1,5 @@
-import { CalendarContext } from "@/providers/calendarProvider";
+import { CalendarContext } from "@/providers/CalendarProvider";
+import { time } from "console";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export default function PRCalendarSubject(props: any) {
@@ -9,6 +10,12 @@ export default function PRCalendarSubject(props: any) {
     setWebReady,
     scrolled,
     setScrolled,
+    topbarToggle, 
+    setTopbarToggle, 
+    topbarCord, 
+    setTopbarCord,
+    topbarHtml, 
+    setTopbarHtml
   } = useContext(CalendarContext);
   const name_days = [
     {
@@ -105,7 +112,6 @@ export default function PRCalendarSubject(props: any) {
   const [planSize, setPlanSize] = useState(1);
   const [planWidth, setPlanWidth] = useState(1);
   useEffect(() => {
-  
     window.addEventListener('resize', resizePlan);
   
     // Cleanup the event listener when the component unmounts
@@ -114,6 +120,43 @@ export default function PRCalendarSubject(props: any) {
     };
   });
 
+  const [focusTime, setFocusTime] = useState({
+    day: 0,
+    start_time: 8,
+    end_time: 8
+  })
+
+  function handleDragToSelectPlanTime(e:any){
+    const target = e.target as HTMLElement | null;
+    const id = target?.id;
+    if(id !== undefined){
+        const time = parseInt(id.split("-")[1]);
+        const dayindex = parseInt(id.split("-")[2]);
+        if(!Number.isNaN(time) && !Number.isNaN(dayindex)){
+          setFocusTime({...focusTime, end_time: time})
+          if(!topbarToggle.pre){
+            setTopbarHtml(<>
+              <p>วัน{name_days[focusTime.day].date_th}</p>
+              <p>{
+                focusTime.start_time == focusTime.end_time
+                ?
+                  focusTime.start_time.toString().padStart(2, "0")+":00 - " + (focusTime.end_time+1).toString().padStart(2, "0")+":00"
+                  :
+                  focusTime.start_time > focusTime.end_time 
+                  ?
+                  focusTime.end_time.toString().padStart(2, "0")+":00 - " + (focusTime.start_time+1).toString().padStart(2, "0")+":00"
+                  :
+                  focusTime.start_time.toString().padStart(2, "0")+":00 - " + (focusTime.end_time+1).toString().padStart(2, "0")+":00"
+                }
+              </p>
+            </>)
+          }
+        }
+    }
+  }
+
+  const [toggleHold, setTooggleHold] = useState<any>(null);
+
   return <>
     <div className={`
       p-canvas-plan relative w-full h-full m-8 md:ml-0 flex justify-center items-center overflow-hidden  drop-shadow-xl
@@ -121,137 +164,139 @@ export default function PRCalendarSubject(props: any) {
     >
       <div className="absolute flex flex-col gap-8 items-center" style={{width: planWidth > 0 ? planWidth+"px" : undefined}}>
         {/* main schedule */}
-        <div className="p-planmain select-none min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip" style={{scale: planSize.toString()}}>
+        <div 
+          className="p-planmain select-none min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip" 
+          style={{scale: planSize.toString()}}
+          onMouseEnter={()=>{
+            setTopbarToggle({pre: false, init: false});
+          }}
+          onMouseLeave={()=>{
+            setTopbarToggle({pre: false, init: false});
+          }}
+          onMouseMove={handleDragToSelectPlanTime}
+        >
           
           {/* row for timer */}
-          <span className="grid grid-flow-col">
+          <span 
+            className="grid grid-flow-col"
+            onMouseEnter={()=>{
+              setTopbarToggle({pre: false, init: false});
+            }}
+          >
             <span className="w-16 bg-pr-msu-1 border-b-2 border-black/10"></span>
-            {memoizedTimeTable.map((t,tindex)=><span className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10">{t.toString().padStart(2, "0")}:00</span>)}
+            {memoizedTimeTable.map((t,tindex)=><span key={`pr-time-${tindex}`} className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10">{t.toString().padStart(2, "0")}:00</span>)}
           </span>
 
+          {name_days.map((day, dindex) => 
+            <span key={`pr-day-${day.date_1}`} className="grid grid-flow-col">
+              <span 
+                className={`w-16 bg-pr-msu-2 ${dindex != name_days.length-1 ? "border-b-2" : ""} border-black/10 flex items-center text-white`}
+                onMouseEnter={()=>{
+                  setTopbarToggle({pre: false, init: false});
+                }}
+              >
+                <p className="ml-3">{day.date_3}</p>
+              </span>
+              {
+                memoizedTimeTable.map((t,tindex)=><span key={`pr-day-${day.date_1}-${t}`} className="relative">
+                  <span 
+                    id={"plan-"+t.toString().padStart(2, "0")+"-"+dindex}
+                    className={`block w-20 h-16 p-2 border-l-2 ${dindex != name_days.length-1 && tindex != 4 ? "border-b-2" : ""} border-black/10 group text-black/10`}
+                    onMouseUp={()=>{
+                      setTopbarToggle({pre: false, init: false});
+                    }}
+                  >
+                  </span>
+
+                  {/* hover to guide user clicked */}
+                  {
+                    tindex != 4
+                    ?
+                    <button 
+                      className={`pr-hover-toclick group absolute select-none left-0 top-0 w-[100%] h-full flex justify-center items-center z-10`}
+                      id={"planhover-"+t.toString().padStart(2, "0")+"-"+dindex}
+                      onMouseDown={(e)=>{
+
+                        setFocusTime({ day: dindex, start_time: t, end_time: t });
+                        setTopbarHtml(<>
+                          <p>กดค้างไว้</p>
+                          <p>เพื่อค้นหาตามเวลา</p>
+                        </>)
+                        setTopbarToggle({pre: true, init: false});
+                        
+                        setTooggleHold(setTimeout(() => {
+                          setTopbarToggle({pre: false, init: true});
+                      
+                          // Clear the timeout to prevent the function from running if the click is released before 0.5 seconds
+                          clearTimeout(toggleHold);
+                        }, 500));
+                      }}
+                      onMouseUp={()=>{
+                        clearTimeout(toggleHold);
+                        setTopbarToggle({pre: false, init: false});
+                      }}
+                    >
+                      <span 
+                        className={`smooth-opacity opacity-0 ${!topbarToggle.init ? "group-hover:opacity-100" : ""} relative rounded-lg text-sm w-11/12 h-5/6 bg-black/40 text-white/80 flex justify-center items-center`}
+                        id={"planhover-"+t.toString().padStart(2, "0")+"-"+dindex}
+                      >
+                        ดูรายวิชา
+                      </span>
+                    </button>
+                    :
+                    null
+                  }
+                  {/* TODO: badge of subjects here */}
+                  <></>
+
+                  {/* hover when user drag clicked */}
+                  { 
+                    dindex === focusTime.day && t === focusTime.start_time
+                    ?
+                      <span 
+                        className={`pr-hover-dragged smooth-all pointer-events-none select-none absolute h-full flex justify-center items-center top-0`}
+                        style={{
+                          width: (focusTime.start_time > focusTime.end_time ? ((focusTime.start_time - focusTime.end_time)+1)*100 : ((focusTime.end_time - focusTime.start_time)+1)*100)+"%",
+                          left: (focusTime.start_time > focusTime.end_time ? (focusTime.end_time - focusTime.start_time)*100 : 0)+"%"
+                        }}
+                      >
+                        <span 
+                          className={`smooth-opacity pr-border-dotspace ${!topbarToggle.init ? "opacity-0" : ""} pointer-events-none select-none relative rounded-lg text-sm w-[calc(100%-10px)] h-5/6 bg-black/60 text-white/80 flex justify-center items-center`}
+                        >{
+                          focusTime.start_time == focusTime.end_time
+                          ?
+                            focusTime.start_time.toString().padStart(2, "0")+" - " + (focusTime.end_time+1).toString().padStart(2, "0")
+                            :
+                            focusTime.start_time > focusTime.end_time 
+                            ?
+                            focusTime.end_time.toString().padStart(2, "0")+":00 - " + (focusTime.start_time+1).toString().padStart(2, "0")+":00"
+                            :
+                            focusTime.start_time.toString().padStart(2, "0")+":00 - " + (focusTime.end_time+1).toString().padStart(2, "0")+":00"
+                          }
+                        </span>
+                      </span>
+                    :
+                    null  
+                  }
+                </span>
+                )
+              }
+            </span>)
+          }
 
         </div>
+
         {/* summary plan detail */}
-        <span className="p-plandetail select-none flex gap-10 text-black/40">
+        <span className={`pr-plandetail select-none flex gap-10 text-black/40 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
           <span>0 วิชา</span>
           <span>0/21 หน่วยกิต</span>
         </span>
         {/* action button */}
-        <span className="p-planaction absolute bottom-0 right-0 flex gap-4 text-black/30">
+        <span className={`pr-planaction absolute bottom-0 right-0 flex gap-4 text-black/30 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
           <button className="hover:text-black/60"><i className="text-2xl bx bx-download"></i></button>
           <button className="hover:text-black/60"><i className="text-2xl bx bx-share"></i></button>
         </span>
       </div>
     </div>
   </>
-
-  return (
-    <div
-      className={`calendar-container overflow-hidden rounded-2xl ${
-        viewSchedule
-          ? "absolute w-min scale-[.24] sm:scale-[.5]"
-          : "relative w-11/12 smooth-out"
-      } xl:w-min border-2 bg-white/80 border-slate-200 shadow-2xl`}
-    >
-      <div
-        className="days absolute h-full w-16 z-50 transition-all duration-300"
-        style={{ transform: "translateX(-" + scrolled + "px)" }}
-      >
-        <div className="border-b-2 border-black/5 ">
-          <p className="opacity-0 py-2">a</p>
-        </div>
-        {name_days.map((d, dindex) => (
-          <div
-            key={dindex}
-            className={`bg-slate-700 h-20 flex items-center shadow-lg ${
-              dindex + 1 < name_days.length && "border-b-2"
-            } border-white/10`}
-          >
-            <p
-              className="transition-all duration-300 pl-4 text-white"
-              style={{ opacity: 1 - scrolled / 38 }}
-            >
-              {d.date_3}
-            </p>
-            <p
-              className="transition-all duration-300 pl-[2.55rem] text-white absolute"
-              style={{ opacity: scrolled / 38 }}
-            >
-              {d.date_1}
-            </p>
-          </div>
-        ))}
-      </div>
-      <div
-        className="header-day relative overflow-x-auto"
-        onScroll={fnHandleScrollCalendar}
-        onScrollCapture={fnHandleScrollCalendar}
-      >
-        <div className="days absolute h-full w-16 bg-slate-700">
-          <div className="border-b-2 border-black/5 bg-yellow-400">
-            <p className="opacity-0 py-2">a</p>
-          </div>
-        </div>
-
-        <div className="pl-16 inline-flex ">
-          {times_m.map((time, tindex) => (
-            <span
-              key={tindex}
-              className="h-full flex items-center w-24 py-2 pl-3 border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950/40"
-            >
-              {time.toString().padStart(2, "0")}:00
-            </span>
-          ))}
-          {/* {times_m.map((time,tindex)=><span key={tindex} className='h-full flex items-center w-32 py-2 justify-center border-l-2 border-b-2 border-black/5 bg-yellow-400 text-orange-950'>{time.toString().padStart(2, '0')} - {(times_m[tindex+1] || 20).toString().padStart(2, '0')}</span>)} */}
-        </div>
-
-        {name_days.map((d, dindex) => (
-          <div key={dindex} className="pl-16 inline-flex align-top">
-            {times_m.map((time, tindex) => (
-              <span
-                key={dindex + "-" + tindex}
-                className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${
-                  dindex + 1 < name_days.length && tindex != 4 && "border-b-2"
-                } border-black/5`}
-              >
-                {/* <p className='opacity-1'>{dindex}:{tindex}</p> */}
-                {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
-                {webReady &&
-                  ((tindex < 4 && tindex % 2 == 0) ||
-                    (tindex > 4 && tindex % 2 == 1)) && (
-                    <div
-                      key={"dt-" + dindex + ":" + tindex}
-                      className="absolute left-0 w-full h-full"
-                      style={{
-                        width: tindex == times_m.length - 1 ? "100%" : "200%",
-                      }}
-                      onClick={() => fnHandleClickedOnCalendar(tindex, dindex)}
-                    >
-                      <div className={`relative h-full p-1 group`}>
-                        <div
-                          className={`cursor-pointer z-10 relative rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${
-                            !viewSchedule && "hover:opacity-100"
-                          } hover:duration-100`}
-                        >
-                          <p className="text-sm">กดเพื่อดูรายวิชา</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                {/* schedule data to show */}
-                {/* {getCurrentPlan().data.map((data:any,dataindex:any)=>{
-                        return getSplitedData(data.time).map((split_date, spindex)=>{
-                          return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
-                          <ScheduleCard position={{x:tindex, y:dindex}} key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
-                          : null
-                        })
-                      })} */}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
