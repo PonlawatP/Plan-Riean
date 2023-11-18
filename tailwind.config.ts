@@ -19,6 +19,7 @@ const config: Config = {
         'pr-msu-1': "#FFC736",
         'pr-msu-2': "#253445",
         'pr-msu-1-60': "#96741c",
+        "pr-text-menu": "#515151"
       },
       dropShadow: {
         'pr-shadow-text': '0 2px 0px rgba(0, 0, 0, 0.2)'

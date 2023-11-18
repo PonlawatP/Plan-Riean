@@ -6,6 +6,9 @@ import { useContext, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
 import { CalendarContext } from '@/providers/CalendarProvider'
+import { ToastContainer } from 'react-toastify'
+
+import 'react-toastify/dist/ReactToastify.css';
 
 const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -31,20 +34,29 @@ export default function Layout({
     <style jsx global>{`
         body {
           background: ${theme === 'day' ? "#E6EDF3" : "#2A3035"};
+          touch-action: none;
         }
     `}</style>
 
     <CalendarContext.Provider value={{viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml}}>
-      <div className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+font.className}>
+      
+      <div 
+        className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+font.className}
+        onMouseUp={()=>{
+          setTopbarToggle({pre: false, init: false});
+        }}
+      >
         <section className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
           <button className='hidden sm:flex'><Image src="/assets/images/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></button>
-          <article className='pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-[25rem] w-[45%] rounded-full drop-shadow-xl'>
-            <button className="header text-2xl font-medium flex gap-3 group">
-              <h1>แผนเรียนใหม่</h1> <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md'><i className='bx bx-pencil mt-[3px]'></i></span>
+          <article className='pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl'>
+            <button className="header text-xl font-medium flex gap-3 group">
+              <h1>แผนเรียนใหม่</h1> <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md -mt-1'><i className='bx bx-pencil mt-[3px]'></i></span>
             </button>
-            <span className='text-md font-light text-pr-gray-1 flex gap-3'>
-              <span className='flex gap-2'><p>เทอม</p><p>1</p></span>
-              <span className='flex gap-2'><p>ปีการศึกษา</p><p>2565</p></span>
+            <span className='text-md font-light text-pr-gray-1 md:flex gap-3'>
+              <span className='flex gap-3'>
+                <span className='flex gap-2'><p>เทอม</p><p>1</p></span>
+                <span className='flex gap-2'><p>ปีการศึกษา</p><p>2565</p></span>
+              </span>
               <span className='plan-badge flex gap-2'>
                 <span className='uni-badge text-sm font-bold px-2 rounded-full border-[2px] border-blue-900/30 bg-blue-300 text-blue-900/60'>IT</span>
                 <span className='uni-badge text-sm font-bold px-2 rounded-full border-[2px] border-pr-msu-1-60/30 bg-pr-msu-1 text-pr-msu-1-60'>MSU</span>
@@ -59,10 +71,16 @@ export default function Layout({
         </section>
 
         <div className={
-          'pr-main select-none grid relative md:grid-cols-[auto_1fr]'
+          'pr-main select-none grid relative md:grid-cols-[auto_1fr] overflow-hidden'
           }>
-            <section className={`pr-sidebar hidden p-8 drop-shadow-xl min-h-[460px] md:w-[122px] lg:w-[260px] md:block smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
-              <div className="content flex flex-col relative h-full bg-white/60 border-[1px] rounded-3xl overflow-hidden">
+            <section 
+              className={`
+                pr-sidebar smooth-all relative hidden p-8 drop-shadow-xl min-h-[460px] md:w-[122px] ${!viewSchedule ? "lg:w-[260px]" : "md:w-[425px] lg:w-[425px]"} md:block smooth-opacity 
+                ${viewSchedule ? "opacity-0 translate-x-10" : topbarToggle.init ? "opacity-20" : "opacity-100"}
+              `}
+            >
+              {/* main sidebar */}
+              <div className="content relative flex flex-col h-full bg-white/60 border-[1px] rounded-3xl overflow-hidden">
                 <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60 bg-pr-msu-1 text-pr-msu-1-60'>
                   <i className='bx bx-home text-2xl drop-shadow-pr-shadow-text'/>
                   <p className="drop-shadow-pr-shadow-text hidden lg:block">แผนเรียน</p>
@@ -94,8 +112,37 @@ export default function Layout({
               </div>
             </section>
           {children}
+          {/* subject selector */}
+          <section className={`pr-subject-select smooth-all absolute md:p-8 w-full md:w-auto h-full grid ${!viewSchedule ? "opacity-0 -translate-x-10 invisible" : topbarToggle.init ? "opacity-20" : ""}`}>
+            <div className="pr-subject-select-body relative md:w-[360px] p-1 rounded-3xl border-[1px] border-white/80 bg-white/90">
+              <div className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-black/20">
+                <div className="flex gap-2 items-center font-semibold text-xl">
+                  <button onClick={()=>setViewState(false)} className='hover:bg-pr-bg active:bg-slate-300 rounded-lg aspect-square w-10'>
+                    <i className="bx bx-chevron-left text-3xl translate-y-[2px]"></i>
+                  </button>
+                  <h1>เลือกรายวิชา</h1>
+                </div>
+                <button className='text-pr-text-menu border-2 border-black/20 px-2 mr-2 rounded-lg bg-pr-bg hover:bg-slate-300 active:bg-slate-400'>
+                  <i className="bx bx-layer text-xl translate-y-[3px] mr-1"></i> คัดกรอง
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          className=""
+        />
     </CalendarContext.Provider>
     </>
   )

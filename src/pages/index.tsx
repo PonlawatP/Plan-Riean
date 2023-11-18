@@ -1,8 +1,7 @@
 import PRCalendarSubject from '@/components/PRCalendarSubject';
 import { ThemeContext } from '@/providers';
 import { CalendarContext } from '@/providers/CalendarProvider';
-import Image from 'next/image'
-import Link from 'next/link'
+import Head from 'next/head';
 import { useContext, useEffect, useReducer, useState } from 'react';
 
 export default function Home() {
@@ -28,17 +27,24 @@ export default function Home() {
     setTheme(theme === 'day' ? "night" : "day")
   }
 
-  useEffect(()=>{
-    setWebReady(true)
-  },[])
+  // TODO: setwebready when load plan in new page
+  // useEffect(()=>{
+  //   setWebReady(true)
+  // },[])
 
   return (
       <div 
-        className={`relative w-full h-full whitespace-nowrap overflow-hidden ${viewSchedule ? "bg-black/70" : ""}`}
+        className={`relative w-full h-full whitespace-nowrap`}
         onMouseMove={(e)=>{
             setTopbarCord([e.clientX + document.body.scrollLeft, e.clientY + document.body.scrollTop])
         }}
+        onTouchMove={(e)=>{
+            setTopbarCord([e.targetTouches[0].clientX + document.body.scrollLeft, e.targetTouches[0].clientY-60 + document.body.scrollTop])
+        }}
       >
+        <Head>
+          <title>แผนเรียนใหม่ - Planriean</title>
+        </Head>
         {/* <Link href={"test"}>
         <button>Test</button>
         </Link> */}
@@ -51,7 +57,7 @@ export default function Home() {
           {topbarHtml}
         </span>
 
-        <div className={`smooth-out ${viewSchedule ? "h-[35dvh] overflow-hidden" : "w-full h-full"} flex justify-center items-center relative`} 
+        <div className={`smooth-out w-full h-full flex justify-center items-center relative`} 
           // onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}
         >
           {/* Summary Calendar Component */}
