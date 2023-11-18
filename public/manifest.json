@@ -1,0 +1,22 @@
+{
+    "name": "Planriean - ตัวช่วยจัดตารางเรียน",
+    "short_name": "Planriean",
+    "icons": [
+      {
+        "src": "/icon.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+  
+      {
+        "src": "/icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "theme_color": "#E6EDF3",
+    "background_color": "#E6EDF3",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "landscape"
+  }

@@ -43,7 +43,7 @@ export default function Home() {
         }}
       >
         <Head>
-          <title>แผนเรียนใหม่ - Planriean</title>
+          <title>แผนเรียนใหม่</title>
         </Head>
         {/* <Link href={"test"}>
         <button>Test</button>
