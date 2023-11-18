@@ -133,6 +133,12 @@ export default function PRCalendarSubject(props: any) {
         const time = parseInt(id.split("-")[1]);
         const dayindex = parseInt(id.split("-")[2]);
         if(!Number.isNaN(time) && !Number.isNaN(dayindex)){
+
+          if(topbarToggle.pre && focusTime.start_time != time){
+            setTopbarToggle({pre: false, init: true});
+            clearTimeout(toggleHold);
+          }
+
           setFocusTime({...focusTime, end_time: time})
           if(!topbarToggle.pre){
             setTopbarHtml(<>
@@ -159,13 +165,13 @@ export default function PRCalendarSubject(props: any) {
 
   return <>
     <div className={`
-      p-canvas-plan relative w-full h-full m-8 md:ml-0 flex justify-center items-center overflow-hidden  drop-shadow-xl
+      p-canvas-plan relative w-full h-full m-8 md:ml-0 flex justify-center items-center overflow-hidden 
     `}
     >
       <div className="absolute flex flex-col gap-8 items-center" style={{width: planWidth > 0 ? planWidth+"px" : undefined}}>
         {/* main schedule */}
         <div 
-          className="p-planmain select-none min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip" 
+          className="p-planmain select-none min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip shadow-xl" 
           style={{scale: planSize.toString()}}
           onMouseEnter={()=>{
             setTopbarToggle({pre: false, init: false});
@@ -216,7 +222,6 @@ export default function PRCalendarSubject(props: any) {
                       className={`pr-hover-toclick group absolute select-none left-0 top-0 w-[100%] h-full flex justify-center items-center z-10`}
                       id={"planhover-"+t.toString().padStart(2, "0")+"-"+dindex}
                       onMouseDown={(e)=>{
-
                         setFocusTime({ day: dindex, start_time: t, end_time: t });
                         setTopbarHtml(<>
                           <p>กดค้างไว้</p>
