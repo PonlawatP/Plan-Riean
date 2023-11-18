@@ -16,7 +16,10 @@ export default function PRCalendarSubject(props: any) {
     topbarCord, 
     setTopbarCord,
     topbarHtml, 
-    setTopbarHtml
+    setTopbarHtml,
+    toggleHold, 
+    setTooggleHold,
+    handleReleaceHoldClick
   } = useContext(CalendarContext);
   const name_days = [
     {
@@ -177,24 +180,22 @@ export default function PRCalendarSubject(props: any) {
     }
   }
 
-  const [toggleHold, setTooggleHold] = useState<any>(null);
 
   function handleHoldClick(e:any, dindex:number, t:number){
-    setFocusTime({ day: dindex, start_time: t, end_time: t });
-    setTopbarHtml(<>
-      <p>กดค้างไว้</p>
-      <p>เพื่อค้นหาตามเวลา</p>
-    </>)
-    setTopbarToggle({pre: true, init: false});
-    
     setTooggleHold(setTimeout(() => {
-      setTopbarToggle({pre: false, init: true});
+      setFocusTime({ day: dindex, start_time: t, end_time: t });
+      setTopbarHtml(<>
+        <p>กดค้างไว้</p>
+        <p>เพื่อค้นหาตามเวลา</p>
+      </>)
+      setTopbarToggle({pre: true, init: false});
       clearTimeout(toggleHold);
-    }, 500));
-  }
-  function handleReleaceHoldClick(e:any){
-    clearTimeout(toggleHold);
-    setTopbarToggle({pre: false, init: false});
+      
+      setTooggleHold(setTimeout(() => {
+        setTopbarToggle({pre: false, init: true});
+        clearTimeout(toggleHold);
+      }, 500));
+    }, 100));
   }
 
   return <>
@@ -208,7 +209,7 @@ export default function PRCalendarSubject(props: any) {
           className="p-planmain select-none smooth-all min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip shadow-xl" 
           style={{scale: planSize.toString()}}
           onMouseMove={handleDragToSelectPlanTime}
-          onTouchMoveCapture={(e)=>{
+          onTouchMove={(e)=>{
             handleDragToSelectPlanTime(e, true)
           }}
         >
@@ -237,6 +238,7 @@ export default function PRCalendarSubject(props: any) {
                     id={"plan-"+t.toString().padStart(2, "0")+"-"+dindex}
                     className={`block w-20 h-16 p-2 border-l-2 ${dindex != name_days.length-1 && tindex != 4 ? "border-b-2" : ""} border-black/10 group text-black/10`}
                     onMouseUp={handleReleaceHoldClick}
+                    onTouchEnd={handleReleaceHoldClick}
                   >
                   </span>
 
@@ -255,11 +257,11 @@ export default function PRCalendarSubject(props: any) {
                         handleHoldClick(e, dindex, t)
                       }}
                       onTouchEnd={handleReleaceHoldClick}
+                      onClick={()=>fnHandleClickedOnCalendar(tindex, dindex)}
                     >
                       <span 
-                        className={`smooth-opacity opacity-0 ${!topbarToggle.init ? "group-hover:opacity-100" : ""} relative rounded-lg text-sm w-11/12 h-5/6 bg-black/40 text-white/80 flex justify-center items-center`}
+                        className={`smooth-opacity opacity-0 ${!topbarToggle.init && !viewSchedule ? "group-hover:opacity-100" : ""} relative rounded-lg text-sm w-11/12 h-5/6 bg-black/40 text-white/80 flex justify-center items-center`}
                         id={"planhover-"+t.toString().padStart(2, "0")+"-"+dindex}
-                        onClick={()=>fnHandleClickedOnCalendar(tindex, dindex)}
                       >
                         ดูรายวิชา
                       </span>

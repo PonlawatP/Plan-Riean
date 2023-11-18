@@ -12,7 +12,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
-  subsets: ['latin', 'thai']
+  subsets: ['latin', 'thai'],
+  display: "swap"
 })
 
 export default function Layout({
@@ -28,6 +29,15 @@ export default function Layout({
   const [topbarToggle, setTopbarToggle] = useState({pre: false, init: false})
   const [topbarCord, setTopbarCord] = useState([0,0])
   const [topbarHtml, setTopbarHtml] = useState(<></>)
+  const [toggleHold, setTooggleHold] = useState<any>(null);
+
+  function handleReleaceHoldClick(e:any){
+    if(topbarToggle.init){
+      setViewState(true)
+    }
+    clearTimeout(toggleHold);
+    setTopbarToggle({pre: false, init: false});
+  }
 
   return (
     <>
@@ -38,13 +48,11 @@ export default function Layout({
         }
     `}</style>
 
-    <CalendarContext.Provider value={{viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml}}>
+    <CalendarContext.Provider value={{viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, handleReleaceHoldClick}}>
       
       <div 
         className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+font.className}
-        onMouseUp={()=>{
-          setTopbarToggle({pre: false, init: false});
-        }}
+        onMouseUp={handleReleaceHoldClick}
       >
         <section className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
           <button className='hidden sm:flex'><Image src="/assets/images/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></button>
@@ -113,7 +121,7 @@ export default function Layout({
             </section>
           {children}
           {/* subject selector */}
-          <section className={`pr-subject-select smooth-all absolute md:p-8 w-full md:w-auto h-full grid ${!viewSchedule ? "opacity-0 -translate-x-10 invisible" : topbarToggle.init ? "opacity-20" : ""}`}>
+          <section className={`pr-subject-select smooth-all absolute md:p-8 w-full md:w-auto h-full grid ${!viewSchedule ? "opacity-0 translate-y-10 md:-translate-x-10 invisible" : topbarToggle.init ? "opacity-20" : ""}`}>
             <div className="pr-subject-select-body relative md:w-[360px] p-1 rounded-3xl border-[1px] border-white/80 bg-white/90">
               <div className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-black/20">
                 <div className="flex gap-2 items-center font-semibold text-xl">
