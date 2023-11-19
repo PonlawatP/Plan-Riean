@@ -2,13 +2,19 @@ import GoogleAnalytics from '@/GoogleAnalytics'
 import { ThemeContext } from '@/providers'
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans_Thai } from 'next/font/google'
-import { useContext, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
 import { CalendarContext } from '@/providers/CalendarProvider'
 import { ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css';
+import PRSubjectSelector from '../PRSubjectSelector'
+import PRSidebar from '../PRSidebar'
+import DialogFirstSearch from '../PRSubjectSelector/dialogue/firstSearch'
+import DialogSearchNotSellectGroup from '../PRSubjectSelector/dialogue/searchNotSellectGroup'
+import DialogSearchNotFound from '../PRSubjectSelector/dialogue/searchNotFound'
+import DialogLoading from '../PRSubjectSelector/dialogue/loading'
 
 const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -23,20 +29,52 @@ export default function Layout({
 }) {
   const {theme} = useContext(ThemeContext)
 
-  const [viewSchedule, setViewState] = useState(false)
+  const [viewSchedule, setViewState] = useState(true)
   const [webReady, setWebReady] = useState(false)
   const [scrolled, setScrolled] = useState(0)
   const [topbarToggle, setTopbarToggle] = useState({pre: false, init: false})
   const [topbarCord, setTopbarCord] = useState([0,0])
   const [topbarHtml, setTopbarHtml] = useState(<></>)
   const [toggleHold, setTooggleHold] = useState<any>(null);
+  const resizeFunc = useRef<void>();
+
+  const [planSize, setPlanSize] = useState(.4);
+  const [planWidth, setPlanWidth] = useState(1);
+
+  const canvasElemRef = useRef<HTMLElement | null>(null);
+  const planElemRef = useRef<HTMLElement | null>(null);
+
 
   function handleReleaceHoldClick(e:any){
     if(topbarToggle.init){
       setViewState(true)
+      setTimeout(()=>{resizePlan()},250)
     }
     clearTimeout(toggleHold);
     setTopbarToggle({pre: false, init: false});
+  }
+
+  const resizePlan = () => {
+    const canvasElem = canvasElemRef.current
+    const planElem = planElemRef.current
+    if(canvasElem instanceof HTMLElement && planElem instanceof HTMLElement){
+      const canvas = canvasElem?.offsetWidth || 0
+      const plan = planElem?.offsetWidth || 0
+
+      if(canvas/plan <= 1){
+        setPlanSize(canvas/plan)
+        setPlanWidth(canvas)
+      } else {
+        setPlanSize(1)
+        setPlanWidth(-1)
+      }
+    }
+  };
+  
+  function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
+    // toast("test")
+    setViewState(!viewSchedule)
+    setTimeout(()=>{resizePlan()},250)
   }
 
   return (
@@ -48,7 +86,10 @@ export default function Layout({
         }
     `}</style>
 
-    <CalendarContext.Provider value={{viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, handleReleaceHoldClick}}>
+    <CalendarContext.Provider value={{
+      viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, handleReleaceHoldClick
+      , resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, fnHandleClickedOnCalendar
+    }}>
       
       <div 
         className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+font.className}
@@ -81,61 +122,61 @@ export default function Layout({
         <div className={
           'pr-main select-none grid relative md:grid-cols-[auto_1fr] overflow-hidden'
           }>
-            <section 
-              className={`
-                pr-sidebar smooth-all relative hidden p-8 drop-shadow-xl min-h-[460px] md:w-[122px] ${!viewSchedule ? "lg:w-[260px]" : "md:w-[425px] lg:w-[425px]"} md:block smooth-opacity 
-                ${viewSchedule ? "opacity-0 translate-x-10" : topbarToggle.init ? "opacity-20" : "opacity-100"}
-              `}
-            >
-              {/* main sidebar */}
-              <div className="content relative flex flex-col h-full bg-white/60 border-[1px] rounded-3xl overflow-hidden">
-                <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60 bg-pr-msu-1 text-pr-msu-1-60'>
-                  <i className='bx bx-home text-2xl drop-shadow-pr-shadow-text'/>
-                  <p className="drop-shadow-pr-shadow-text hidden lg:block">แผนเรียน</p>
-                </button>
-                <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-                  <i className='group-hover:drop-shadow-pr-shadow-text bx bx-task text-2xl'/>
-                  <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">แผนการเรียน</p>
-                </button>
-                <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-                  <i className='group-hover:drop-shadow-pr-shadow-text bx bx-stats text-2xl'/>
-                  <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">สถานะการเรียน</p>
-                </button>
-                <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-                  <i className='group-hover:drop-shadow-pr-shadow-text bx bx-git-repo-forked text-2xl rotate-90'/>
-                  <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">เส้นทางหลักสูตร</p>
-                </button>
-                <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-                  <i className='group-hover:drop-shadow-pr-shadow-text bx bx-star text-2xl'/>
-                  <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">รีวิว</p>
-                </button>
-                <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-                  <i className='group-hover:drop-shadow-pr-shadow-text bx bx-map-alt text-2xl'/>
-                  <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">แผนที่</p>
-                </button>
-                <button className='absolute bottom-0 px-4 h-14 w-full text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-                  <i className='group-hover:drop-shadow-pr-shadow-text bx bx-cog text-2xl'/>
-                  <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">ตั้งค่า</p>
-                </button>
-              </div>
-            </section>
+          {/* sidebar */}
+          <PRSidebar/>
           {children}
           {/* subject selector */}
-          <section className={`pr-subject-select smooth-all absolute md:p-8 w-full md:w-auto h-full grid ${!viewSchedule ? "opacity-0 translate-y-10 md:-translate-x-10 invisible" : topbarToggle.init ? "opacity-20" : ""}`}>
-            <div className="pr-subject-select-body relative md:w-[360px] p-1 rounded-3xl border-[1px] border-white/80 bg-white/90">
-              <div className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-black/20">
-                <div className="flex gap-2 items-center font-semibold text-xl">
-                  <button onClick={()=>setViewState(false)} className='hover:bg-pr-bg active:bg-slate-300 rounded-lg aspect-square w-10'>
-                    <i className="bx bx-chevron-left text-3xl translate-y-[2px]"></i>
-                  </button>
-                  <h1>เลือกรายวิชา</h1>
-                </div>
-                <button className='text-pr-text-menu border-2 border-black/20 px-2 mr-2 rounded-lg bg-pr-bg hover:bg-slate-300 active:bg-slate-400'>
-                  <i className="bx bx-layer text-xl translate-y-[3px] mr-1"></i> คัดกรอง
-                </button>
-              </div>
-            </div>
-          </section>
+          <PRSubjectSelector isShowDialog={true}>
+            <DialogFirstSearch/>
+            <DialogSearchNotSellectGroup/>
+            <DialogSearchNotFound/>
+            <DialogLoading/>
+            {/* TODO: subject list right here */}
+            {/* <p className='bg-red-400'>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p>
+            <p>test</p> */}
+          </PRSubjectSelector>
         </div>
       </div>
         <ToastContainer

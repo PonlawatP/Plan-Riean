@@ -19,7 +19,10 @@ export default function PRCalendarSubject(props: any) {
     setTopbarHtml,
     toggleHold, 
     setTooggleHold,
-    handleReleaceHoldClick
+    handleReleaceHoldClick, 
+    planWidth, setPlanWidth, planSize, setPlanSize,
+    resizePlan, canvasElemRef, planElemRef,
+    fnHandleClickedOnCalendar
   } = useContext(CalendarContext);
   const name_days = [
     {
@@ -67,14 +70,7 @@ export default function PRCalendarSubject(props: any) {
 
   const memoizedTimeTable = useMemo(() => getTimeTable(MAX_SUBJECT_TIME), [MAX_SUBJECT_TIME]);
 
-  function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
-    // toast("test")
-    setViewState(!viewSchedule)
-    setTimeout(()=>{resizePlan()},250)
-  }
-
-  const canvasElemRef = useRef<HTMLElement | null>(null);
-  const planElemRef = useRef<HTMLElement | null>(null);
+  
 
   useEffect(() => {
     const canvasElem = document.querySelector(".p-canvas-plan");
@@ -87,26 +83,7 @@ export default function PRCalendarSubject(props: any) {
 
     resizePlan()
   }, []);
-  
-  const resizePlan = () => {
-    const canvasElem = canvasElemRef.current
-    const planElem = planElemRef.current
-    if(canvasElem instanceof HTMLElement && planElem instanceof HTMLElement){
-      const canvas = canvasElem?.offsetWidth || 0
-      const plan = planElem?.offsetWidth || 0
 
-      if(canvas/plan <= 1){
-        setPlanSize(canvas/plan)
-        setPlanWidth(canvas)
-      } else {
-        setPlanSize(1)
-        setPlanWidth(-1)
-      }
-    }
-  };
-
-  const [planSize, setPlanSize] = useState(.4);
-  const [planWidth, setPlanWidth] = useState(1);
   useEffect(() => {
     window.addEventListener('resize', resizePlan);
   
