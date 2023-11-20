@@ -5,11 +5,12 @@ import { IBM_Plex_Sans_Thai } from 'next/font/google'
 import { useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
-import { CalendarContext } from '@/providers/CalendarProvider'
+import { CalendarContext, CalendarFilterContext, ICalendarFilter } from '@/providers/CalendarProvider'
 import { ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css';
 import PRSubjectSelector from '../PRSubjectSelector'
+import PRSubjectFilter from '../PRSubjectFilter'
 import PRSidebar from '../PRSidebar'
 import DialogFirstSearch from '../PRSubjectSelector/dialogue/firstSearch'
 import DialogSearchNotSellectGroup from '../PRSubjectSelector/dialogue/searchNotSellectGroup'
@@ -43,7 +44,6 @@ export default function Layout({
 
   const canvasElemRef = useRef<HTMLElement | null>(null);
   const planElemRef = useRef<HTMLElement | null>(null);
-
 
   function handleReleaceHoldClick(e:any){
     if(topbarToggle.init){
@@ -91,6 +91,16 @@ export default function Layout({
       , resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, fnHandleClickedOnCalendar
     }}>
       
+      <CalendarFilterContext.Provider value={{
+          group: [],
+          subject: [],
+          day: [],
+          time: [],
+          place: [],
+          room: []
+      }}>
+
+      </CalendarFilterContext.Provider>
       <div 
         className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+font.className}
         onMouseUp={handleReleaceHoldClick}
@@ -115,7 +125,7 @@ export default function Layout({
           </article>
           <button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-light hover:underline">
             <p className='hidden md:block'>Ponlawat</p>
-            <Image src="https://scontent.fkkc3-1.fna.fbcdn.net/v/t39.30808-1/384989124_2274522622755838_4666111611377143413_n.jpg?stp=c34.0.445.444a_dst-jpg_p480x480&_nc_cat=101&ccb=1-7&_nc_sid=5f2048&_nc_ohc=wUdpZxwB05YAX8ciyiU&_nc_ht=scontent.fkkc3-1.fna&oh=00_AfD3pTyHz5xsvdJK4L_DaKLOagZBY8VVOouRgtoNPp78gQ&oe=655AF106" alt="Planriean Logo" width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></Image>
+            <Image src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg" alt="Planriean Logo" width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></Image>
           </button>
         </section>
 
@@ -177,6 +187,8 @@ export default function Layout({
             <p>test</p>
             <p>test</p> */}
           </PRSubjectSelector>
+          <PRSubjectFilter>
+          </PRSubjectFilter>
         </div>
       </div>
         <ToastContainer

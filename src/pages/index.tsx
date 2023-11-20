@@ -1,6 +1,6 @@
 import PRCalendarSubject from '@/components/PRCalendarSubject';
 import { ThemeContext } from '@/providers';
-import { CalendarContext } from '@/providers/CalendarProvider';
+import { CalendarContext, CalendarFilterContext } from '@/providers/CalendarProvider';
 import Head from 'next/head';
 import { useContext, useEffect, useReducer, useState } from 'react';
 
@@ -45,9 +45,6 @@ export default function Home() {
         <Head>
           <title>แผนเรียนใหม่</title>
         </Head>
-        {/* <Link href={"test"}>
-        <button>Test</button>
-        </Link> */}
         {/* <button onClick={toggleTheme}>Dark</button> */}
 
         <span 

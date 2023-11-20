@@ -9,7 +9,7 @@ const nextConfig = {
         remotePatterns: [
           {
             protocol: 'https',
-            hostname: 'scontent.fkkc3-1.fna.fbcdn.net',
+            hostname: 'thumbs.dreamstime.com',
             port: '',
             pathname: '**',
           },
