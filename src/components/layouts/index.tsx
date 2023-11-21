@@ -31,6 +31,7 @@ export default function Layout({
   const {theme} = useContext(ThemeContext)
 
   const [viewSchedule, setViewState] = useState(true)
+  const [viewFilter, setViewFilter] = useState(false)
   const [webReady, setWebReady] = useState(false)
   const [scrolled, setScrolled] = useState(0)
   const [topbarToggle, setTopbarToggle] = useState({pre: false, init: false})
@@ -71,9 +72,11 @@ export default function Layout({
     }
   };
   
-  function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
+  function fnHandleClickedOnCalendar(tindex: number, dindex: number, view = true) {
     // toast("test")
-    setViewState(!viewSchedule)
+
+    setViewState(view)
+    setViewFilter(false)
     setTimeout(()=>{resizePlan()},250)
   }
 
@@ -88,10 +91,11 @@ export default function Layout({
 
     <CalendarContext.Provider value={{
       viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, handleReleaceHoldClick
-      , resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, fnHandleClickedOnCalendar
+      , resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, fnHandleClickedOnCalendar, viewFilter, setViewFilter
     }}>
       
       <CalendarFilterContext.Provider value={{
+          updated: "18/11/66 19:54:43",
           group: [],
           subject: [],
           day: [],
@@ -138,9 +142,10 @@ export default function Layout({
           {/* subject selector */}
           <PRSubjectSelector isShowDialog={true}>
             <DialogFirstSearch/>
-            <DialogSearchNotSellectGroup/>
+            {/* <DialogSearchNotSellectGroup/>
             <DialogSearchNotFound/>
-            <DialogLoading/>
+            <DialogLoading/> */}
+
             {/* TODO: subject list right here */}
             {/* <p className='bg-red-400'>test</p>
             <p>test</p>
@@ -187,8 +192,7 @@ export default function Layout({
             <p>test</p>
             <p>test</p> */}
           </PRSubjectSelector>
-          <PRSubjectFilter>
-          </PRSubjectFilter>
+          <PRSubjectFilter />
         </div>
       </div>
         <ToastContainer

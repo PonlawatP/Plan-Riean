@@ -1,6 +1,7 @@
 import { createContext, useState } from "react"
 
 export interface ICalendarFilter {
+    updated: string,
     group: [],
     subject: [],
     day: [],
@@ -11,6 +12,7 @@ export interface ICalendarFilter {
 
 export const CalendarContext = createContext<any>({})
 export const CalendarFilterContext = createContext<ICalendarFilter>({
+    updated: "",
     group: [],
     subject: [],
     day: [],

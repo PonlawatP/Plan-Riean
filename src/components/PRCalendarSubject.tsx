@@ -60,7 +60,7 @@ export default function PRCalendarSubject(props: any) {
 
   const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
 
-  function getTimeTable(added: number = 18){
+  function getTimeTable(added: number = 16){
     const times_m: Array<number> = [];
     for (let i = 8; i <= added; i++) {
       times_m.push(i);

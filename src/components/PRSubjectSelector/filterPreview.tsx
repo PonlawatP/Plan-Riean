@@ -50,7 +50,7 @@ function getGroupFormat(){
     return "null"
 }
 
-return <div className="flex flex-wrap gap-2 p-2 pt-3 pb-5 text-pr-gray-1 bg-gradient-to-t from-transparent via-white/50 via-20% to-white/80 to-50% sticky top-0 backdrop-blur-sm">
+return <div className="flex flex-wrap gap-2 p-2 pt-3 pb-5 text-pr-gray-1 bg-gradient-to-t from-transparent via-white/50 via-20% to-white/80 to-50% sticky top-0 backdrop-blur-sm z-10">
         <span className="flex gap-1 items-center">
             <i className="bx bxs-book text-2xl"></i>
             <p>{getGroupFormat()}</p>
