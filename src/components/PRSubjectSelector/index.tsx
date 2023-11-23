@@ -1,6 +1,7 @@
 import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider"
 import { useContext } from "react"
 import FilterPreview from "./filterPreview"
+import { CalendarSelectorDataContext, ICalendarDataProvider } from "@/providers/CalendarSelectorDataProvider";
 
 export default function PRSubjectSelector(props:any){
   const {isShowDialog, children} = props;
@@ -12,10 +13,12 @@ export default function PRSubjectSelector(props:any){
         fnHandleClickedOnCalendar
     } = useContext(CalendarContext)
     
-    const {filter, setFilter} = useContext(CalendarFilterContext);
+    const {calsel_data} = useContext<ICalendarDataProvider>(CalendarSelectorDataContext);
     const {
       updated,
-  } = filter;
+      isLoading,
+      isError
+    } = calsel_data;
 
     function handleFilterPanel(){
       setViewFilter(!viewFilter)
@@ -42,7 +45,7 @@ export default function PRSubjectSelector(props:any){
       </section>
       {/* content */}
       <section className="pr-subject-content relative h-full overflow-auto">
-        {!isShowDialog ? <FilterPreview/> : null}
+        {!isShowDialog && !isLoading && !isError ? <FilterPreview/> : null}
           {children}
       </section>
     </div>

@@ -44,21 +44,13 @@ export const name_days = [
 export default function PRCalendarSubject(props: any) {
   const {
     viewSchedule,
-    setViewState,
-    webReady,
-    setWebReady,
-    scrolled,
-    setScrolled,
     topbarToggle, 
     setTopbarToggle, 
-    topbarCord, 
-    setTopbarCord,
-    topbarHtml, 
     setTopbarHtml,
     toggleHold, 
     setTooggleHold,
     handleReleaceHoldClick, 
-    planWidth, setPlanWidth, planSize, setPlanSize,
+    planWidth, planSize,
     resizePlan, canvasElemRef, planElemRef,
     fnHandleClickedOnCalendar,
     focusTime, setFocusTime

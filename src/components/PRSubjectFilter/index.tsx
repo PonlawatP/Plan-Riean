@@ -1,6 +1,7 @@
 import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider"
 import { useContext } from "react"
 import { name_days } from "../PRCalendarSubject";
+import { CalendarSelectorDataContext, ICalendarDataProvider } from "@/providers/CalendarSelectorDataProvider";
 
 export default function PRSubjectFilter({children}:any, props:any){
     const {
@@ -14,7 +15,6 @@ export default function PRSubjectFilter({children}:any, props:any){
     const {filter, setFilter, TimeFilterTogglePRC, SingleTimeFilterTogglePRC} = useContext(CalendarFilterContext);
 
     const {
-      updated,
       group,
       subject,
       day,
@@ -22,7 +22,10 @@ export default function PRSubjectFilter({children}:any, props:any){
       room,
       master
   } = filter;
-    
+
+  const {calsel_data, setCalselData} = useContext<ICalendarDataProvider>(CalendarSelectorDataContext)
+  const {updated} = calsel_data
+  
     function elemButton(msg: any, onClickEvent:()=>void = () => {}, isOn: boolean=false, classAdd:string=""){
       return <button onClick={onClickEvent} className={'h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] active:border-0 '+classAdd+` ${isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
       {msg}
@@ -34,11 +37,25 @@ export default function PRSubjectFilter({children}:any, props:any){
     }
 
     function handleFilterSubmit(clear=false){
-      if(!clear){
-        setViewFilter(!viewFilter)
+      if(clear){
+        setFilter({
+          group: [],
+          subject: [],
+          day: [],
+          time: [],
+          room: [],
+          master: []
+      })
+        return
       }
+      handleSearch()
+      setViewFilter(!viewFilter)
+      
     }
-    
+    function handleSearch(){
+      setCalselData({...calsel_data, isLoading: true, current_filter: filter, isFirstLoading: false})
+    }
+
     function isGroupFilterOn(name: string = ""){
       return group.includes(name);
     }

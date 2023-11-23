@@ -1,7 +1,6 @@
 import { createContext, useState } from "react"
 
 export interface ICalendarFilter {
-    updated: string,
     group: Array<any>,
     subject: Array<any>,
     day: Array<any>,

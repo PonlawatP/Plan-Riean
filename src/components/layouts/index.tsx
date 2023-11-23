@@ -1,6 +1,4 @@
-import GoogleAnalytics from '@/GoogleAnalytics'
 import { ThemeContext } from '@/providers'
-import type { Metadata } from 'next'
 import { IBM_Plex_Sans_Thai } from 'next/font/google'
 import { useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
@@ -13,7 +11,7 @@ import PRSubjectSelector from '../PRSubjectSelector'
 import PRSubjectFilter from '../PRSubjectFilter'
 import PRSidebar from '../PRSidebar'
 import DialogFirstSearch from '../PRSubjectSelector/dialogue/firstSearch'
-import DialogSearchNotSellectGroup from '../PRSubjectSelector/dialogue/searchNotSellectGroup'
+import CalendarSelectorDataProvider, { CalendarSelectorDataContext, ICalendarData, ICalendarDataProvider } from '@/providers/CalendarSelectorDataProvider'
 import DialogSearchNotFound from '../PRSubjectSelector/dialogue/searchNotFound'
 import DialogLoading from '../PRSubjectSelector/dialogue/loading'
 
@@ -30,7 +28,7 @@ export default function Layout({
 }) {
   const {theme} = useContext(ThemeContext)
 
-  const [viewSchedule, setViewState] = useState(true)
+  const [viewSchedule, setViewState] = useState(false)
   const [viewFilter, setViewFilter] = useState(false)
   const [webReady, setWebReady] = useState(false)
   const [scrolled, setScrolled] = useState(0)
@@ -47,14 +45,13 @@ export default function Layout({
   const planElemRef = useRef<HTMLElement | null>(null);
 
   const [filter, setFilter] = useState<ICalendarFilter>({
-    updated: "null",
     group: [],
     subject: [],
     day: [],
     time: [],
     room: [],
     master: []
-})
+  })
 
 const [focusTime, setFocusTime] = useState({
   day: 0,
@@ -125,14 +122,14 @@ const [focusTime, setFocusTime] = useState({
   function SingleTimeFilterTogglePRC(time_num:string="", forceToggle = false){
     let temp_time = filter.time;
 
-    if(!filter.time.includes(time_num)){
+    if(!filter.time.includes(time_num) || forceToggle){
       temp_time = [time_num]
     } else {
       temp_time = temp_time.filter((t:string)=>t!=="all")
 
       temp_time = temp_time.map((tt:string)=>{
         if(tt === time_num){
-          return time_num.includes("-") ? tt.slice(1) : forceToggle ? tt : "-"+tt
+          return time_num.includes("-") ? tt.slice(1) : "-"+tt
         }
         return tt
       })
@@ -141,6 +138,26 @@ const [focusTime, setFocusTime] = useState({
 
     setFilter({...filter, time: temp_time})
   }
+
+  // data & functions to use in Subject Selector
+  const [calsel_data, setCalselData] = useState<ICalendarData>({
+    isFirstLoading: true,
+    isLoading: false,
+    isError: false,
+    updated: "null",
+    current_filter: {
+        group: [],
+        subject: [],
+        day: [],
+        time: [],
+        room: [],
+        master: []
+    },
+    result: {
+        recommanded: [],
+        data: []
+    }
+  })
 
   return (
     <>
@@ -187,64 +204,30 @@ const [focusTime, setFocusTime] = useState({
 
           <div className={
             'pr-main select-none grid relative md:grid-cols-[auto_1fr] overflow-hidden'
-            }>
+          }>
             {/* sidebar */}
             <PRSidebar/>
             {children}
             {/* subject selector */}
-            <PRSubjectSelector isShowDialog={false}>
-              <DialogFirstSearch/>
-              {/* <DialogSearchNotSellectGroup/>
-              <DialogSearchNotFound/>
-              <DialogLoading/> */}
-
-              {/* TODO: subject list right here */}
-              {/* <p className='bg-red-400'>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p>
-              <p>test</p> */}
-            </PRSubjectSelector>
-            <PRSubjectFilter />
+            <CalendarSelectorDataContext.Provider value={{calsel_data, setCalselData, calsel_data_func: {}}}>
+              <PRSubjectSelector isShowDialog={!calsel_data.isLoading && !calsel_data.isError}>
+                {
+                  calsel_data.isLoading ?
+                    <DialogLoading/>
+                  :
+                  calsel_data.result.data.length != 0
+                  ?
+                    <>TODO: show subject list here...</>
+                  :
+                  calsel_data.isFirstLoading
+                  ?
+                    <DialogFirstSearch/>
+                  :
+                    <DialogSearchNotFound/>
+                }
+              </PRSubjectSelector>
+              <PRSubjectFilter />
+            </CalendarSelectorDataContext.Provider>
           </div>
         </div>
           <ToastContainer
