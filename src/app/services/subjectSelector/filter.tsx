@@ -1,4 +1,4 @@
-import { CalendarContext, CalendarFilterContext, ICalendarFilter } from "@/providers/CalendarProvider";
+import { CalendarContext, CalendarFilterContext, ICalendarFilter } from "@/app/providers/CalendarProvider";
 import { useContext, useState } from "react";
 
 export default function SubjectSelectorFilterModel(props:any){

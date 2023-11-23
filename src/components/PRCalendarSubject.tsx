@@ -1,4 +1,4 @@
-import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider";
+import { CalendarContext, CalendarFilterContext } from "@/app/providers/CalendarProvider";
 import { time } from "console";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";

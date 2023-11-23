@@ -1,4 +1,4 @@
-import { CalendarContext } from "@/providers/CalendarProvider"
+import { CalendarContext } from "@/app/providers/CalendarProvider"
 import { useContext } from "react"
 
 export default function DialogLoading({children}:any, props:any){

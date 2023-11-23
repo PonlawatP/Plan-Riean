@@ -1,6 +1,6 @@
 import PRCalendarSubject from '@/components/PRCalendarSubject';
-import { ThemeContext } from '@/providers';
-import { CalendarContext, CalendarFilterContext } from '@/providers/CalendarProvider';
+import { ThemeContext } from '@/app/providers';
+import { CalendarContext, CalendarFilterContext } from '@/app/providers/CalendarProvider';
 import Head from 'next/head';
 import { useContext, useEffect, useReducer, useState } from 'react';
 

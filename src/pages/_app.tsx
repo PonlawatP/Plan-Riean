@@ -1,10 +1,10 @@
 import { AppProps } from "next/app";
 import './globals.css'
-import Layout from "@/layouts";
+import Layout from "@/app/layouts";
 import Script from "next/script";
 // import GoogleAnalytics from "@/GoogleAnalytics";
 import { GoogleAnalytics } from "nextjs-google-analytics";
-import { ThemeContext } from "@/providers";
+import { ThemeContext } from "@/app/providers";
 import { useState } from "react";
 import Head from "next/head";
 

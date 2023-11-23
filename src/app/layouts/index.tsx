@@ -1,19 +1,19 @@
-import { ThemeContext } from '@/providers'
+import { ThemeContext } from '@/app/providers'
 import { IBM_Plex_Sans_Thai } from 'next/font/google'
 import { useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
-import { CalendarContext, CalendarFilterContext, ICalendarData, ICalendarFilter } from '@/providers/CalendarProvider'
+import { CalendarContext, CalendarFilterContext, ICalendarData, ICalendarFilter } from '@/app/providers/CalendarProvider'
 import { ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css';
-import PRSubjectSelector from '../components/PRSubjectSelector'
-import PRSubjectFilter from '../components/PRSubjectFilter'
-import PRSidebar from '../components/PRSidebar'
-import DialogFirstSearch from '../components/PRSubjectSelector/dialogue/firstSearch'
-import DialogSearchNotFound from '../components/PRSubjectSelector/dialogue/searchNotFound'
-import DialogLoading from '../components/PRSubjectSelector/dialogue/loading'
-import DialogError from '../components/PRSubjectSelector/dialogue/error'
+import PRSubjectSelector from '../../components/PRSubjectSelector'
+import PRSubjectFilter from '../../components/PRSubjectFilter'
+import PRSidebar from '../../components/PRSidebar'
+import DialogFirstSearch from '../../components/PRSubjectSelector/dialogue/firstSearch'
+import DialogSearchNotFound from '../../components/PRSubjectSelector/dialogue/searchNotFound'
+import DialogLoading from '../../components/PRSubjectSelector/dialogue/loading'
+import DialogError from '../../components/PRSubjectSelector/dialogue/error'
 import SubjectSelectorFilterModel from '../services/subjectSelector/filter'
 
 const font = IBM_Plex_Sans_Thai({ 

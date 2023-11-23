@@ -1,4 +1,4 @@
-import { CalendarFilterContext } from "@/providers/CalendarProvider";
+import { CalendarFilterContext } from "@/app/providers/CalendarProvider";
 import { useContext } from "react";
 import { name_days } from "../PRCalendarSubject";
 
