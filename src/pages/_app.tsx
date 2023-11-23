@@ -1,6 +1,6 @@
 import { AppProps } from "next/app";
 import './globals.css'
-import Layout from "@/components/layouts";
+import Layout from "@/layouts";
 import Script from "next/script";
 // import GoogleAnalytics from "@/GoogleAnalytics";
 import { GoogleAnalytics } from "nextjs-google-analytics";

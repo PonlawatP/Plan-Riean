@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { name_days } from "../PRCalendarSubject";
 
 export default function FilterPreview(props:any){
-  const {filter, setFilter} = useContext(CalendarFilterContext);
+  const f = useContext(CalendarFilterContext);
   const {
     group,
     subject,
@@ -11,7 +11,7 @@ export default function FilterPreview(props:any){
     time,
     room,
     master
-} = filter
+} = f.filter
 
 function getGroupFormat(){
   if(group.includes("all") || group.length == 0 || group.length == 9){

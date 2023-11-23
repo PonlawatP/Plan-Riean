@@ -1,4 +1,4 @@
-import { CalendarContext } from "@/providers/CalendarProvider";
+import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider";
 import { time } from "console";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
@@ -49,26 +49,18 @@ export default function PRCalendarSubject(props: any) {
     setTopbarHtml,
     toggleHold, 
     setTooggleHold,
-    handleReleaceHoldClick, 
     planWidth, planSize,
     resizePlan, canvasElemRef, planElemRef,
-    fnHandleClickedOnCalendar,
-    focusTime, setFocusTime
+    focusTime, setFocusTime,
+    getTimeTable, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME
   } = useContext(CalendarContext);
 
-  const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
+  const {
+    fnHandleClickedOnCalendar,
+    handleReleaceHoldClick, 
+  } = useContext(CalendarFilterContext)
 
-  function getTimeTable(added: number = 16){
-    const times_m: Array<number> = [];
-    for (let i = 8; i <= added; i++) {
-      times_m.push(i);
-    }
-    return times_m;
-  }
-
-  const memoizedTimeTable = useMemo(() => getTimeTable(MAX_SUBJECT_TIME), [MAX_SUBJECT_TIME]);
-
-  
+  const memoizedTimeTable = useMemo(() => getTimeTable(MAX_SUBJECT_TIME), [MAX_SUBJECT_TIME, getTimeTable]);
 
   useEffect(() => {
     const canvasElem = document.querySelector(".p-canvas-plan");
@@ -188,7 +180,7 @@ export default function PRCalendarSubject(props: any) {
             className="grid grid-flow-col"
           >
             <span className="w-16 bg-pr-msu-1 border-b-2 border-black/10"></span>
-            {memoizedTimeTable.map((t,tindex)=><span key={`pr-time-${tindex}`} className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10">{t.toString().padStart(2, "0")}:00</span>)}
+            {memoizedTimeTable.map((t:number,tindex:number)=><span key={`pr-time-${tindex}`} className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10">{t.toString().padStart(2, "0")}:00</span>)}
           </span>
           {/* loop row from days */}
           {name_days.map((day, dindex) => 
@@ -202,7 +194,7 @@ export default function PRCalendarSubject(props: any) {
               </span>
               {/* loop schedule from timetable */}
               {
-                memoizedTimeTable.map((t,tindex)=><span key={`pr-day-${day.date_en_1}-${t}`} className="relative">
+                memoizedTimeTable.map((t:number,tindex:number)=><span key={`pr-day-${day.date_en_1}-${t}`} className="relative">
                   <span 
                     id={"plan-"+t.toString().padStart(2, "0")+"-"+dindex}
                     className={`block w-20 h-16 p-2 border-l-2 ${dindex != name_days.length-1 && tindex != 4 ? "border-b-2" : ""} border-black/10 group text-black/10`}
