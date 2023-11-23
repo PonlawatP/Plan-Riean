@@ -3,6 +3,44 @@ import { time } from "console";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
+export const name_days = [
+  {
+    date_th: "จันทร์",
+    date_th_1: "จ",
+    date_en_3: "Mon",
+    date_en_2: "Mo",
+    date_en_1: "M",
+  },
+  {
+    date_th: "อังคาร",
+    date_th_1: "อ",
+    date_en_3: "Tue",
+    date_en_2: "Tu",
+    date_en_1: "t",
+  },
+  {
+    date_th: "พุธ",
+    date_th_1: "พ",
+    date_en_3: "Wed",
+    date_en_2: "We",
+    date_en_1: "W",
+  },
+  {
+    date_th: "พฤหัสฯ",
+    date_th_1: "พฤ",
+    date_en_3: "Thu",
+    date_en_2: "Th",
+    date_en_1: "Th",
+  },
+  {
+    date_th: "ศุกร์",
+    date_th_1: "ศ",
+    date_en_3: "Fri",
+    date_en_2: "Fr",
+    date_en_1: "F",
+  },
+];
+
 export default function PRCalendarSubject(props: any) {
   const {
     viewSchedule,
@@ -22,41 +60,9 @@ export default function PRCalendarSubject(props: any) {
     handleReleaceHoldClick, 
     planWidth, setPlanWidth, planSize, setPlanSize,
     resizePlan, canvasElemRef, planElemRef,
-    fnHandleClickedOnCalendar
+    fnHandleClickedOnCalendar,
+    focusTime, setFocusTime
   } = useContext(CalendarContext);
-  const name_days = [
-    {
-      date_th: "จันทร์",
-      date_3: "Mon",
-      date_2: "Mo",
-      date_1: "M",
-    },
-    {
-      date_th: "อังคาร",
-      date_3: "Tue",
-      date_2: "Tu",
-      date_1: "t",
-    },
-    {
-      date_th: "พุธ",
-      date_3: "Wed",
-      date_2: "We",
-      date_1: "W",
-    },
-    {
-      date_th: "พฤหัสฯ",
-      date_3: "Thu",
-      date_2: "Th",
-      date_1: "Th",
-    },
-    {
-      date_th: "ศุกร์",
-      date_3: "Fri",
-      date_2: "Fr",
-      date_1: "F",
-    },
-  ];
-
 
   const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
 
@@ -93,12 +99,6 @@ export default function PRCalendarSubject(props: any) {
     };
   });
 
-  const [focusTime, setFocusTime] = useState({
-    day: 0,
-    start_time: 8,
-    end_time: 8
-  })
-
   function getRangeTimeFormat(start_time:number, end_time:number, short_start = false){
     if(short_start){
       return start_time == end_time
@@ -116,7 +116,7 @@ export default function PRCalendarSubject(props: any) {
     ?
       start_time.toString().padStart(2, "0")+":00 - " + (end_time+1).toString().padStart(2, "0")+":00"
       :
-      start_time > end_time 
+      start_time > end_time
       ?
       end_time.toString().padStart(2, "0")+":00 - " + (start_time+1).toString().padStart(2, "0")+":00"
       :
@@ -201,16 +201,16 @@ export default function PRCalendarSubject(props: any) {
           {/* loop row from days */}
           {name_days.map((day, dindex) => 
           // row element
-            <span key={`pr-day-${day.date_1}`} className="grid grid-flow-col">
+            <span key={`pr-day-${day.date_en_1}`} className="grid grid-flow-col">
               {/* day element */}
               <span 
                 className={`w-16 bg-pr-msu-2 ${dindex != name_days.length-1 ? "border-b-2" : ""} border-black/10 flex items-center text-white`}
               >
-                <p className="ml-3">{day.date_3}</p>
+                <p className="ml-3">{day.date_en_3}</p>
               </span>
               {/* loop schedule from timetable */}
               {
-                memoizedTimeTable.map((t,tindex)=><span key={`pr-day-${day.date_1}-${t}`} className="relative">
+                memoizedTimeTable.map((t,tindex)=><span key={`pr-day-${day.date_en_1}-${t}`} className="relative">
                   <span 
                     id={"plan-"+t.toString().padStart(2, "0")+"-"+dindex}
                     className={`block w-20 h-16 p-2 border-l-2 ${dindex != name_days.length-1 && tindex != 4 ? "border-b-2" : ""} border-black/10 group text-black/10`}

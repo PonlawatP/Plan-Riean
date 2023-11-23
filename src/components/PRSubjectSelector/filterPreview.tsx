@@ -1,5 +1,6 @@
 import { CalendarFilterContext } from "@/providers/CalendarProvider";
 import { useContext } from "react";
+import { name_days } from "../PRCalendarSubject";
 
 export default function FilterPreview(props:any){
   const {filter, setFilter} = useContext(CalendarFilterContext);
@@ -14,7 +15,7 @@ export default function FilterPreview(props:any){
 
 function getGroupFormat(){
   if(group.includes("all") || group.length == 0 || group.length == 9){
-      return "ทั้งหมด"
+      return "ทุกวิชา"
   }
 
   const res:any[] = [];
@@ -73,6 +74,23 @@ function getGroupFormat(){
 
   return res.join(", ").trim();
 }
+function getDayFormat(){
+  if(day.length == name_days.length){
+      return "ทุกวัน"
+  } else if(day.length >= 3){
+    return day.length + " วัน"
+  }
+  const temp_day:Array<string> = [];
+  day.map((d:string)=>{
+    temp_day.push(name_days.filter((n)=>n.date_en_2 === d)[0].date_th_1)
+  })
+  return temp_day.join(", ")
+}
+
+function getTimeFormat(){
+  const temp_time = time.filter((t:string)=> t === t.replaceAll("-","")).map((t:string)=>t.split(":")[0]);
+  return temp_time.length == 1 ? temp_time+":00" : temp_time.join(" - ")
+}
 
 return <div className="flex flex-wrap gap-2 p-2 pt-3 pb-5 text-pr-gray-1 bg-gradient-to-t from-transparent via-white/50 via-20% to-white/80 to-50% sticky top-0 backdrop-blur-sm z-10">
         <span className="flex gap-1 items-center">
@@ -88,13 +106,13 @@ return <div className="flex flex-wrap gap-2 p-2 pt-3 pb-5 text-pr-gray-1 bg-grad
         {day.length > 0 &&
           <span className="flex gap-1 items-center">
               <i className="bx bx-calendar text-2xl"></i>
-              <p>ทั้งหมด</p>
+              <p>{getDayFormat()}</p>
           </span>
         }
-        {time.length > 0 &&
+        {time.filter((t:string)=> t === t.replaceAll("-", "")).length > 0 && !time.includes("all") &&
           <span className="flex gap-1 items-center">
               <i className="bx bx-time-five text-2xl"></i>
-              <p>ทั้งหมด</p>
+              <p>{getTimeFormat()}</p>
           </span>
         }
         {room.length > 0 &&

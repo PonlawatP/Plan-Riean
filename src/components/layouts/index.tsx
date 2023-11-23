@@ -56,9 +56,22 @@ export default function Layout({
     master: []
 })
 
+const [focusTime, setFocusTime] = useState({
+  day: 0,
+  start_time: 8,
+  end_time: 8
+})
+
   function handleReleaceHoldClick(e:any){
     if(topbarToggle.init){
+      if(focusTime.start_time < focusTime.end_time){
+        TimeFilterTogglePRC(false, focusTime.start_time.toString().padStart(2, "0")+":00", (focusTime.end_time+1).toString().padStart(2, "0")+":00")
+      } else {
+        TimeFilterTogglePRC(false, focusTime.end_time.toString().padStart(2, "0")+":00", (focusTime.start_time+1).toString().padStart(2, "0")+":00")
+      }
+
       setViewState(true)
+      setViewFilter(true)
       setTimeout(()=>{resizePlan()},250)
     }
     clearTimeout(toggleHold);
@@ -84,10 +97,49 @@ export default function Layout({
   
   function fnHandleClickedOnCalendar(tindex: number, dindex: number, view = true) {
     // toast("test")
+    if(viewSchedule){
+      setViewState(false)
+      setViewFilter(false)
+    } else {
+      if(tindex >= 0) SingleTimeFilterTogglePRC((8+tindex).toString().padStart(2, "0")+":00", true)
 
-    setViewState(view)
-    setViewFilter(false)
+      setViewState(true)
+      setViewFilter(true)
+    }
     setTimeout(()=>{resizePlan()},250)
+  }
+
+  function TimeFilterTogglePRC(all:boolean=false, time_start:string="", time_stop:string=""){
+    let temp_time = filter.time;
+    if(all){
+      if(!temp_time.includes("all")){
+        temp_time = temp_time.map((t:string)=>t===t.replaceAll("-","")?"-"+t:t)
+          temp_time.push("all");
+      }
+    } else if(time_start !== "" && time_stop !== ""){
+      temp_time = [time_start, time_stop]
+    }
+
+    setFilter({...filter, time: temp_time})
+  }
+  function SingleTimeFilterTogglePRC(time_num:string="", forceToggle = false){
+    let temp_time = filter.time;
+
+    if(!filter.time.includes(time_num)){
+      temp_time = [time_num]
+    } else {
+      temp_time = temp_time.filter((t:string)=>t!=="all")
+
+      temp_time = temp_time.map((tt:string)=>{
+        if(tt === time_num){
+          return time_num.includes("-") ? tt.slice(1) : forceToggle ? tt : "-"+tt
+        }
+        return tt
+      })
+    }
+
+
+    setFilter({...filter, time: temp_time})
   }
 
   return (
@@ -101,10 +153,10 @@ export default function Layout({
 
     <CalendarContext.Provider value={{
       viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, handleReleaceHoldClick
-      , resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, fnHandleClickedOnCalendar, viewFilter, setViewFilter
+      , resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, fnHandleClickedOnCalendar, viewFilter, setViewFilter, focusTime, setFocusTime
     }}>
       
-      <CalendarFilterContext.Provider value={{filter, setFilter}}>
+      <CalendarFilterContext.Provider value={{filter, setFilter, TimeFilterTogglePRC, SingleTimeFilterTogglePRC}}>
         <div 
           className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+font.className}
           onMouseUp={handleReleaceHoldClick}

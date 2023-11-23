@@ -1,8 +1,8 @@
 import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider"
 import { useContext } from "react"
+import { name_days } from "../PRCalendarSubject";
 
 export default function PRSubjectFilter({children}:any, props:any){
-  const {isShowDialog = false} = props;
     const {
         viewSchedule,
         viewFilter,
@@ -11,7 +11,7 @@ export default function PRSubjectFilter({children}:any, props:any){
         fnHandleClickedOnCalendar
     } = useContext(CalendarContext)
 
-    const {filter, setFilter} = useContext(CalendarFilterContext);
+    const {filter, setFilter, TimeFilterTogglePRC, SingleTimeFilterTogglePRC} = useContext(CalendarFilterContext);
 
     const {
       updated,
@@ -43,7 +43,7 @@ export default function PRSubjectFilter({children}:any, props:any){
       return group.includes(name);
     }
 
-    function FilterTogglePRC(name:string){
+    function GroupFilterTogglePRC(name:string){
       let temp_group = group;
 
       if(group.includes(name)){
@@ -53,6 +53,30 @@ export default function PRSubjectFilter({children}:any, props:any){
       }
 
       setFilter({...filter, group: temp_group})
+  }
+    
+  function isDayFilterOn(name: string = ""){
+    return day.includes(name);
+  }
+
+  function DayFilterTogglePRC(name:string){
+    let temp_day = day;
+
+    if(day.includes(name)){
+      temp_day = day.filter((item:string) => item !== name)
+    } else {
+      temp_day.push(name);
+    }
+
+    setFilter({...filter, day: temp_day})
+  }
+
+  function isTimeFilterOn(all:boolean = false, time_num:string = ""){
+    if(all){
+      return time.length == 0 || (time.length > 0 && time.includes("all")) || time.filter((t:string)=>t===t.replaceAll("-","")).length == 0
+    }
+
+    return time.includes("all") ? false : time.filter((t:string)=> t === time_num.replaceAll("-","")).length > 0;
   }
 
     return <section className={`pr-subject-filter pointer-events-none smooth-all absolute lg:left-[465px] md:p-8 w-full md:w-auto bottom-0 h-full grid z-10 lg:z-auto ${!viewSchedule || topbarToggle.init || topbarToggle.pre || !viewFilter ? "opacity-0 translate-y-10 lg:translate-y-0 lg:-translate-x-10 invisible" : ""}`}>
@@ -79,17 +103,17 @@ export default function PRSubjectFilter({children}:any, props:any){
         <div className="pr-filter-group pt-2 pb-6">
           <p className="font-semibold text-pr-text-menu">หมวดหมู่รายวิชา</p>
           <div className="mt-2 grid grid-cols-5 gap-2">
-            {elemButton("หมวด 1", ()=>FilterTogglePRC("ge-1"), isGroupFilterOn("ge-1"))}
-            {elemButton("หมวด 2", ()=>FilterTogglePRC("ge-2"), isGroupFilterOn("ge-2"))}
-            {elemButton("หมวด 3", ()=>FilterTogglePRC("ge-3"), isGroupFilterOn("ge-3"))}
-            {elemButton("หมวด 4", ()=>FilterTogglePRC("ge-4"), isGroupFilterOn("ge-4"))}
-            {elemButton("หมวด 5", ()=>FilterTogglePRC("ge-5"), isGroupFilterOn("ge-5"))}
+            {elemButton("หมวด 1", ()=>GroupFilterTogglePRC("ge-1"), isGroupFilterOn("ge-1"))}
+            {elemButton("หมวด 2", ()=>GroupFilterTogglePRC("ge-2"), isGroupFilterOn("ge-2"))}
+            {elemButton("หมวด 3", ()=>GroupFilterTogglePRC("ge-3"), isGroupFilterOn("ge-3"))}
+            {elemButton("หมวด 4", ()=>GroupFilterTogglePRC("ge-4"), isGroupFilterOn("ge-4"))}
+            {elemButton("หมวด 5", ()=>GroupFilterTogglePRC("ge-5"), isGroupFilterOn("ge-5"))}
           </div>
           <div className="mt-2 grid grid-cols-4 gap-2">
-            {elemButton("พื้นฐาน", ()=>FilterTogglePRC("fund"), isGroupFilterOn("fund"))}
-            {elemButton("เอกบังคับ", ()=>FilterTogglePRC("mainf"), isGroupFilterOn("mainf"))}
-            {elemButton("เอกเลือก", ()=>FilterTogglePRC("mainc"), isGroupFilterOn("mainc"))}
-            {elemButton("วิชาเสรี", ()=>FilterTogglePRC("free"), isGroupFilterOn("free"))}
+            {elemButton("พื้นฐาน", ()=>GroupFilterTogglePRC("fund"), isGroupFilterOn("fund"))}
+            {elemButton("เอกบังคับ", ()=>GroupFilterTogglePRC("mainf"), isGroupFilterOn("mainf"))}
+            {elemButton("เอกเลือก", ()=>GroupFilterTogglePRC("mainc"), isGroupFilterOn("mainc"))}
+            {elemButton("วิชาเสรี", ()=>GroupFilterTogglePRC("free"), isGroupFilterOn("free"))}
           </div>
         </div>
         <div className="pr-filter-group pb-6">
@@ -101,18 +125,23 @@ export default function PRSubjectFilter({children}:any, props:any){
         <div className="pr-filter-group pb-6">
           <p className="font-semibold text-pr-text-menu">วันที่เรียน</p>
           <div className="mt-1 grid grid-cols-5 gap-2">
-            {elemButton("จันทร์")}
-            {elemButton("อังคาร")}
-            {elemButton("พุธ")}
-            {elemButton("พฤหัสฯ")}
-            {elemButton("ศุกร")}
+            {name_days.map((d)=>elemButton(d.date_th, ()=>DayFilterTogglePRC(d.date_en_2), isDayFilterOn(d.date_en_2)))}
           </div>
         </div>
         <div className="pr-filter-group pb-6">
           <p className="font-semibold text-pr-text-menu">เวลาที่เรียน</p>
           <div className="mt-1 grid grid-cols-5 gap-2">
-            {elemButton("ทั้งหมด")}
-            {elemButton("+")}
+            {elemButton("ทั้งหมด", ()=>TimeFilterTogglePRC(true), isTimeFilterOn(true))}
+            {
+            time.filter((t:string)=>t !== "all")
+              .map((t:string, tind:number)=>
+              <>
+                {elemButton(t.replaceAll("-",""), ()=>SingleTimeFilterTogglePRC(t), isTimeFilterOn(false, t))}
+                {time.filter((t:string)=>t !== "all").length === 1 && tind == 0 ? <span className="flex justify-center items-center text-pr-gray-1">เป็นต้นไป</span> : null}
+                {time.filter((t:string)=>t !== "all").length === 2 && tind == 0 ? <span className="flex justify-center items-center text-pr-gray-1">ถึง</span> : null}
+              </>
+            )}
+            {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-time-five text-2xl absolute top-0 -translate-x-1/2"></i></span>, ()=>TimeFilterTogglePRC(false, "08:00", "10:00"), isTimeFilterOn())}
           </div>
         </div>
         <div className="pr-filter-group pb-6">
