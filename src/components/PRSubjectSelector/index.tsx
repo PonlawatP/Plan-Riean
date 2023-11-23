@@ -1,4 +1,4 @@
-import { CalendarContext } from "@/providers/CalendarProvider"
+import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider"
 import { useContext } from "react"
 import FilterPreview from "./filterPreview"
 
@@ -11,6 +11,11 @@ export default function PRSubjectSelector(props:any){
         topbarToggle,
         fnHandleClickedOnCalendar
     } = useContext(CalendarContext)
+    
+    const {filter, setFilter} = useContext(CalendarFilterContext);
+    const {
+      updated,
+  } = filter;
 
     function handleFilterPanel(){
       setViewFilter(!viewFilter)
@@ -28,7 +33,7 @@ export default function PRSubjectSelector(props:any){
           </button>
           <div className="">
             <h1>เลือกรายวิชา</h1>
-            <p className='text-sm font-normal text-pr-gray-1'>อัพเดต: 18/11/66 19:54:43</p>
+            {updated === "null" ? null : <p className='text-sm font-normal text-pr-gray-1'>อัพเดต: {updated}</p>}
           </div>
         </div>
         <button onClick={handleFilterPanel} className={`h-fit px-2 py-1 mr-2 rounded-lg ${viewFilter ? "text-white/80 bg-pr-bg-3 border-b-[3px] border-slate-600/50 hover:bg-slate-600 active:border-0 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80"}`}>
