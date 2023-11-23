@@ -3,7 +3,7 @@ import { IBM_Plex_Sans_Thai } from 'next/font/google'
 import { useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
-import { CalendarContext, CalendarFilterContext, ICalendarFilter } from '@/providers/CalendarProvider'
+import { CalendarContext, CalendarFilterContext, ICalendarData, ICalendarFilter } from '@/providers/CalendarProvider'
 import { ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,11 +11,9 @@ import PRSubjectSelector from '../components/PRSubjectSelector'
 import PRSubjectFilter from '../components/PRSubjectFilter'
 import PRSidebar from '../components/PRSidebar'
 import DialogFirstSearch from '../components/PRSubjectSelector/dialogue/firstSearch'
-import { CalendarSelectorDataContext, ICalendarData, ICalendarDataProvider } from '@/providers/CalendarSelectorDataProvider'
 import DialogSearchNotFound from '../components/PRSubjectSelector/dialogue/searchNotFound'
 import DialogLoading from '../components/PRSubjectSelector/dialogue/loading'
 import DialogError from '../components/PRSubjectSelector/dialogue/error'
-import SubjectSelectorModel from '../services/subjectSelector'
 import SubjectSelectorFilterModel from '../services/subjectSelector/filter'
 
 const font = IBM_Plex_Sans_Thai({ 

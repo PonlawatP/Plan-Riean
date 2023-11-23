@@ -1,7 +1,6 @@
 import { CalendarContext, CalendarFilterContext } from "@/providers/CalendarProvider"
 import { useContext } from "react"
 import { name_days } from "../PRCalendarSubject";
-import { CalendarSelectorDataContext, ICalendarDataProvider } from "@/providers/CalendarSelectorDataProvider";
 
 export default function PRSubjectFilter({children}:any, props:any){
     const {
