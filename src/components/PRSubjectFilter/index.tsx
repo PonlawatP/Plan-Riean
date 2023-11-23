@@ -25,7 +25,7 @@ export default function PRSubjectFilter({children}:any, props:any){
   const {updated} = calsel_data
   
     function elemButton(msg: any, onClickEvent:()=>void = () => {}, isOn: boolean=false, classAdd:string="", keyName:any=undefined){
-      return <button key={keyName} onClick={onClickEvent} className={'h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] active:border-0 '+classAdd+` ${isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
+      return <button key={keyName} onClick={onClickEvent} className={'h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] active:border-pr-bg '+classAdd+` ${isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
       {msg}
       </button>
     }
@@ -64,7 +64,7 @@ export default function PRSubjectFilter({children}:any, props:any){
             {elemButton("หมวด 4", ()=>f.GroupFilterTogglePRC("ge-4"), f.isGroupFilterOn("ge-4"))}
             {elemButton("หมวด 5", ()=>f.GroupFilterTogglePRC("ge-5"), f.isGroupFilterOn("ge-5"))}
           </div>
-          <div className="mt-2 grid grid-cols-4 gap-2">
+          <div className={`mt-2 grid grid-cols-4 gap-2 ${"opacity-60"}`}>
             {elemButton("พื้นฐาน", ()=>f.GroupFilterTogglePRC("fund"), f.isGroupFilterOn("fund"))}
             {elemButton("เอกบังคับ", ()=>f.GroupFilterTogglePRC("mainf"), f.isGroupFilterOn("mainf"))}
             {elemButton("เอกเลือก", ()=>f.GroupFilterTogglePRC("mainc"), f.isGroupFilterOn("mainc"))}

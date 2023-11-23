@@ -39,6 +39,13 @@ export default function SubjectSelectorFilterModel(props:any){
       master
   } = filter;
 
+    function handleOpenSubjectSelect(){
+      setViewState(true)
+      setViewFilter(false)
+
+      setTimeout(()=>{resizePlan()},250)
+    }
+
     function handleReleaceHoldClick(e:any){
       if(topbarToggle.init){
         if(focusTime.start_time < focusTime.end_time){
@@ -84,7 +91,7 @@ export default function SubjectSelectorFilterModel(props:any){
       },1000)
     }
 
-    function fnHandleClickedOnCalendar(tindex: number, dindex: number, view = true) {
+    function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
       // toast("test")
       if(viewSchedule){
         setViewState(false)
@@ -172,7 +179,7 @@ export default function SubjectSelectorFilterModel(props:any){
     }
 
     return <CalendarFilterContext.Provider value={{
-      fnHandleClickedOnCalendar, handleReleaceHoldClick, handleFilterPanel, handleFilterSubmit,
+      fnHandleClickedOnCalendar, handleReleaceHoldClick, handleFilterPanel, handleFilterSubmit, handleOpenSubjectSelect,
       filter, setFilter,
       isGroupFilterOn, isDayFilterOn, isTimeFilterOn,
       GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC,

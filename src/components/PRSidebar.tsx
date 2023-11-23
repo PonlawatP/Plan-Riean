@@ -1,11 +1,15 @@
-import { CalendarContext } from "@/app/providers/CalendarProvider"
+import { CalendarContext, CalendarFilterContext } from "@/app/providers/CalendarProvider"
 import { useContext } from "react"
 
 export default function PRSidebar(props:any){
-    const {
-        viewSchedule,
-        topbarToggle,
-    } = useContext(CalendarContext)
+  const {
+      viewSchedule,
+      topbarToggle,
+  } = useContext(CalendarContext)
+  const {
+      handleOpenSubjectSelect
+  } = useContext(CalendarFilterContext)
+
     
     return <section 
       className={`
@@ -18,6 +22,10 @@ export default function PRSidebar(props:any){
         <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60 bg-pr-msu-1 text-pr-msu-1-60'>
           <i className='bx bx-home text-2xl drop-shadow-pr-shadow-text'/>
           <p className="drop-shadow-pr-shadow-text hidden lg:block">แผนเรียน</p>
+        </button>
+        <button onClick={()=>handleOpenSubjectSelect()} className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
+          <i className='group-hover:drop-shadow-pr-shadow-text bx bx-objects-horizontal-left text-2xl'/>
+          <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">เลือกรายวิชา</p>
         </button>
         {/* <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='group-hover:drop-shadow-pr-shadow-text bx bx-task text-2xl'/>
