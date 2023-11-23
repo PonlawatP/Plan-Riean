@@ -965,10 +965,10 @@ export default function Home({props} :any) {
                     {times_m.map((time,tindex)=><span key={dindex+"-"+tindex} className={`relative flex flex-col items-center w-24 h-20 py-2 justify-center border-l-2 ${dindex+1 < name_days.length && "border-b-2"} border-black/5`}>
                       <p className='opacity-0'>{dindex}:{tindex}</p>
                       {/* temp schedule - show when hover - event: click to filter subject & sect that on time user clicked & not collapse on other subject */}
-                      {state.webReady &&
+                      {state.webReady && ((tindex%2==0 && tindex < 4) || (tindex%2==1 && tindex > 4)) &&
                         <div key={"dt-"+dindex+":"+tindex} className="absolute w-full h-full">
 
-                              <div className={`relative h-full p-1 group`} style={{width: "100%"}}>
+                              <div className={`relative h-full p-1 group z-10`} style={{width: "200%"}}>
                                 <div onClick={()=>fnHandleClickedOnCalendar(tindex,dindex)} className={`cursor-pointer rounded-lg border-2 border-white/25 h-full w-full p-1 text-center shadow-md text-white/95 bg-black/40 opacity-0 transition-all duration-500 flex items-center justify-center ${!state.viewSchedule && "hover:opacity-100"} hover:duration-100`}>
                                   <p className='text-sm'>กดเพื่อดูรายวิชา</p>
                                 </div>
