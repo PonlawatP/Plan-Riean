@@ -1,7 +1,6 @@
 import { CalendarContext, CalendarFilterContext } from "@/app/providers/CalendarProvider"
 import { useContext } from "react"
 import FilterPreview from "./filterPreview"
-import { CalendarSelectorDataContext, ICalendarDataProvider } from "@/providers/CalendarSelectorDataProvider";
 import PRSubjectFilter from "../PRSubjectFilter";
 
 export default function PRSubjectSelector(props:any){
@@ -15,6 +14,8 @@ export default function PRSubjectSelector(props:any){
     } = useContext(CalendarContext)
     const {
       fnHandleClickedOnCalendar,
+      setSubjectViewFilter,
+      setMasterViewFilter
     } = useContext(CalendarFilterContext)
     
     const {
@@ -25,6 +26,9 @@ export default function PRSubjectSelector(props:any){
 
     function handleFilterPanel(){
       setViewFilter(!viewFilter)
+
+      setSubjectViewFilter(false)
+      setMasterViewFilter(false)
     }
 
     return <>
@@ -54,6 +58,6 @@ export default function PRSubjectSelector(props:any){
           </section>
         </div>
       </section>
-      <PRSubjectFilter />
+      <PRSubjectFilter/>
     </>
 }

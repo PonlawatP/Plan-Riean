@@ -1,5 +1,5 @@
 import { CalendarContext, CalendarFilterContext, ICalendarFilter } from "@/app/providers/CalendarProvider";
-import { useContext, useState } from "react";
+import { SetStateAction, useContext, useState } from "react";
 
 export default function SubjectSelectorFilterModel(props:any){
     const {children} = props
@@ -38,6 +38,14 @@ export default function SubjectSelectorFilterModel(props:any){
       room,
       master
   } = filter;
+
+  const [timeoutId, setTimeoutId] = useState<any>()
+  function debounce(fn:()=>void, delay:number) {
+    return () => {
+      clearTimeout(timeoutId);
+      setTimeoutId(setTimeout(() => fn(), delay));
+    };
+  }
 
     function handleOpenSubjectSelect(){
       setViewState(true)
@@ -84,10 +92,9 @@ export default function SubjectSelectorFilterModel(props:any){
       
     }
     function handleSearch(){
-      console.log(filter)
-      setCalselData({...calsel_data, isLoading: true, current_filter: filter, isFirstLoading: false})
+      setCalselData({...calsel_data, isLoading: true, current_filter: filter})
       setTimeout(()=>{
-        setCalselData({...calsel_data, isLoading: false})
+        setCalselData({...calsel_data, isLoading: false, isFirstLoading: false})
       },1000)
     }
 
@@ -178,11 +185,63 @@ export default function SubjectSelectorFilterModel(props:any){
       setFilter({...filter, time: temp_time})
     }
 
+    // in-panel filter
+    const [subjectViewFilter, setSubjectViewFilter] = useState(false)
+    const [roomViewFilter, setRoomViewFilter] = useState(false)
+    const [masterViewFilter, setMasterViewFilter] = useState(false)
+    const [filterDebounceProgress, setFilterDebounceProgress] = useState(0)
+    const [filterDebounceProgressFunc, setFilterDebounceProgressFunc] = useState<any>()
+
+    function handleSubjectFilterSubmit(){
+      setSubjectViewFilter(false)
+    }
+    function resetSubjectViewFilter(){
+      setFilter({...filter, subject: []})
+    }
+    function handleMasterFilterSubmit(){
+      setMasterViewFilter(false)
+    }
+    function resetMasterViewFilter(){
+      setFilter({...filter, master: []})
+    }
+    function handleRoomFilterSubmit(){
+      setMasterViewFilter(false)
+    }
+    function resetRoomViewFilter(){
+      setFilter({...filter, master: []})
+    }
+    
+    function handleFilterOnSubmit(funcRun:()=>void){
+      setFilterDebounceProgress(0)
+      clearInterval(filterDebounceProgressFunc)
+      const debouncedFunction = debounce(()=>{
+        setFilterDebounceProgressFunc(()=>{
+          let a = setInterval(()=>{
+            setFilterDebounceProgress((prev)=>{
+              if(prev >= 100){
+                funcRun()
+                clearInterval(a)
+                return 0
+              }
+              return prev+25
+            })
+          }, 100)
+          return a
+        })
+      }, 500);
+      debouncedFunction()
+
+    }
+
     return <CalendarFilterContext.Provider value={{
       fnHandleClickedOnCalendar, handleReleaceHoldClick, handleFilterPanel, handleFilterSubmit, handleOpenSubjectSelect,
       filter, setFilter,
       isGroupFilterOn, isDayFilterOn, isTimeFilterOn,
       GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC,
+      subjectViewFilter, setSubjectViewFilter, roomViewFilter, setRoomViewFilter, masterViewFilter, setMasterViewFilter,
+      filterDebounceProgress,
+      handleSubjectFilterSubmit, handleMasterFilterSubmit, handleRoomFilterSubmit, handleFilterOnSubmit,
+      resetSubjectViewFilter, resetMasterViewFilter, resetRoomViewFilter,
       }}>
         <div
         className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+props.classname}

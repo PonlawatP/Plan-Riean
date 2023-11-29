@@ -148,6 +148,10 @@ export default function Layout({
                 calsel_data.isLoading ?
                   <DialogLoading/>
                 :
+                calsel_data.isFirstLoading
+                ?
+                  <DialogFirstSearch/>
+                :
                 calsel_data.isError
                 ?
                   <DialogError/>
@@ -155,10 +159,6 @@ export default function Layout({
                 calsel_data.result.data.length != 0
                 ?
                   <>TODO: show subject list here...</>
-                :
-                calsel_data.isFirstLoading
-                ?
-                  <DialogFirstSearch/>
                 :
                   <DialogSearchNotFound/>
               }

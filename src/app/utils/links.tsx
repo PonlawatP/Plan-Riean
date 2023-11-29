@@ -1,0 +1,1 @@
+export const loadingAnimation = "https://lottie.host/2711f120-65ea-4a43-96a4-4d635a5fdf77/BeS4ry9Sl6.lottie"
