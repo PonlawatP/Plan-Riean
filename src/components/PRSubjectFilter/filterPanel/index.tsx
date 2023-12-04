@@ -22,7 +22,7 @@ export default function FilterPanel(props:any){
   const {title="name", placeholder="", isOn, onClose=()=>{}, onSearch=(value:string | null)=>{}} = props
 
     return <section className={`pr-subject-filter pointer-events-none smooth-all absolute lg:left-[465px] md:p-8 w-full md:w-auto bottom-0 h-full grid z-10 lg:z-auto ${!viewSchedule || topbarToggle.init || topbarToggle.pre || !viewFilter || !isOn ? "opacity-0 scale-95 invisible" : ""}`}>
-        <div className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_1fr] md:w-[450px] h-full overflow-auto p-1 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}>
+        <div className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] md:w-[450px] h-full overflow-auto p-1 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}>
           {/* header */}
           <section className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-slate-400/50">
             <div className="flex gap-2 items-center font-semibold text-xl">
@@ -47,8 +47,7 @@ export default function FilterPanel(props:any){
           {/* content */}
           <div className="content w-full h-full relative grid grid-rows-[1fr_auto]">
             <span className={`smooth-all absolute pointer-events-none block h-1 shadow-md left-0 rounded-b-full shadow-pr-msu-1 bg-pr-msu-1`} style={{opacity: `${f.filterDebounceProgress > 96 || f.filterDebounceProgress == 0 ? 0 : 100}%`, width: `${f.filterDebounceProgress}%`}}></span>
-            <section className="pr-subject-filter-content relative h-full overflow-auto fade-scroll p-5 pt-0">
-              {/* code here */}
+            <section className="pr-subject-filter-content relative overflow-auto fade-y">
               {props.children}
             </section>
             <section className="pr-subject-actions z-10 p-5 pt-2">

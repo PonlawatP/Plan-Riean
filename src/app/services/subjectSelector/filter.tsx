@@ -1,4 +1,5 @@
 import { CalendarContext, CalendarFilterContext, ICalendarFilter } from "@/app/providers/CalendarProvider";
+import { name_days } from "@/components/PRCalendarSubject";
 import { SetStateAction, useContext, useState } from "react";
 
 export default function SubjectSelectorFilterModel(props:any){
@@ -57,9 +58,9 @@ export default function SubjectSelectorFilterModel(props:any){
     function handleReleaceHoldClick(e:any){
       if(topbarToggle.init){
         if(focusTime.start_time < focusTime.end_time){
-          TimeFilterTogglePRC(false, focusTime.start_time.toString().padStart(2, "0")+":00", (focusTime.end_time+1).toString().padStart(2, "0")+":00")
+          TimeFilterTogglePRC(false, focusTime.start_time.toString().padStart(2, "0")+":00", (focusTime.end_time+1).toString().padStart(2, "0")+":00", focusTime.day)
         } else {
-          TimeFilterTogglePRC(false, focusTime.end_time.toString().padStart(2, "0")+":00", (focusTime.start_time+1).toString().padStart(2, "0")+":00")
+          TimeFilterTogglePRC(false, focusTime.end_time.toString().padStart(2, "0")+":00", (focusTime.start_time+1).toString().padStart(2, "0")+":00", focusTime.day)
         }
   
         setViewState(true)
@@ -99,12 +100,11 @@ export default function SubjectSelectorFilterModel(props:any){
     }
 
     function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
-      // toast("test")
       if(viewSchedule){
         setViewState(false)
         setViewFilter(false)
       } else {
-        if(tindex >= 0) SingleTimeFilterTogglePRC((8+tindex).toString().padStart(2, "0")+":00", true)
+        if(tindex >= 0) SingleTimeFilterTogglePRC((8+tindex).toString().padStart(2, "0")+":00", true, dindex)
   
         setViewState(true)
         setViewFilter(true)
@@ -152,7 +152,11 @@ export default function SubjectSelectorFilterModel(props:any){
       return time.includes("all") ? false : time.filter((t:string)=> t === time_num.replaceAll("-","")).length > 0;
     }
 
-    function TimeFilterTogglePRC(all:boolean=false, time_start:string="", time_stop:string=""){
+    function isSubjectFilterOn(code: string = ""){
+    return subject.includes(code);
+    }
+
+    function TimeFilterTogglePRC(all:boolean=false, time_start:string="", time_stop:string="", dindex:number=-1){
       let temp_time = filter.time;
       if(all){
         if(!temp_time.includes("all")){
@@ -163,9 +167,14 @@ export default function SubjectSelectorFilterModel(props:any){
         temp_time = [time_start, time_stop]
       }
   
-      setFilter({...filter, time: temp_time})
+      // day select
+      if(dindex!=-1){
+        setFilter({...filter, time: temp_time, day: [name_days[dindex].date_en_2]})
+      } else {
+        setFilter({...filter, time: temp_time})
+      }
     }
-    function SingleTimeFilterTogglePRC(time_num:string="", forceToggle = false){
+    function SingleTimeFilterTogglePRC(time_num:string="", forceToggle = false, dindex:number=-1){
       let temp_time = filter.time;
   
       if(!filter.time.includes(time_num) || forceToggle){
@@ -180,9 +189,24 @@ export default function SubjectSelectorFilterModel(props:any){
           return tt
         })
       }
-  
-  
-      setFilter({...filter, time: temp_time})
+      
+      // day select
+      if(dindex!=-1){
+        setFilter({...filter, time: temp_time, day: [name_days[dindex].date_en_2]})
+      } else {
+        setFilter({...filter, time: temp_time})
+      }
+    }
+
+    function SubjectFilterTogglePRC(code:string){
+      let temp = filter.subject;
+      if(isSubjectFilterOn(code)){
+        temp = temp.filter((s:string)=> s !== code)
+      } else {
+        temp.push(code)
+      }
+
+      setFilter({...filter, subject: temp})
     }
 
     // in-panel filter
@@ -236,15 +260,15 @@ export default function SubjectSelectorFilterModel(props:any){
     return <CalendarFilterContext.Provider value={{
       fnHandleClickedOnCalendar, handleReleaceHoldClick, handleFilterPanel, handleFilterSubmit, handleOpenSubjectSelect,
       filter, setFilter,
-      isGroupFilterOn, isDayFilterOn, isTimeFilterOn,
-      GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC,
+      isGroupFilterOn, isDayFilterOn, isTimeFilterOn, isSubjectFilterOn,
+      GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC, SubjectFilterTogglePRC,
       subjectViewFilter, setSubjectViewFilter, roomViewFilter, setRoomViewFilter, masterViewFilter, setMasterViewFilter,
       filterDebounceProgress,
       handleSubjectFilterSubmit, handleMasterFilterSubmit, handleRoomFilterSubmit, handleFilterOnSubmit,
       resetSubjectViewFilter, resetMasterViewFilter, resetRoomViewFilter,
       }}>
         <div
-        className={"pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+props.classname}
+        className={"bg-pr-bg dark:bg-pr-bg-3 pr-layout h-[100dvh] grid grid-rows-[auto_1fr] "+props.classname}
         onMouseUp={handleReleaceHoldClick}
         >
             {children}

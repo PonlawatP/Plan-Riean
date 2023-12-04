@@ -15,6 +15,7 @@ import DialogSearchNotFound from '../../components/PRSubjectSelector/dialogue/se
 import DialogLoading from '../../components/PRSubjectSelector/dialogue/loading'
 import DialogError from '../../components/PRSubjectSelector/dialogue/error'
 import SubjectSelectorFilterModel from '../services/subjectSelector/filter'
+import { PRThemeSwitcher } from '@/components/PRThemeSwitcher'
 
 const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -37,6 +38,7 @@ export default function Layout({
   const [topbarCord, setTopbarCord] = useState([0,0])
   const [topbarHtml, setTopbarHtml] = useState(<></>)
   const [toggleHold, setTooggleHold] = useState<any>(null);
+  const [toggleSidebar, setTooggleSidebar] = useState(true);
 
   const [planSize, setPlanSize] = useState(.4);
   const [planWidth, setPlanWidth] = useState(1);
@@ -101,13 +103,12 @@ export default function Layout({
     <>
     <style jsx global>{`
         body {
-          background: ${theme === 'day' ? "#E6EDF3" : "#2A3035"};
           touch-action: none;
         }
     `}</style>
 
     <CalendarContext.Provider value={{
-      viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, 
+      viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, toggleSidebar, setTooggleSidebar,
       resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, viewFilter, setViewFilter, focusTime, setFocusTime, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME, getTimeTable,
       calsel_data, setCalselData
     }}>
@@ -116,7 +117,11 @@ export default function Layout({
           <button className='hidden sm:flex'><Image src="/assets/images/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></button>
           <article className='pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl'>
             <button className="header text-xl font-medium flex gap-3 group">
-              <h1>แผนเรียนใหม่</h1> <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md -mt-1'><i className='bx bx-pencil mt-[3px]'></i></span>
+              <h1>แผนเรียนใหม่</h1>
+              <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md -mt-1'>
+                <i className='bx bx-pencil mt-[3px]'></i>
+              </span>
+              <PRThemeSwitcher></PRThemeSwitcher>
             </button>
             <span className='text-md font-light text-pr-gray-1 md:flex gap-3'>
               <span className='flex gap-3'>
@@ -137,10 +142,10 @@ export default function Layout({
         </section>
 
         <div className={
-          'pr-main select-none grid relative md:grid-cols-[auto_1fr] overflow-hidden'
+          `pr-main select-none grid ${toggleSidebar ? "md:grid-cols-[auto_1fr]" : ""} relative overflow-hidden`
         }>
           {/* sidebar */}
-          <PRSidebar/>
+          <PRSidebar hidden={!toggleSidebar}/>
           {children}
           {/* subject selector */}
             <PRSubjectSelector isShowDialog={!calsel_data.isLoading && !calsel_data.isError}>

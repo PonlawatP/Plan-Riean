@@ -2,6 +2,7 @@ import { CalendarContext, CalendarFilterContext } from "@/app/providers/Calendar
 import { useContext } from "react"
 
 export default function PRSidebar(props:any){
+  const { hidden } = props
   const {
       viewSchedule,
       topbarToggle,
@@ -13,7 +14,7 @@ export default function PRSidebar(props:any){
     
     return <section 
       className={`
-        pr-sidebar smooth-all relative hidden p-8 drop-shadow-xl min-h-[460px] md:w-[122px] ${!viewSchedule ? "lg:w-[260px]" : "md:w-[510px] lg:w-[510px]"} md:block smooth-opacity 
+        pr-sidebar smooth-all relative hidden p-8 drop-shadow-xl min-h-[460px] md:w-[122px] ${!viewSchedule ? "lg:w-[260px]" : "md:w-[510px] lg:w-[510px]"} ${!hidden ? "md:block" : ""} smooth-opacity 
         ${viewSchedule ? "opacity-0 translate-x-10" : topbarToggle.init ? "opacity-20" : "opacity-100"}
       `}
     >

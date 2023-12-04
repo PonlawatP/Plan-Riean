@@ -52,7 +52,8 @@ export default function PRCalendarSubject(props: any) {
     planWidth, planSize,
     resizePlan, canvasElemRef, planElemRef,
     focusTime, setFocusTime,
-    getTimeTable, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME
+    getTimeTable, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME,
+    toggleSidebar
   } = useContext(CalendarContext);
 
   const {
@@ -161,7 +162,7 @@ export default function PRCalendarSubject(props: any) {
 
   return <>
     <div className={`
-      p-canvas-plan relative w-full h-full m-8 md:ml-0 flex justify-center items-center
+      p-canvas-plan relative w-full h-full ${toggleSidebar ? "m-8" : ""} md:ml-0 flex justify-center items-center
     `}
     >
       <div className="absolute flex flex-col gap-8 items-center" style={{width: planWidth > 0 ? planWidth+"px" : undefined}}>

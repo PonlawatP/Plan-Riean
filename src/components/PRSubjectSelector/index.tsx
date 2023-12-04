@@ -11,6 +11,8 @@ export default function PRSubjectSelector(props:any){
         setViewFilter,
         topbarToggle,
         calsel_data,
+        toggleSidebar, 
+        setTooggleSidebar
     } = useContext(CalendarContext)
     const {
       fnHandleClickedOnCalendar,

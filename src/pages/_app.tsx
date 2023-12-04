@@ -7,14 +7,15 @@ import { GoogleAnalytics } from "nextjs-google-analytics";
 import { ThemeContext } from "@/app/providers";
 import { useState } from "react";
 import Head from "next/head";
+import { ThemeProvider } from "@/app/providers/ThemeProvider";
 
 export default function MyApp({Component, pageProps}: AppProps){
-    const [theme, setTheme] = useState('day');
+    const [theme, setTheme] = useState('light');
 
-    return <ThemeContext.Provider value={{theme,setTheme}}>
-                <Layout>
-                   <GoogleAnalytics strategy="lazyOnload" trackPageViews={true} />
-                   <Component {...pageProps}/>
-                </Layout>
-    </ThemeContext.Provider>
+    return <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <Layout>
+            <GoogleAnalytics strategy="lazyOnload" trackPageViews={true} />
+            <Component {...pageProps}/>
+        </Layout>
+    </ThemeProvider>
 }

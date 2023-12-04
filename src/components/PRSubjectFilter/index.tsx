@@ -1,7 +1,9 @@
 import { CalendarContext, CalendarFilterContext } from "@/app/providers/CalendarProvider"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { name_days } from "../PRCalendarSubject";
-import FilterPanel from "./FilterPanel";
+import FilterPanel from "./filterPanel";
+import { useBreakpoint } from "@/app/utils/useBreakpoint";
+import SubjectObject from "./SubjectObject";
 
 export default function PRSubjectFilter({children}:any, props:any){
     const {
@@ -9,7 +11,7 @@ export default function PRSubjectFilter({children}:any, props:any){
         viewFilter,
         topbarToggle,
         calsel_data,
-        setCalselData
+        setCalselData,
     } = useContext(CalendarContext)
 
     const f = useContext(CalendarFilterContext);
@@ -24,7 +26,9 @@ export default function PRSubjectFilter({children}:any, props:any){
   } = f.filter;
 
   const {updated} = calsel_data
-  
+
+  const { isBelowLg } = useBreakpoint("lg");
+
     function elemButton(msg: any, onClickEvent:()=>void = () => {}, isOn: boolean=false, classAdd:string="", keyName:any=undefined){
       return <button key={keyName} onClick={onClickEvent} className={'h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] active:border-pr-bg '+classAdd+` ${isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
       {msg}
@@ -35,15 +39,21 @@ export default function PRSubjectFilter({children}:any, props:any){
       return number >= 0 ? time.filter((t:string)=>t !== "all")[number] : time.filter((t:string)=>t !== "all")
     }
 
+    function test(ts:any=<></>){
+      const t = []
+      for (let index = 0; index < 30; index++) {
+        t.push(ts)
+      }
+      return t
+    }
+
     return <>
       <section className={`pr-subject-filter pointer-events-none smooth-all absolute lg:left-[465px] md:p-8 w-full md:w-auto bottom-0 h-full grid z-10 lg:z-auto ${!viewSchedule || topbarToggle.init || topbarToggle.pre || !viewFilter ? "opacity-0 translate-y-10 lg:translate-y-0 lg:-translate-x-10 invisible" : ""}`}>
-        <div className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_1fr] lg:grid-rows-1 md:w-[450px] h-full overflow-auto p-1 lg:pt-6 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}>
+        <div className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 md:w-[450px] h-full overflow-auto p-1 lg:pt-6 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}>
           {/* header */}
           <section className="pr-subject-header flex lg:hidden justify-between p-2 py-3 border-b-[1px] border-slate-400/50">
             <div className="flex gap-2 items-center font-semibold text-xl">
-              <button onClick={()=>{
-                f.fnHandleClickedOnCalendar(-1, -1)
-              }} className='hover:bg-pr-bg active:bg-slate-300 rounded-lg aspect-square w-10'>
+              <button onClick={f.handleFilterPanel} className='lg:hidden hover:bg-pr-bg active:bg-slate-300 rounded-lg aspect-square w-10'>
                 <i className="bx bx-chevron-left text-3xl translate-y-[2px]"></i>
               </button>
               <div className="">
@@ -51,13 +61,13 @@ export default function PRSubjectFilter({children}:any, props:any){
                 {updated == "null" ? null : <p className='text-sm font-normal text-pr-gray-1'>อัพเดต: {updated}</p>}
               </div>
             </div>
-            <button onClick={f.handleFilterPanel} className={`h-fit px-2 py-1 mr-2 rounded-lg ${viewFilter ? "text-white/80 bg-pr-bg-3 border-b-[3px] border-slate-600/50 hover:bg-slate-600 active:border-0 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80"}`}>
+            <button onClick={f.handleFilterPanel} className={`hidden lg:block h-fit px-2 py-1 mr-2 rounded-lg ${viewFilter ? "text-white/80 bg-pr-bg-3 border-b-[3px] border-slate-600/50 hover:bg-slate-600 active:border-0 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80"}`}>
               <i className="bx bx-layer text-xl translate-y-[3px] mr-1"></i> คัดกรอง
             </button>
           </section>
           {/* content */}
-          <div className="content w-full h-full relative grid grid-rows-[1fr_auto]h">
-            <section className="pr-subject-filter-content relative h-full overflow-auto fade-scroll p-5 pt-0">
+          <div className="content w-full h-full relative grid grid-rows-[1fr_auto]">
+            <section className="pr-subject-filter-content relative h-full overflow-auto fade-y p-5 pt-0">
               <div className="pr-filter-group pt-2 pb-6">
                 <p className="font-semibold text-pr-text-menu">หมวดหมู่รายวิชา</p>
                 <div className="mt-2 grid grid-cols-5 gap-2">
@@ -76,8 +86,9 @@ export default function PRSubjectFilter({children}:any, props:any){
               </div>
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">เฉพาะรายวิชา</p>
-                <div className="mt-1 grid grid-cols-5 gap-2">
-                  {elemButton("+",()=>f.setSubjectViewFilter(true), false)}
+                <div className="mt-1 grid grid-cols-4 gap-2">
+                  {subject.map((s:string)=>elemButton(s, ()=>f.SubjectFilterTogglePRC(s), true))}
+                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setSubjectViewFilter(true), false)}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
@@ -115,14 +126,14 @@ export default function PRSubjectFilter({children}:any, props:any){
                 <p className="font-semibold text-pr-text-menu">ห้องที่เรียน</p>
                 <div className="mt-1 grid grid-cols-5 gap-2">
                   {elemButton("ทุกห้อง")}
-                  {elemButton("+",()=>f.setRoomViewFilter(true), false)}
+                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setRoomViewFilter(true), false)}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">อาจารย์ผู้สอน</p>
                 <div className="mt-1 grid grid-cols-5 gap-2">
                   {elemButton("ทุกคน")}
-                  {elemButton("+",()=>f.setMasterViewFilter(true), false)}
+                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setMasterViewFilter(true), false)}
                 </div>
               </div>
             </section>
@@ -131,7 +142,7 @@ export default function PRSubjectFilter({children}:any, props:any){
                 <button disabled={calsel_data.isLoading} onClick={()=>f.handleFilterSubmit(true)} className={`w-24 text-pr-text-menu h-fit px-2 py-1 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80 ${calsel_data.isLoading ? "pointer-events-none opacity-50" : ""}`}>
                   ล้าง
                 </button>
-                <button disabled={calsel_data.isLoading} onClick={()=>f.handleFilterSubmit()} className={`w-24 h-fit px-2 py-1 rounded-lg border-b-[3px] active:border-0 text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80 ${calsel_data.isLoading ? "pointer-events-none opacity-50" : ""}`}>
+                <button disabled={calsel_data.isLoading} onClick={()=>{if(isBelowLg){f.handleFilterPanel()} f.handleFilterSubmit()}} className={`w-24 h-fit px-2 py-1 rounded-lg border-b-[3px] active:border-0 text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80 ${calsel_data.isLoading ? "pointer-events-none opacity-50" : ""}`}>
                   คัดกรอง
                 </button>
               </div>
@@ -152,6 +163,20 @@ export default function PRSubjectFilter({children}:any, props:any){
           console.log(e)
         }}
       >
+        <span className="fade-b block py-2 sticky top-0 px-5 bg-white">
+          <h1 className="font-bold">หมวดหมู่ที่ 1</h1>
+          <p className="">ทักษะการเรียนรู้ตลอดชีวิต</p>
+        </span>
+        <SubjectObject
+          code={"0041001"}
+          title={"Preparatory English"}
+          desc={"เตรียมความพร้อมภาษาอังกฤษ"}
+        />
+        <SubjectObject
+          code={"0041002"}
+          title={"2nd Subject"}
+          desc={"วิชาที่ 2"}
+        />
 
       </FilterPanel>
       <FilterPanel
