@@ -1,5 +1,5 @@
 import { CalendarContext, CalendarFilterContext } from "@/app/providers/CalendarProvider"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import FilterPreview from "./filterPreview"
 import PRSubjectFilter from "../PRSubjectFilter";
 
@@ -33,9 +33,20 @@ export default function PRSubjectSelector(props:any){
       setMasterViewFilter(false)
     }
 
+    const [tempOn, setTempOn] = useState(false)
+    useEffect(()=>{
+      if(viewSchedule){
+        setTempOn(viewSchedule)
+      } else {
+        setTimeout(()=>{
+          setTempOn(false)
+        }, 150)
+      }
+    },[viewSchedule])
+
     return <>
       <section className={`pr-subject-select smooth-all absolute md:p-8 w-full md:w-auto h-full grid ${!viewSchedule ? "opacity-0 translate-y-10 md:translate-y-0 md:-translate-x-10 invisible" : topbarToggle.init ? "opacity-20" : ""}`}>
-        <div className="pr-subject-select-body relative grid grid-rows-[auto_1fr] md:w-[450px] h-full overflow-auto p-1 rounded-3xl border-[1px] border-white/80 bg-white/60">
+        {viewSchedule || tempOn ? <div className="pr-subject-select-body relative grid grid-rows-[auto_1fr] md:w-[450px] h-full overflow-auto p-1 rounded-3xl border-[1px] border-white/80 bg-white/60">
           {/* header */}
           <section className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-slate-400/50">
             <div className="flex gap-2 items-center font-semibold text-xl">
@@ -58,7 +69,7 @@ export default function PRSubjectSelector(props:any){
             {!isShowDialog && !isLoading && !isError ? <FilterPreview/> : null}
               {children}
           </section>
-        </div>
+        </div> : null}
       </section>
       <PRSubjectFilter/>
     </>

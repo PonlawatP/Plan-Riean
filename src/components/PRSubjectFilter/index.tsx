@@ -1,9 +1,14 @@
 import { CalendarContext, CalendarFilterContext } from "@/app/providers/CalendarProvider"
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 import { name_days } from "../PRCalendarSubject";
 import FilterPanel from "./filterPanel";
 import { useBreakpoint } from "@/app/utils/useBreakpoint";
 import SubjectObject from "./SubjectObject";
+import { getSubjectColor } from "@/app/utils/msu/subjectUtils";
+import SubjectGroup from "./ChildFilterGroup";
+import ChildFilterGroup from "./ChildFilterGroup";
+import MasterObject from "./MasterObject";
+import RoomObject from "./RoomObject";
 
 export default function PRSubjectFilter({children}:any, props:any){
     const {
@@ -30,7 +35,7 @@ export default function PRSubjectFilter({children}:any, props:any){
   const { isBelowLg } = useBreakpoint("lg");
 
     function elemButton(msg: any, onClickEvent:()=>void = () => {}, isOn: boolean=false, classAdd:string="", keyName:any=undefined){
-      return <button key={keyName} onClick={onClickEvent} className={'h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] active:border-pr-bg '+classAdd+` ${isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600 active:bg-slate-600 active:text-white/80" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
+      return <button key={keyName} onClick={onClickEvent} className={`h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] overflow-hidden truncate active:border-pr-bg ${classAdd !== "" ? classAdd : isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
       {msg}
       </button>
     }
@@ -47,9 +52,20 @@ export default function PRSubjectFilter({children}:any, props:any){
       return t
     }
 
+    const [tempOn, setTempOn] = useState(false)
+    useEffect(()=>{
+      if(viewFilter){
+        setTempOn(viewFilter)
+      } else {
+        setTimeout(()=>{
+          setTempOn(false)
+        }, 150)
+      }
+    },[viewFilter])
+
     return <>
       <section className={`pr-subject-filter pointer-events-none smooth-all absolute lg:left-[465px] md:p-8 w-full md:w-auto bottom-0 h-full grid z-10 lg:z-auto ${!viewSchedule || topbarToggle.init || topbarToggle.pre || !viewFilter ? "opacity-0 translate-y-10 lg:translate-y-0 lg:-translate-x-10 invisible" : ""}`}>
-        <div className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 md:w-[450px] h-full overflow-auto p-1 lg:pt-6 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}>
+        {viewFilter || tempOn ? <div className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 md:w-[450px] h-full overflow-auto p-1 lg:pt-6 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}>
           {/* header */}
           <section className="pr-subject-header flex lg:hidden justify-between p-2 py-3 border-b-[1px] border-slate-400/50">
             <div className="flex gap-2 items-center font-semibold text-xl">
@@ -77,7 +93,7 @@ export default function PRSubjectFilter({children}:any, props:any){
                   {elemButton("หมวด 4", ()=>f.GroupFilterTogglePRC("ge-4"), f.isGroupFilterOn("ge-4"))}
                   {elemButton("หมวด 5", ()=>f.GroupFilterTogglePRC("ge-5"), f.isGroupFilterOn("ge-5"))}
                 </div>
-                <div className={`mt-2 grid grid-cols-4 gap-2 ${"opacity-60"}`}>
+                <div className={`mt-2 grid grid-cols-4 gap-2 ${false ? "opacity-60" : ""}`}>
                   {elemButton("พื้นฐาน", ()=>f.GroupFilterTogglePRC("fund"), f.isGroupFilterOn("fund"))}
                   {elemButton("เอกบังคับ", ()=>f.GroupFilterTogglePRC("mainf"), f.isGroupFilterOn("mainf"))}
                   {elemButton("เอกเลือก", ()=>f.GroupFilterTogglePRC("mainc"), f.isGroupFilterOn("mainc"))}
@@ -87,7 +103,10 @@ export default function PRSubjectFilter({children}:any, props:any){
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">เฉพาะรายวิชา</p>
                 <div className="mt-1 grid grid-cols-4 gap-2">
-                  {subject.map((s:string)=>elemButton(s, ()=>f.SubjectFilterTogglePRC(s), true))}
+                  {subject.map((s:string)=>{
+                    const colors = getSubjectColor(s);
+                    return elemButton(s, ()=>f.SubjectFilterTogglePRC(s), true, `${colors.color} ${colors.bgColor} border-slate-600/50 hover:opacity-80`)
+                  })}
                   {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setSubjectViewFilter(true), false)}
                 </div>
               </div>
@@ -123,17 +142,17 @@ export default function PRSubjectFilter({children}:any, props:any){
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
-                <p className="font-semibold text-pr-text-menu">ห้องที่เรียน</p>
-                <div className="mt-1 grid grid-cols-5 gap-2">
-                  {elemButton("ทุกห้อง")}
-                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setRoomViewFilter(true), false)}
+                <p className="font-semibold text-pr-text-menu">อาจารย์ผู้สอน</p>
+                <div className="mt-1 grid grid-cols-4 gap-2">
+                  {master.map((m:string)=>elemButton(m.split(".")[m.split(".").length-1], ()=>f.MasterFilterTogglePRC(m), f.isMasterFilterOn(m)))}
+                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setMasterViewFilter(true), false)}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
-                <p className="font-semibold text-pr-text-menu">อาจารย์ผู้สอน</p>
-                <div className="mt-1 grid grid-cols-5 gap-2">
-                  {elemButton("ทุกคน")}
-                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setMasterViewFilter(true), false)}
+                <p className="font-semibold text-pr-text-menu">ห้องที่เรียน</p>
+                <div className="mt-1 grid grid-cols-4 gap-2">
+                  {room.map((r:string)=>elemButton(r, ()=>f.RoomFilterTogglePRC(r), f.isRoomFilterOn(r)))}
+                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setRoomViewFilter(true), false)}
                 </div>
               </div>
             </section>
@@ -148,7 +167,7 @@ export default function PRSubjectFilter({children}:any, props:any){
               </div>
             </section>
           </div>
-        </div>
+        </div> : null}
       </section>
 
       <FilterPanel
@@ -163,20 +182,21 @@ export default function PRSubjectFilter({children}:any, props:any){
           console.log(e)
         }}
       >
-        <span className="fade-b block py-2 sticky top-0 px-5 bg-white">
-          <h1 className="font-bold">หมวดหมู่ที่ 1</h1>
-          <p className="">ทักษะการเรียนรู้ตลอดชีวิต</p>
-        </span>
-        <SubjectObject
-          code={"0041001"}
-          title={"Preparatory English"}
-          desc={"เตรียมความพร้อมภาษาอังกฤษ"}
-        />
-        <SubjectObject
-          code={"0041002"}
-          title={"2nd Subject"}
-          desc={"วิชาที่ 2"}
-        />
+        <ChildFilterGroup 
+          title="หมวดหมู่ที่ 1"
+          desc="ทักษะการเรียนรู้ตลอดชีวิต"
+        >
+            <SubjectObject
+            code={"0041001"}
+            title={"Preparatory English"}
+            desc={"เตรียมความพร้อมภาษาอังกฤษ"}
+            />
+            <SubjectObject
+            code={"0041002"}
+            title={"2nd Subject"}
+            desc={"วิชาที่ 2"}
+            />
+        </ChildFilterGroup>
 
       </FilterPanel>
       <FilterPanel
@@ -186,12 +206,47 @@ export default function PRSubjectFilter({children}:any, props:any){
         onClose={()=>{
           f.setRoomViewFilter(false)
         }}
+        onClear={()=>{
+          f.resetRoomViewFilter()
+        }}
         onSearch={(e:string)=>{
           // search
           console.log(e)
         }}
       >
-
+        <ChildFilterGroup 
+          title="EN"
+          desc="คณะวิศวกรรมศาสตร์"
+          checkbox
+          className={`h-16`}
+          img={"https://www.msu.ac.th/wp-content/uploads/2022/06/eng.jpg"}
+          checkedAllText="เลือกตึกนี้"
+          // TODO: checkbox check process
+          checked={true}
+          checkedAll={true}
+          onCheckedClick={(e:string)=>{
+            console.log(e)
+          }}
+          onClose={()=>{
+            f.setRoomViewFilter(false)
+          }}
+          onClear={()=>{
+            f.resetRoomViewFilter()
+          }}
+        >
+          <RoomObject
+          title={"EN-110"}
+          />
+          <RoomObject
+          title={"EN-111"}
+          />
+        </ChildFilterGroup>
+        {/* <div className="place-card flex items-center bg-red-200 h-16">
+          <div className="content flex gap-2 px-4">
+            <i className="text-xl bx bx-checkbox"></i>
+            <p>คณะวิศวกรรมศาสตร์</p>
+          </div>
+        </div> */}
       </FilterPanel>
       <FilterPanel
         title="อาจารย์ผู้สอน"
@@ -200,12 +255,26 @@ export default function PRSubjectFilter({children}:any, props:any){
         onClose={()=>{
           f.setMasterViewFilter(false)
         }}
+        onClear={()=>{
+          f.resetMasterViewFilter()
+        }}
         onSearch={(e:string)=>{
           // search
           console.log(e)
         }}
       >
 
+          <MasterObject
+            name="ผศ.ดร. วรัญญู แก้วดวงตา"
+            other_name="Waranyoo Kaewduangta"
+          />
+          <MasterObject
+            name="อ. นนทิวรรธน์ จันทนะผะลิน"
+          />
+          <MasterObject
+            name="Ms. Tyeyoung Yang"
+            other_name="Tyeyoung Yang"
+          />
       </FilterPanel>
   </>
 }

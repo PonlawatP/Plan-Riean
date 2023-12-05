@@ -156,6 +156,14 @@ export default function SubjectSelectorFilterModel(props:any){
     return subject.includes(code);
     }
 
+    function isMasterFilterOn(name: string = ""){
+    return master.includes(name);
+    }
+
+    function isRoomFilterOn(name: string = ""){
+    return room.includes(name);
+    }
+
     function TimeFilterTogglePRC(all:boolean=false, time_start:string="", time_stop:string="", dindex:number=-1){
       let temp_time = filter.time;
       if(all){
@@ -207,6 +215,26 @@ export default function SubjectSelectorFilterModel(props:any){
       }
 
       setFilter({...filter, subject: temp})
+    }
+    function MasterFilterTogglePRC(name:string){
+      let temp = filter.master;
+      if(isMasterFilterOn(name)){
+        temp = temp.filter((s:string)=> s !== name)
+      } else {
+        temp.push(name)
+      }
+
+      setFilter({...filter, master: temp})
+    }
+    function RoomFilterTogglePRC(name:string){
+      let temp = filter.room;
+      if(isRoomFilterOn(name)){
+        temp = temp.filter((s:string)=> s !== name)
+      } else {
+        temp.push(name)
+      }
+
+      setFilter({...filter, room: temp})
     }
 
     // in-panel filter
@@ -260,8 +288,8 @@ export default function SubjectSelectorFilterModel(props:any){
     return <CalendarFilterContext.Provider value={{
       fnHandleClickedOnCalendar, handleReleaceHoldClick, handleFilterPanel, handleFilterSubmit, handleOpenSubjectSelect,
       filter, setFilter,
-      isGroupFilterOn, isDayFilterOn, isTimeFilterOn, isSubjectFilterOn,
-      GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC, SubjectFilterTogglePRC,
+      isGroupFilterOn, isDayFilterOn, isTimeFilterOn, isSubjectFilterOn, isMasterFilterOn, isRoomFilterOn,
+      GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC, SubjectFilterTogglePRC, MasterFilterTogglePRC, RoomFilterTogglePRC,
       subjectViewFilter, setSubjectViewFilter, roomViewFilter, setRoomViewFilter, masterViewFilter, setMasterViewFilter,
       filterDebounceProgress,
       handleSubjectFilterSubmit, handleMasterFilterSubmit, handleRoomFilterSubmit, handleFilterOnSubmit,
