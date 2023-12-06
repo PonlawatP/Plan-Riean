@@ -18,6 +18,7 @@ const config: Config = {
         'pr-bg': "#E6EDF3",
         'pr-bg-3': "#576573",
         'pr-gray-1': '#696969',
+        'pr-gray-2': '#ababab',
         'pr-msu-1': "#FFC736",
         'pr-msu-2': "#253445",
         'pr-msu-1-60': "#96741c",

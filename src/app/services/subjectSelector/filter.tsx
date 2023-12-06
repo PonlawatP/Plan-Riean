@@ -1,4 +1,5 @@
 import { CalendarContext, CalendarFilterContext, ICalendarFilter } from "@/app/providers/CalendarProvider";
+import { IFloorData, IRoomData } from "@/app/utils/test-data/rooms";
 import { name_days } from "@/components/PRCalendarSubject";
 import { SetStateAction, useContext, useState } from "react";
 
@@ -127,7 +128,7 @@ export default function SubjectSelectorFilterModel(props:any){
 
       setFilter({...filter, group: temp_group})
     }
-      
+
     function isDayFilterOn(name: string = ""){
       return day.includes(name);
     }
@@ -160,8 +161,8 @@ export default function SubjectSelectorFilterModel(props:any){
     return master.includes(name);
     }
 
-    function isRoomFilterOn(name: string = ""){
-    return room.includes(name);
+    function isRoomFilterOn(name: string = "", place = "", floor = -1){
+    return room.includes(name) || room.includes(place) || room.includes(`${place}-${floor}`);
     }
 
     function TimeFilterTogglePRC(all:boolean=false, time_start:string="", time_stop:string="", dindex:number=-1){
@@ -226,8 +227,47 @@ export default function SubjectSelectorFilterModel(props:any){
 
       setFilter({...filter, master: temp})
     }
-    function RoomFilterTogglePRC(name:string){
+    function FloorFilterTogglePRC(name:string, floor:number){
       let temp = filter.room;
+      if(floor === undefined){
+        temp = temp.filter((s:string)=> s !== name)
+      } else {
+        const tag_name = `${name}-${floor}`
+        if(isRoomFilterOn(name, name, floor)){
+          if(temp.some((t:string)=>t===name)){
+            temp = temp.filter((s:string)=> s !== name)
+            temp.push(tag_name)
+          } else {
+            temp = temp.filter((s:string)=> s !== tag_name)
+          }
+        } else {
+          temp.push(tag_name)
+        }
+      }
+
+      setFilter({...filter, room: temp})
+    }
+    function getFloorAmountInPlace(place:IRoomData):number{
+      return place.floors.length
+    }
+    function getFloorToggledInPlace(place:IRoomData):number{
+      let temp = 0;
+      if(filter.room.includes(place.place)){
+        return place.floors.length
+      } else {
+        place.floors.map((r:IFloorData)=>{
+            if(filter.room.includes(`${place.place}-${r.floor}`)){
+              temp = temp + 1;
+            }
+        })
+      }
+      return temp
+    }
+    function AllFloorFilterTogglePRC(name:string){
+      let temp = filter.room;
+
+      temp = temp.filter((t:string)=>!t.includes(name))
+
       if(isRoomFilterOn(name)){
         temp = temp.filter((s:string)=> s !== name)
       } else {
@@ -260,7 +300,7 @@ export default function SubjectSelectorFilterModel(props:any){
       setMasterViewFilter(false)
     }
     function resetRoomViewFilter(){
-      setFilter({...filter, master: []})
+      setFilter({...filter, room: []})
     }
     
     function handleFilterOnSubmit(funcRun:()=>void){
@@ -289,8 +329,8 @@ export default function SubjectSelectorFilterModel(props:any){
       fnHandleClickedOnCalendar, handleReleaceHoldClick, handleFilterPanel, handleFilterSubmit, handleOpenSubjectSelect,
       filter, setFilter,
       isGroupFilterOn, isDayFilterOn, isTimeFilterOn, isSubjectFilterOn, isMasterFilterOn, isRoomFilterOn,
-      GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC, SubjectFilterTogglePRC, MasterFilterTogglePRC, RoomFilterTogglePRC,
-      subjectViewFilter, setSubjectViewFilter, roomViewFilter, setRoomViewFilter, masterViewFilter, setMasterViewFilter,
+      GroupFilterTogglePRC, DayFilterTogglePRC, TimeFilterTogglePRC, SingleTimeFilterTogglePRC, SubjectFilterTogglePRC, MasterFilterTogglePRC, FloorFilterTogglePRC, AllFloorFilterTogglePRC,
+      subjectViewFilter, setSubjectViewFilter, roomViewFilter, setRoomViewFilter, masterViewFilter, setMasterViewFilter, getFloorAmountInPlace, getFloorToggledInPlace,
       filterDebounceProgress,
       handleSubjectFilterSubmit, handleMasterFilterSubmit, handleRoomFilterSubmit, handleFilterOnSubmit,
       resetSubjectViewFilter, resetMasterViewFilter, resetRoomViewFilter,

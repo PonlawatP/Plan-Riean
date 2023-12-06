@@ -8,7 +8,8 @@ import { getSubjectColor } from "@/app/utils/msu/subjectUtils";
 import SubjectGroup from "./ChildFilterGroup";
 import ChildFilterGroup from "./ChildFilterGroup";
 import MasterObject from "./MasterObject";
-import RoomObject from "./RoomObject";
+import RoomFloorObject from "./RoomFloorObject";
+import { IFloorData, IRoomData, roomsDummy } from "@/app/utils/test-data/rooms";
 
 export default function PRSubjectFilter({children}:any, props:any){
     const {
@@ -35,7 +36,7 @@ export default function PRSubjectFilter({children}:any, props:any){
   const { isBelowLg } = useBreakpoint("lg");
 
     function elemButton(msg: any, onClickEvent:()=>void = () => {}, isOn: boolean=false, classAdd:string="", keyName:any=undefined){
-      return <button key={keyName} onClick={onClickEvent} className={`h-fit px-1 md:px-2 py-1 rounded-lg border-b-[3px] overflow-hidden truncate active:border-pr-bg ${classAdd !== "" ? classAdd : isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
+      return <button key={keyName} onClick={onClickEvent} className={`h-fit px-2 md:px-2 py-1 rounded-lg border-b-[3px] overflow-hidden truncate active:border-pr-bg ${classAdd !== "" ? classAdd : isOn ? "text-white/80 bg-pr-bg-3 border-slate-600/50 hover:bg-slate-600" : "text-pr-text-menu bg-pr-bg border-slate-400/50 hover:bg-slate-300 active:bg-slate-400 active:text-white/80"}`}>
       {msg}
       </button>
     }
@@ -105,7 +106,7 @@ export default function PRSubjectFilter({children}:any, props:any){
                 <div className="mt-1 grid grid-cols-4 gap-2">
                   {subject.map((s:string)=>{
                     const colors = getSubjectColor(s);
-                    return elemButton(s, ()=>f.SubjectFilterTogglePRC(s), true, `${colors.color} ${colors.bgColor} border-slate-600/50 hover:opacity-80`)
+                    return elemButton(s, ()=>f.SubjectFilterTogglePRC(s), true, `${colors.color} ${colors.bgColor} border-slate-600/50 hover:opacity-80`, `subject-filter-${s}`)
                   })}
                   {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setSubjectViewFilter(true), false)}
                 </div>
@@ -144,14 +145,14 @@ export default function PRSubjectFilter({children}:any, props:any){
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">อาจารย์ผู้สอน</p>
                 <div className="mt-1 grid grid-cols-4 gap-2">
-                  {master.map((m:string)=>elemButton(m.split(".")[m.split(".").length-1], ()=>f.MasterFilterTogglePRC(m), f.isMasterFilterOn(m)))}
+                  {master.map((m:string, mindex:number)=>elemButton(m.split(".")[m.split(".").length-1], ()=>f.MasterFilterTogglePRC(m), f.isMasterFilterOn(m), "", `master-filter-${mindex}`))}
                   {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setMasterViewFilter(true), false)}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
-                <p className="font-semibold text-pr-text-menu">ห้องที่เรียน</p>
+                <p className="font-semibold text-pr-text-menu">ตึกที่เรียน</p>
                 <div className="mt-1 grid grid-cols-4 gap-2">
-                  {room.map((r:string)=>elemButton(r, ()=>f.RoomFilterTogglePRC(r), f.isRoomFilterOn(r)))}
+                  {room.map((r:string, rindex:number)=>elemButton(r, ()=>f.FloorFilterTogglePRC(r), f.isRoomFilterOn(r), "", `floor-filter-${rindex}`))}
                   {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setRoomViewFilter(true), false)}
                 </div>
               </div>
@@ -200,7 +201,7 @@ export default function PRSubjectFilter({children}:any, props:any){
 
       </FilterPanel>
       <FilterPanel
-        title="ห้องที่เรียน"
+        title="ตึกที่เรียน"
         placeholder="ชื่อตึก-รหัสห้อง"
         isOn={f.roomViewFilter}
         onClose={()=>{
@@ -214,39 +215,33 @@ export default function PRSubjectFilter({children}:any, props:any){
           console.log(e)
         }}
       >
-        <ChildFilterGroup 
-          title="EN"
-          desc="คณะวิศวกรรมศาสตร์"
-          checkbox
-          className={`h-16`}
-          img={"https://www.msu.ac.th/wp-content/uploads/2022/06/eng.jpg"}
-          checkedAllText="เลือกตึกนี้"
-          // TODO: checkbox check process
-          checked={true}
-          checkedAll={true}
-          onCheckedClick={(e:string)=>{
-            console.log(e)
-          }}
-          onClose={()=>{
-            f.setRoomViewFilter(false)
-          }}
-          onClear={()=>{
-            f.resetRoomViewFilter()
-          }}
-        >
-          <RoomObject
-          title={"EN-110"}
-          />
-          <RoomObject
-          title={"EN-111"}
-          />
-        </ChildFilterGroup>
-        {/* <div className="place-card flex items-center bg-red-200 h-16">
-          <div className="content flex gap-2 px-4">
-            <i className="text-xl bx bx-checkbox"></i>
-            <p>คณะวิศวกรรมศาสตร์</p>
-          </div>
-        </div> */}
+        {
+          roomsDummy.map((r:IRoomData, rindex)=><ChildFilterGroup
+            key={rindex}
+            title={r.place}
+            desc={r.place_name_th}
+            checkbox
+            className={`h-16`}
+            img={r.banner}
+            checkedAllText="เลือกตึกนี้"
+            checked={f.getFloorToggledInPlace(r) > 0}
+            checkedAll={f.getFloorToggledInPlace(r) == f.getFloorAmountInPlace(r)}
+            onCheckedClick={(e:string)=>{
+              f.AllFloorFilterTogglePRC(e)
+            }}
+            onClose={()=>{
+              f.setRoomViewFilter(false)
+            }}
+            onClear={()=>{
+              f.resetRoomViewFilter()
+            }}
+            subDesc={`${f.getFloorToggledInPlace(r)}/${f.getFloorAmountInPlace(r)} ชั้น`}
+          >
+            {r.floors.map((temp:IFloorData, rxIndex:number)=><RoomFloorObject key={rxIndex} title={`ชั้น ${temp.floor}`} place={r.place} floor={temp.floor}/>)}
+          </ChildFilterGroup>
+
+          )
+        }
       </FilterPanel>
       <FilterPanel
         title="อาจารย์ผู้สอน"

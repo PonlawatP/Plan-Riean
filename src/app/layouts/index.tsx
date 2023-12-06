@@ -121,7 +121,7 @@ export default function Layout({
               <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md -mt-1'>
                 <i className='bx bx-pencil mt-[3px]'></i>
               </span>
-              <PRThemeSwitcher></PRThemeSwitcher>
+              {/* <PRThemeSwitcher></PRThemeSwitcher> */}
             </button>
             <span className='text-md font-light text-pr-gray-1 md:flex gap-3'>
               <span className='flex gap-3'>
