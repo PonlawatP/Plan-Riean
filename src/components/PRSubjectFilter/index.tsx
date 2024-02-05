@@ -10,6 +10,7 @@ import ChildFilterGroup from "./ChildFilterGroup";
 import MasterObject from "./MasterObject";
 import RoomFloorObject from "./RoomFloorObject";
 import { IFloorData, IRoomData, roomsDummy } from "@/app/utils/test-data/rooms";
+import { Ifilter, getData } from "@/app/utils/subjectAPI";
 
 export default function PRSubjectFilter({children}:any, props:any){
     const {
@@ -42,7 +43,7 @@ export default function PRSubjectFilter({children}:any, props:any){
     }
 
     function getTimeNotAll(number=-1){
-      return number >= 0 ? time.filter((t:string)=>t !== "all")[number] : time.filter((t:string)=>t !== "all")
+      return number >= 0 ? time.filter((t:string)=>t !== "total")[number] : time.filter((t:string)=>t !== "total")
     }
 
     function test(ts:any=<></>){
@@ -63,6 +64,7 @@ export default function PRSubjectFilter({children}:any, props:any){
         }, 150)
       }
     },[viewFilter])
+
 
     return <>
       <section className={`pr-subject-filter pointer-events-none smooth-all absolute lg:left-[465px] md:p-8 w-full md:w-auto bottom-0 h-full grid z-10 lg:z-auto ${!viewSchedule || topbarToggle.init || topbarToggle.pre || !viewFilter ? "opacity-0 translate-y-10 lg:translate-y-0 lg:-translate-x-10 invisible" : ""}`}>
@@ -87,14 +89,25 @@ export default function PRSubjectFilter({children}:any, props:any){
             <section className="pr-subject-filter-content relative h-full overflow-auto fade-y p-5 pt-0">
               <div className="pr-filter-group pt-2 pb-6">
                 <p className="font-semibold text-pr-text-menu">หมวดหมู่รายวิชา</p>
-                <div className="mt-2 grid grid-cols-5 gap-2">
+                <div className="mt-2 grid grid-cols-4 xs:hidden gap-2">
+                  {elemButton("หมวด 1", ()=>f.GroupFilterTogglePRC("ge-1"), f.isGroupFilterOn("ge-1"))}
+                  {elemButton("หมวด 2", ()=>f.GroupFilterTogglePRC("ge-2"), f.isGroupFilterOn("ge-2"))}
+                  {elemButton("หมวด 3", ()=>f.GroupFilterTogglePRC("ge-3"), f.isGroupFilterOn("ge-3"))}
+                  {elemButton("หมวด 4", ()=>f.GroupFilterTogglePRC("ge-4"), f.isGroupFilterOn("ge-4"))}
+                  {elemButton("หมวด 5", ()=>f.GroupFilterTogglePRC("ge-5"), f.isGroupFilterOn("ge-5"))}
+                  {elemButton("พื้นฐาน", ()=>f.GroupFilterTogglePRC("fund"), f.isGroupFilterOn("fund"))}
+                  {elemButton("บังคับ", ()=>f.GroupFilterTogglePRC("mainf"), f.isGroupFilterOn("mainf"))}
+                  {elemButton("เลือก", ()=>f.GroupFilterTogglePRC("mainc"), f.isGroupFilterOn("mainc"))}
+                  {elemButton("วิชาเสรี", ()=>f.GroupFilterTogglePRC("free"), f.isGroupFilterOn("free"))}
+                </div>
+                <div className="mt-2 hidden xs:grid grid-cols-5 gap-2">
                   {elemButton("หมวด 1", ()=>f.GroupFilterTogglePRC("ge-1"), f.isGroupFilterOn("ge-1"))}
                   {elemButton("หมวด 2", ()=>f.GroupFilterTogglePRC("ge-2"), f.isGroupFilterOn("ge-2"))}
                   {elemButton("หมวด 3", ()=>f.GroupFilterTogglePRC("ge-3"), f.isGroupFilterOn("ge-3"))}
                   {elemButton("หมวด 4", ()=>f.GroupFilterTogglePRC("ge-4"), f.isGroupFilterOn("ge-4"))}
                   {elemButton("หมวด 5", ()=>f.GroupFilterTogglePRC("ge-5"), f.isGroupFilterOn("ge-5"))}
                 </div>
-                <div className={`mt-2 grid grid-cols-4 gap-2 ${false ? "opacity-60" : ""}`}>
+                <div className={`mt-2 hidden xs:grid grid-cols-4 gap-2 ${false ? "opacity-60" : ""}`}>
                   {elemButton("พื้นฐาน", ()=>f.GroupFilterTogglePRC("fund"), f.isGroupFilterOn("fund"))}
                   {elemButton("เอกบังคับ", ()=>f.GroupFilterTogglePRC("mainf"), f.isGroupFilterOn("mainf"))}
                   {elemButton("เอกเลือก", ()=>f.GroupFilterTogglePRC("mainc"), f.isGroupFilterOn("mainc"))}
@@ -108,18 +121,18 @@ export default function PRSubjectFilter({children}:any, props:any){
                     const colors = getSubjectColor(s);
                     return elemButton(s, ()=>f.SubjectFilterTogglePRC(s), true, `${colors.color} ${colors.bgColor} border-slate-600/50 hover:opacity-80`, `subject-filter-${s}`)
                   })}
-                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setSubjectViewFilter(true), false)}
+                  {elemButton(<span className="relative block"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setSubjectViewFilter(true), false)}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">วันที่เรียน</p>
-                <div className="mt-1 grid grid-cols-5 gap-2">
+                <div className="mt-1 grid grid-cols-4 xs:grid-cols-5 gap-2">
                   {name_days.map((d, dind:number)=>elemButton(d.date_th, ()=>f.DayFilterTogglePRC(d.date_en_2), f.isDayFilterOn(d.date_en_2), "", dind))}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">เวลาที่เรียน</p>
-                <div className="mt-1 grid grid-cols-5 gap-2">
+                <div className="mt-1 grid grid-cols-4 gap-2">
                   {elemButton("ทั้งหมด", ()=>f.TimeFilterTogglePRC(true), f.isTimeFilterOn(true))}
                   {
                     getTimeNotAll().length == 2
@@ -139,21 +152,21 @@ export default function PRSubjectFilter({children}:any, props:any){
                     :
                     null
                   }
-                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-time-five text-2xl absolute top-0 -translate-x-1/2"></i></span>, ()=>f.TimeFilterTogglePRC(false, "08:00", "10:00"), f.isTimeFilterOn())}
+                  {elemButton(<span className="relative block"><p className="invisible">t</p><i className="bx bx-time-five text-2xl absolute top-0 -translate-x-1/2"></i></span>, ()=>f.TimeFilterTogglePRC(false, "08:00", "10:00"), f.isTimeFilterOn())}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">อาจารย์ผู้สอน</p>
-                <div className="mt-1 grid grid-cols-4 gap-2">
+                <div className="mt-1 grid grid-cols-1 xs:grid-cols-2 gap-2">
                   {master.map((m:string, mindex:number)=>elemButton(m.split(".")[m.split(".").length-1], ()=>f.MasterFilterTogglePRC(m), f.isMasterFilterOn(m), "", `master-filter-${mindex}`))}
-                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setMasterViewFilter(true), false)}
+                  {elemButton(<span className="relative block"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setMasterViewFilter(true), false)}
                 </div>
               </div>
               <div className="pr-filter-group pb-6">
                 <p className="font-semibold text-pr-text-menu">ตึกที่เรียน</p>
                 <div className="mt-1 grid grid-cols-4 gap-2">
                   {room.map((r:string, rindex:number)=>elemButton(r, ()=>f.FloorFilterTogglePRC(r), f.isRoomFilterOn(r), "", `floor-filter-${rindex}`))}
-                  {elemButton(<span className="relative"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setRoomViewFilter(true), false)}
+                  {elemButton(<span className="relative block"><p className="invisible">t</p><i className="bx bx-search text-2xl absolute top-0 -translate-x-1/2"></i></span>,()=>f.setRoomViewFilter(true), false)}
                 </div>
               </div>
             </section>

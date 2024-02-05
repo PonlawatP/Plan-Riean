@@ -2,6 +2,8 @@ import { CalendarContext, CalendarFilterContext } from "@/app/providers/Calendar
 import { time } from "console";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import ScheduleCard from "./PRScheduleCard";
+import { getDayIndex, getHourIndex, getSplitedData } from "@/app/utils/msu/subjectUtils";
 
 export const name_days = [
   {
@@ -53,7 +55,7 @@ export default function PRCalendarSubject(props: any) {
     resizePlan, canvasElemRef, planElemRef,
     focusTime, setFocusTime,
     getTimeTable, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME,
-    toggleSidebar
+    toggleSidebar, getCurrentPlan
   } = useContext(CalendarContext);
 
   const {
@@ -73,7 +75,7 @@ export default function PRCalendarSubject(props: any) {
     }
 
     resizePlan()
-  }, []);
+  }, [canvasElemRef, planElemRef, resizePlan]);
 
   useEffect(() => {
     window.addEventListener('resize', resizePlan);
@@ -232,14 +234,20 @@ export default function PRCalendarSubject(props: any) {
                     null
                   }
                   {/* TODO: badge of subjects here */}
-                  <></>
+                  {getCurrentPlan().data.map((data:any,dataindex:any)=>{
+                        return getSplitedData(data.time).map((split_date, spindex)=>{
+                          return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
+                          <ScheduleCard position={{x:tindex, y:dindex}} key={"d-"+dataindex} data={data} time={split_date.fullDate}/>
+                          : null
+                        })
+                      })}
 
                   {/* hover when user drag clicked */}
                   { 
                     dindex === focusTime.day && t === focusTime.start_time
                     ?
                       <span 
-                        className={`pr-hover-dragged smooth-all pointer-events-none select-none absolute h-full flex justify-center items-center top-0`}
+                        className={`pr-hover-dragged smooth-all pointer-events-none select-none absolute h-full flex justify-center items-center top-0 z-50`}
                         style={{
                           width: (focusTime.start_time > focusTime.end_time ? ((focusTime.start_time - focusTime.end_time)+1)*100 : ((focusTime.end_time - focusTime.start_time)+1)*100)+"%",
                           left: (focusTime.start_time > focusTime.end_time ? (focusTime.end_time - focusTime.start_time)*100 : 0)+"%"

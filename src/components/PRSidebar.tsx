@@ -20,30 +20,30 @@ export default function PRSidebar(props:any){
     >
       {/* main sidebar */}
       <div className="content relative flex flex-col h-full bg-white/60 border-[1px] rounded-3xl overflow-hidden">
-        <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60 bg-pr-msu-1 text-pr-msu-1-60'>
+        <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='bx bx-home text-2xl drop-shadow-pr-shadow-text'/>
-          <p className="drop-shadow-pr-shadow-text hidden lg:block">แผนเรียน</p>
+          <p className="drop-shadow-pr-shadow-text hidden lg:block">หน้าแรก</p>
+        </button>
+        <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60 bg-pr-msu-1 text-pr-msu-1-60'>
+          <i className='group-hover:drop-shadow-pr-shadow-text bx bx-task text-2xl'/>
+          <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">แผนเรียน</p>
         </button>
         <button onClick={()=>handleOpenSubjectSelect()} className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='group-hover:drop-shadow-pr-shadow-text bx bx-objects-horizontal-left text-2xl'/>
           <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">เลือกรายวิชา</p>
         </button>
         {/* <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
-          <i className='group-hover:drop-shadow-pr-shadow-text bx bx-task text-2xl'/>
-          <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">รายการแผน</p>
-        </button>
-        <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='group-hover:drop-shadow-pr-shadow-text bx bx-stats text-2xl'/>
           <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">สถานะการเรียน</p>
-        </button>
+        </button> */}
         <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='group-hover:drop-shadow-pr-shadow-text bx bx-git-repo-forked text-2xl rotate-90'/>
           <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">เส้นทางหลักสูตร</p>
-        </button> */}
-        <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
+        </button>
+        {/* <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='group-hover:drop-shadow-pr-shadow-text bx bx-star text-2xl'/>
           <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">รีวิว</p>
-        </button>
+        </button> */}
         {/* <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>
           <i className='group-hover:drop-shadow-pr-shadow-text bx bx-map-alt text-2xl'/>
           <p className="group-hover:drop-shadow-pr-shadow-text hidden lg:block">แผนที่</p>

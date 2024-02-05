@@ -1,5 +1,5 @@
 import { ThemeContext } from '@/app/providers'
-import { IBM_Plex_Sans_Thai } from 'next/font/google'
+import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google'
 import { useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
@@ -16,8 +16,16 @@ import DialogLoading from '../../components/PRSubjectSelector/dialogue/loading'
 import DialogError from '../../components/PRSubjectSelector/dialogue/error'
 import SubjectSelectorFilterModel from '../services/subjectSelector/filter'
 import { PRThemeSwitcher } from '@/components/PRThemeSwitcher'
+import { subjectDemoData } from '../utils/test-data/subjects'
+import { IsubjectSectDate, calculateScale, getDayIndex, getHourIndex, getSplitedData } from '../utils/msu/subjectUtils'
+import SubjectList from '@/components/SubjectList'
 
-const font = IBM_Plex_Sans_Thai({ 
+export const font = IBM_Plex_Sans_Thai({ 
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  subsets: ['latin', 'thai'],
+  display: "swap"
+})
+export const k2dfont = K2D({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
   subsets: ['latin', 'thai'],
   display: "swap"
@@ -52,6 +60,7 @@ export default function Layout({
     end_time: 8
   })
 
+  const [myPlan, setMyPlan] = useState<any>({data:[]});
   const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
 
   function getTimeTable(added: number = 16){
@@ -99,6 +108,64 @@ export default function Layout({
       }
     })
 
+    function getCurrentPlan() {
+      return myPlan;
+    }
+    const checkSubjectSchedule = (subject: any) => {
+      const plan = getCurrentPlan();
+      return (
+        plan.data.filter(
+          (data: any) =>
+            data.code.trim() === subject.code.trim() && data.sec === subject.sec
+        ).length > 0
+      );
+    };
+    const addSubjectSchedule = (subject: any) => {
+      const plan = getCurrentPlan();
+      plan.data.push(subject);
+      setMyPlan(plan);
+    };
+    const removeSubjectSchedule = (subject: any) => {
+      const plan = getCurrentPlan();
+      plan.data = plan.data.filter(
+        (data: any) =>
+          data.code.trim() !== subject.code.trim() || data.sec !== subject.sec
+      );
+      setMyPlan(plan);
+    };
+    const toggleSubjectSchedule = (subject: any) => {
+      if (checkSubjectSchedule(subject)) {
+        removeSubjectSchedule(subject);
+      } else {
+        addSubjectSchedule(subject);
+      }
+    };
+    const checkSubjectCollapsed = (subject: any) => {
+      const plan = getCurrentPlan();
+      const res = plan.data.filter(
+        (data: any) => {
+          return getSplitedData(data.time).filter(
+            (df: IsubjectSectDate) =>
+              getSplitedData(subject.time).filter(
+                (sf: IsubjectSectDate) => {
+                  // console.log(sf, df, getHourIndex(sf.fullDate), (calculateScale(sf.fullDate) - 1), getHourIndex(df.fullDate))
+                  return getDayIndex(df.fullDate) == getDayIndex(sf.fullDate) &&
+                  (
+                    getHourIndex(df.fullDate) == getHourIndex(sf.fullDate) ||
+                    (
+                      getHourIndex(sf.fullDate) + (calculateScale(sf.fullDate) - 1) >= getHourIndex(df.fullDate)
+                      &&
+                      getHourIndex(df.fullDate) + (calculateScale(df.fullDate) - 1) >= getHourIndex(sf.fullDate)
+                    )
+                  )
+                }
+              ).length > 0
+          ).length > 0
+        }
+      );
+      return res.length > 0;
+    };
+
   return (
     <>
     <style jsx global>{`
@@ -110,7 +177,8 @@ export default function Layout({
     <CalendarContext.Provider value={{
       viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, toggleSidebar, setTooggleSidebar,
       resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, viewFilter, setViewFilter, focusTime, setFocusTime, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME, getTimeTable,
-      calsel_data, setCalselData
+      calsel_data, setCalselData, myPlan, setMyPlan,
+      getCurrentPlan, checkSubjectSchedule, addSubjectSchedule, removeSubjectSchedule, toggleSubjectSchedule, checkSubjectCollapsed
     }}>
       <SubjectSelectorFilterModel classname={font.className}>
         <section className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
@@ -135,9 +203,12 @@ export default function Layout({
             </span>
             {/* <button className='absolute right-10 top-1/2 -mt-4 rounded-xl text-pr-msu-1-60 bg-pr-msu-1 border-2 border-pr-msu-1-60/30 p-1 px-2'>เลิอกแผนนี้</button> */}
           </article>
-          <button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-light hover:underline">
-            <p className='hidden md:block'>Ponlawat</p>
-            <Image src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg" alt="Planriean Logo" width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></Image>
+          <button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
+            <div className="text-right hidden md:block mt-2">
+              <p className=''>Ponlawat</p>
+              <p className='font-light text-sm'>CS | MSU</p>
+            </div>
+            <Image src="/assets/images/prof.jpg" alt="Planriean Logo" width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></Image>
           </button>
         </section>
 
@@ -163,7 +234,8 @@ export default function Layout({
                 :
                 calsel_data.result.data.length != 0
                 ?
-                  <>TODO: show subject list here...</>
+                  // <>TODO: show subject list here...</>
+                  <SubjectList/>
                 :
                   <DialogSearchNotFound/>
               }

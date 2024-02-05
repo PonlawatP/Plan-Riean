@@ -14,7 +14,7 @@ export default function FilterPreview(props:any){
 } = f.filter
 
 function getGroupFormat(){
-  if(group.includes("all") || group.length == 0 || group.length == 9){
+  if(group.includes("total") || group.length == 0 || group.length == 9){
       return "ทุกวิชา"
   }
 
@@ -109,7 +109,7 @@ return <div className="flex flex-wrap gap-2 p-2 pt-3 pb-5 text-pr-gray-1 bg-grad
               <p>{getDayFormat()}</p>
           </span>
         }
-        {time.filter((t:string)=> t === t.replaceAll("-", "")).length > 0 && !time.includes("all") &&
+        {time.filter((t:string)=> t === t.replaceAll("-", "")).length > 0 && !time.includes("total") &&
           <span className="flex gap-1 items-center">
               <i className="bx bx-time-five text-2xl"></i>
               <p>{getTimeFormat()}</p>

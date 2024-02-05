@@ -15,7 +15,9 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors: {
+        'pr-dark': "#181C27",
         'pr-bg': "#E6EDF3",
+        'pr-bg-1': "#CACFD9",
         'pr-bg-3': "#576573",
         'pr-gray-1': '#696969',
         'pr-gray-2': '#ababab',
@@ -28,6 +30,7 @@ const config: Config = {
         'pr-shadow-text': '0 2px 0px rgba(0, 0, 0, 0.2)'
       },
       screens: {
+        'xs': '450px',
         'sm': '640px',
         // => @media (min-width: 640px) { ... }
   
@@ -41,6 +44,9 @@ const config: Config = {
         // => @media (min-width: 1280px) { ... }
   
         '2xl': '1536px',
+      },
+      fontFamily: {
+        'k2d': ['K2D'],
       },
     },
   },

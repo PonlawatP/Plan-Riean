@@ -12,7 +12,8 @@ import { ThemeProvider } from "@/app/providers/ThemeProvider";
 export default function MyApp({Component, pageProps}: AppProps){
     const [theme, setTheme] = useState('light');
 
-    return <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    return <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    {/* return <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
         <Layout>
             <GoogleAnalytics strategy="lazyOnload" trackPageViews={true} />
             <Component {...pageProps}/>

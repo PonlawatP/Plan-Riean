@@ -1,5 +1,7 @@
 import { CalendarContext, CalendarFilterContext, ICalendarFilter } from "@/app/providers/CalendarProvider";
+import { Ifilter, getData, getUpdatedData } from "@/app/utils/subjectAPI";
 import { IFloorData, IRoomData } from "@/app/utils/test-data/rooms";
+import { subjectDemoData } from "@/app/utils/test-data/subjects";
 import { name_days } from "@/components/PRCalendarSubject";
 import { SetStateAction, useContext, useState } from "react";
 
@@ -77,7 +79,7 @@ export default function SubjectSelectorFilterModel(props:any){
       setViewFilter(!viewFilter)
     }
 
-    function handleFilterSubmit(clear=false){
+    async function handleFilterSubmit(clear=false){
       if(clear){
         setFilter({
           group: [],
@@ -93,11 +95,70 @@ export default function SubjectSelectorFilterModel(props:any){
       // setViewFilter(!viewFilter)
       
     }
-    function handleSearch(){
-      setCalselData({...calsel_data, isLoading: true, current_filter: filter})
-      setTimeout(()=>{
-        setCalselData({...calsel_data, isLoading: false, isFirstLoading: false})
-      },1000)
+
+    let abortController:any;
+    let abortUpdateController:any;
+    async function handleSearch(){
+      let err = false
+      setCalselData({...calsel_data, isLoading: true, isError: false, current_filter: filter})
+
+      // TODO:search from API
+      if (abortController) {
+        // If there is an ongoing request, cancel it
+        abortController.abort();
+      }
+    
+      abortController = new AbortController(); // Create a new AbortController instance
+    
+      try {
+        // TODO: now to can use old api. i need to convert this one.
+        const temp_time = filter.time.filter((t:string)=>{
+          if(!t.includes("-")){
+            return t
+          }
+        })
+        const check_filt: Ifilter = {
+          firstFilter: false,
+          type: filter.group,
+          code: filter.subject,
+          date: filter.day,
+          time: temp_time.toString() === "" ? "total" : temp_time[0].toString().split(":")[0]
+        }
+
+        const res = await getData(check_filt, abortController.signal); // Pass the signal to the getData function
+    
+        // setSubjectShowData(res);
+        console.log(check_filt, res)
+  
+        abortUpdateController = new AbortController(); // Create a new AbortController instance
+        await getUpdatedData(abortUpdateController.signal).then(res2=> {
+          
+          if (abortUpdateController) {
+            // If there is an ongoing request, cancel it
+            abortUpdateController.abort();
+          }
+          setCalselData({...calsel_data, isLoading: false, isFirstLoading: false, updated: res2, result: {recommand:[], data: res}})
+          // setSubjectUpdatedData(res);
+        });
+      } catch (error:any) {
+        if (error.name === 'AbortError') {
+          // Request was aborted, handle cancellation as needed
+          console.log('Request was cancelled.');
+          return;
+        }
+    
+        // Handle other errors
+        console.error('An error occurred:', error);
+        err = true
+        setCalselData({...calsel_data, isLoading: false, isFirstLoading: false, isError: true, result: {recommand:[], data:[]}})
+      } finally {
+        // toggleDataLoaded(true);
+        abortController = null; // Reset the abortController variable
+      }
+      
+      // setTimeout(()=>{
+      //   setCalselData({...calsel_data, isLoading: false, isFirstLoading: false, result: {recommand:[], data:[...subjectDemoData]}})
+      // },1000)
     }
 
     function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
@@ -147,10 +208,10 @@ export default function SubjectSelectorFilterModel(props:any){
 
     function isTimeFilterOn(all:boolean = false, time_num:string = ""){
       if(all){
-        return time.length == 0 || (time.length > 0 && time.includes("all")) || time.filter((t:string)=>t===t.replaceAll("-","")).length == 0
+        return time.length == 0 || (time.length > 0 && time.includes("total")) || time.filter((t:string)=>t===t.replaceAll("-","")).length == 0
       }
 
-      return time.includes("all") ? false : time.filter((t:string)=> t === time_num.replaceAll("-","")).length > 0;
+      return time.includes("total") ? false : time.filter((t:string)=> t === time_num.replaceAll("-","")).length > 0;
     }
 
     function isSubjectFilterOn(code: string = ""){
@@ -168,9 +229,9 @@ export default function SubjectSelectorFilterModel(props:any){
     function TimeFilterTogglePRC(all:boolean=false, time_start:string="", time_stop:string="", dindex:number=-1){
       let temp_time = filter.time;
       if(all){
-        if(!temp_time.includes("all")){
+        if(!temp_time.includes("total")){
           temp_time = temp_time.map((t:string)=>t===t.replaceAll("-","")?"-"+t:t)
-            temp_time.push("all");
+            temp_time.push("total");
         }
       } else if(time_start !== "" && time_stop !== ""){
         temp_time = [time_start, time_stop]
@@ -189,7 +250,7 @@ export default function SubjectSelectorFilterModel(props:any){
       if(!filter.time.includes(time_num) || forceToggle){
         temp_time = [time_num]
       } else {
-        temp_time = temp_time.filter((t:string)=>t!=="all")
+        temp_time = temp_time.filter((t:string)=>t!=="total")
   
         temp_time = temp_time.map((tt:string)=>{
           if(tt === time_num){
