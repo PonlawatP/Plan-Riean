@@ -122,7 +122,7 @@ export default function SubjectSelectorFilterModel(props:any){
           type: filter.group,
           code: filter.subject,
           date: filter.day,
-          time: temp_time.toString() === "" ? "total" : temp_time[0].toString().split(":")[0]
+          time: temp_time.toString() === "" ? "total" : temp_time.map((t:string) => {return t.toString().split(":")[0]}).join("-")
         }
 
         const res = await getData(check_filt, abortController.signal); // Pass the signal to the getData function
