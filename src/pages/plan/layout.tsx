@@ -1,6 +1,6 @@
 import { ThemeContext } from '@/app/providers'
 import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google'
-import { useContext, useRef, useState } from 'react'
+import { Fragment, useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
 import { CalendarContext, CalendarFilterContext, ICalendarData, ICalendarFilter } from '@/app/providers/CalendarProvider'
@@ -22,6 +22,10 @@ import SubjectList from '@/components/SubjectList'
 import { ThemeProvider } from '@/app/providers/ThemeProvider'
 import AuthProvider from '@/app/providers/AuthProvider'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
+import { useSession, signOut } from "next-auth/react";
+import { Menu, Transition } from '@headlessui/react'
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 export const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -65,6 +69,10 @@ export default function PlanPageLayout({
 
   const [myPlan, setMyPlan] = useState<any>({data:[]});
   const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
+
+  const router = usePathname()
+  const params = useSearchParams()
+  const rollback_url = `${router}${params ? "?"+params.toString() : ""}`
 
   function getTimeTable(added: number = 16){
     const times_m: Array<number> = [];
@@ -168,11 +176,7 @@ export default function PlanPageLayout({
       );
       return res.length > 0;
     };
-
-    console.log({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET as string,
-    })
+    const { data: session } = useSession();
 
   return (
     <>
@@ -189,7 +193,7 @@ export default function PlanPageLayout({
       }}>
         <SubjectSelectorFilterModel classname={font.className}>
           <section className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
-            <button className='hidden sm:flex'><Image src="/assets/images/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></button>
+            <button className='hidden sm:flex'><Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></button>
             <article className='pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl'>
               <button className="header text-xl font-medium flex gap-3 group">
                 <h1>แผนเรียนใหม่</h1>
@@ -210,13 +214,97 @@ export default function PlanPageLayout({
               </span>
               {/* <button className='absolute right-10 top-1/2 -mt-4 rounded-xl text-pr-msu-1-60 bg-pr-msu-1 border-2 border-pr-msu-1-60/30 p-1 px-2'>เลิอกแผนนี้</button> */}
             </article>
-            <button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
-              <div className="text-right hidden md:block mt-2">
-                <p className=''>Ponlawat</p>
-                <p className='font-light text-sm'>CS | MSU</p>
-              </div>
-              <Image src="/assets/images/prof.jpg" alt="Planriean Logo" width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></Image>
-            </button>
+            {session ? 
+              <Menu as="div" className="">
+                    <div>
+                      <Menu.Button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
+                        {/* <span className="absolute -inset-1.5" /> */}
+                        {/* <span className="sr-only">Open user menu</span>
+                        <img
+                          className="h-8 w-8 rounded-full"
+                          src={session?.user?.image || ""}
+                          alt="User Profile"
+                        /> */}
+                        <div className="text-right hidden md:block mt-2">
+                          <p className=''>{session?.user?.name || "User"}</p>
+                          <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p>
+                        </div>
+                        <img src={session?.user?.image || ""} alt={`${session?.user?.name || "User"}'s ${session?.user?.name || "Profile"}`} width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></img>
+                      
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute overflow-hidden right-8 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href='/account'
+                              className={
+                                "profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu hover:bg-pr-msu-1"
+                              }
+                            >
+                              {session?.user?.name || "User"}
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href='/account/plan'
+                              className={
+                                "profile-badge-li block cursor-pointer text-sm py-2 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4"
+                              }
+                            >
+                              แผนการเรียนของคุณ
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              href='/account/setting'
+                              className={
+                                "profile-badge-li block cursor-pointer text-sm py-2 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4"
+                              }
+                            >
+                              จัดการบัญชี
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <a
+                              onClick={() => signOut()}
+                              className={
+                                "profile-badge-li block cursor-pointer text-sm py-2 pb-3 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4"
+                              }
+                            >
+                              ออกจากระบบ
+                            </a>
+                          )}
+                        </Menu.Item>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+              :
+                <Link href={{
+                  pathname:"/login", query:{fallbackUrl:rollback_url}
+                }} className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
+                  <div className="text-right hidden md:block mt-2">
+                    <p className=''>เป็นครอบครัวแพลนเรียน</p>
+                    <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p>
+                  </div>
+                  <Image src="/assets/images/prof.jpg" alt="Planriean Logo" width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></Image>
+                </Link>
+            }
           </section>
 
           <div className={

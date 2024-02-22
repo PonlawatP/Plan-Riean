@@ -1,3 +1,7 @@
+.profile-badge-li{
+  all: unset;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

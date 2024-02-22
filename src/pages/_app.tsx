@@ -32,6 +32,7 @@ export default function MyApp({Component, pageProps}: AppProps){
         <AuthProvider>
             <GoogleAnalytics strategy="lazyOnload" trackPageViews={true} />
             {getLayout(<Component {...pageProps} />)}
+            {/* <Component {...pageProps} /> */}
         </AuthProvider>
     </ThemeProvider>
 }

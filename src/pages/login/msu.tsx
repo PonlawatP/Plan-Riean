@@ -23,12 +23,13 @@ function LoginPage(props:any) {
       </> :
         <div className="bg-gray-100 px-5 py-12 md:w-96 rounded-2xl shadow-lg">
           <div className="px-8">
-            <h2 className="font-bold text-2xl text-[#002D74]">เข้าสู่ระบบ</h2>
+            <h2 className="font-bold text-2xl text-[#002D74]">เข้าใช้ด้วยระบบทะเบียน</h2>
+            <h2 className="font-bold text-lg text-[#002D74]">มหาวิทยาลัยมหาสารคาม</h2>
             <form className="text-sm flex flex-col gap-4 mt-4">
               <input
-                type="email"
+                type="learner-id"
                 className="p-2 rounded-xl border"
-                placeholder="Email / ชื่อผู้ใช้"
+                placeholder="รหัสนิสิต / ชื่อผู้ใช้"
               />
               <input
                 type="password"
@@ -45,42 +46,14 @@ function LoginPage(props:any) {
             <div className="mt-2 text-xs text-[#002D74] underline">
               <Link href={{pathname: "/forget-password", query: { fallbackUrl: redirect.query.fallbackUrl }}}>ลืมรหัสผ่าน</Link>
             </div>
-            <div className="mt-6 text-gray-400 grid items-center grid-cols-3">
-              <hr className="border-gray-400" />
-              <p className="text-center text-sm">หรือ</p>
+            <div className="mt-6 text-gray-400 grid items-center grid-cols-1">
               <hr className="border-gray-400" />
             </div>
-            <button
-              onClick={() => signIn("google")}
-              className="bg-white px-2 py-2 mt-5 border w-full rounded-xl 
-            flex justify-center items-center text-sm hover:scale-105 duration-300 text-[#002D74]"
-            >
-              <Image
-                src="/assets/images/logo/google-logo.png"
-                width={30}
-                height={30}
-                alt="Google Logo"
-              />
-              <span className="px-2">เข้าสู่ระบบด้วย Google</span>
-            </button>
-            <Link
-              href={{pathname: "/login/msu", query: { fallbackUrl: redirect.query.fallbackUrl }}}
-              className="bg-white px-2 py-2 mt-5 border w-full rounded-xl 
-              flex justify-center items-center text-sm hover:scale-105 duration-300 text-[#002D74]"
-            >
-              <Image
-                src="/assets/images/university/msu.png"
-                width={30}
-                height={30}
-                alt="Google Logo"
-              />
-              <span className="px-2">เข้าสู่ระบบด้วยระบบทะเบียน มมส</span>
-            </Link>
 
             <div className="mt-5 text-xs flex justify-between items-center">
-              <p className="text-gray-400">คุณยังไม่มีบัญชีใช่หรือไม่?</p>
-              <Link href={{pathname: "/register", query: { fallbackUrl: redirect.query.fallbackUrl }}} className="text-[#002D74]">
-                สมัครสมาชิก
+              <p className="text-gray-400">ไม่ได้อยู่ที่มหาวิทยาลัยมหาสารคาม?</p>
+              <Link href={{pathname: "/login", query: { fallbackUrl: redirect.query.fallbackUrl }}} className="text-[#002D74]">
+                เข้าสู่ระบบปกติ
               </Link>
             </div>
           </div>
