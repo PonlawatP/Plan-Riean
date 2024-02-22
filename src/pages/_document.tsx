@@ -15,7 +15,7 @@ class MyDocument extends Document {
             />
           <link rel="apple-touch-icon" href="/icon.png"></link>
           <meta name="theme-color" content="#E6EDF3" />
-          <meta name="description" content="จัดตารางเรียนให้ง่ายขึ้นด้วย Planriean, ตารางเรียน, แผนการเรียน, ตัวช่วยนักศึกษา" />
+          <meta name="description" content="ไม่รู้จะจัดตารางเรียนยังไง มาลองทำให้ง่ายขึ้นด้วย Planriean สิ, ตารางเรียน, แผนการเรียน, ตัวช่วยนักศึกษา" />
         </Head>
         <body>
           <Main />
