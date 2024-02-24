@@ -15,6 +15,8 @@ const config: Config = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors: {
+        'pr-blue': '#0075F7',
+        'pr-blue-dark': '#002D74',
         'pr-dark': "#181C27",
         'pr-bg': "#E6EDF3",
         'pr-bg-1': "#CACFD9",
@@ -50,6 +52,8 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+  ],
 }
 export default config

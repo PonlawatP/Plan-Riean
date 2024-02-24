@@ -1,4 +1,4 @@
-import { k2dfont } from "@/pages/plan/layout"
+import { k2dfont } from "@/app/layout/planlayout"
 import { CalendarContext } from "@/app/providers/CalendarProvider"
 import { calculateScale, getColorCode, getTimeRange } from "@/app/utils/msu/subjectUtils"
 import { useContext } from "react"

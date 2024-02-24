@@ -11,8 +11,10 @@ export const font = IBM_Plex_Sans_Thai({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-      <div className={font.className} >
-        {children}
-      </div>
+      <>
+        <div className={`${font.className}`} >
+          {children}
+        </div>
+      </>
   );
 }

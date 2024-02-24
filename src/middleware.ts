@@ -10,16 +10,16 @@ export async function middleware(req: NextRequest) {
   // Clone the URL
   const url = req.nextUrl.clone();
 
-  // Skip public files
-  if (PUBLIC_FILE.test(url.pathname) || url.pathname.includes('_next')) return;
+  // // Skip public files
+  // if (PUBLIC_FILE.test(url.pathname) || url.pathname.includes('_next')) return;
 
-  const host = req.headers.get('host');
-  const subdomain = getValidSubdomain(host);
-  if (subdomain) {
-    // Subdomain available, rewriting
-    console.log(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
-    url.pathname = `/${subdomain}${url.pathname}`;
-  }
+  // const host = req.headers.get('host');
+  // const subdomain = getValidSubdomain(host);
+  // if (subdomain) {
+  //   // Subdomain available, rewriting
+  //   console.log(`>>> Rewriting: ${url.pathname} to /${subdomain}/${subdomain}${url.pathname}`);
+  //   url.pathname = `/${subdomain}/${subdomain}${url.pathname}`;
+  // }
 
   return NextResponse.rewrite(url);
 }

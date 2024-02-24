@@ -1,10 +1,10 @@
 import { ThemeContext } from '@/app/providers'
 import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google'
-import { Fragment, useContext, useRef, useState } from 'react'
+import { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
 import { CalendarContext, CalendarFilterContext, ICalendarData, ICalendarFilter } from '@/app/providers/CalendarProvider'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css';
 import PRSubjectSelector from '../../components/PRSubjectSelector'
@@ -14,10 +14,10 @@ import DialogFirstSearch from '../../components/PRSubjectSelector/dialogue/first
 import DialogSearchNotFound from '../../components/PRSubjectSelector/dialogue/searchNotFound'
 import DialogLoading from '../../components/PRSubjectSelector/dialogue/loading'
 import DialogError from '../../components/PRSubjectSelector/dialogue/error'
-import SubjectSelectorFilterModel from '../../app/services/subjectSelector/filter'
+import SubjectSelectorFilterModel from '../services/subjectSelector/filter'
 import { PRThemeSwitcher } from '@/components/PRThemeSwitcher'
-import { subjectDemoData } from '../../app/utils/test-data/subjects'
-import { IsubjectSectDate, calculateScale, getDayIndex, getHourIndex, getSplitedData } from '../../app/utils/msu/subjectUtils'
+import { subjectDemoData } from '../utils/test-data/subjects'
+import { IsubjectSectDate, calculateScale, getDayIndex, getHourIndex, getSplitedData } from '../utils/msu/subjectUtils'
 import SubjectList from '@/components/SubjectList'
 import { ThemeProvider } from '@/app/providers/ThemeProvider'
 import AuthProvider from '@/app/providers/AuthProvider'
@@ -39,9 +39,9 @@ export const k2dfont = K2D({
 })
 
 export default function PlanPageLayout({
-  children,
+  children
 }: {
-  children: React.ReactNode
+  children: React.ReactNode,
 }) {
   const {theme} = useContext(ThemeContext)
 
@@ -67,7 +67,7 @@ export default function PlanPageLayout({
     end_time: 8
   })
 
-  const [myPlan, setMyPlan] = useState<any>({data:[]});
+  const [myPlan, setMyPlan] = useState<any>({data: undefined, subjects:[]});
   const [MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME] = useState(18);
 
   const router = usePathname()
@@ -125,7 +125,7 @@ export default function PlanPageLayout({
     const checkSubjectSchedule = (subject: any) => {
       const plan = getCurrentPlan();
       return (
-        plan.data.filter(
+        plan.subjects.filter(
           (data: any) =>
             data.code.trim() === subject.code.trim() && data.sec === subject.sec
         ).length > 0
@@ -133,12 +133,12 @@ export default function PlanPageLayout({
     };
     const addSubjectSchedule = (subject: any) => {
       const plan = getCurrentPlan();
-      plan.data.push(subject);
+      plan.subjects.push(subject);
       setMyPlan(plan);
     };
     const removeSubjectSchedule = (subject: any) => {
       const plan = getCurrentPlan();
-      plan.data = plan.data.filter(
+      plan.subjects = plan.subjects.filter(
         (data: any) =>
           data.code.trim() !== subject.code.trim() || data.sec !== subject.sec
       );
@@ -153,7 +153,7 @@ export default function PlanPageLayout({
     };
     const checkSubjectCollapsed = (subject: any) => {
       const plan = getCurrentPlan();
-      const res = plan.data.filter(
+      const res = plan.subjects.filter(
         (data: any) => {
           return getSplitedData(data.time).filter(
             (df: IsubjectSectDate) =>
@@ -178,9 +178,40 @@ export default function PlanPageLayout({
     };
     const { data: session } = useSession();
 
+    const isSessionLoaded = session != undefined
+    const hasSession = session != null
+    
+  async function createNewPlan(){
+    const resolveWithSomeData = new Promise(resolve => setTimeout(() => resolve("world"), 3000));
+    toast.promise(
+        resolveWithSomeData,
+        {
+          pending: {
+            render(){
+              return "สร้างแพลนเรียนใหม่"
+            },
+          },
+          success: {
+            render({data}){
+              return `สร้างแพลนเรียนแล้ว`
+            },
+          },
+          error: {
+            render({data}){
+              // When the promise reject, data will contains the error
+              return `เกิดข้อผิดพลาด ขออภัยในความไม่สะดวก`
+            }
+          }
+        }
+    )
+  }
+
   return (
     <>
       <style jsx global>{`
+          :root {
+            --toastify-font-family: ${font.style.fontFamily};
+          }
           body {
             touch-action: none;
           }
@@ -189,33 +220,38 @@ export default function PlanPageLayout({
         viewSchedule, setViewState, webReady, setWebReady, scrolled, setScrolled, topbarToggle, setTopbarToggle, topbarCord, setTopbarCord, topbarHtml, setTopbarHtml, toggleHold, setTooggleHold, toggleSidebar, setTooggleSidebar,
         resizePlan, planWidth, setPlanWidth, planSize, setPlanSize, canvasElemRef, planElemRef, viewFilter, setViewFilter, focusTime, setFocusTime, MAX_SUBJECT_TIME, setMAX_SUBJECT_TIME, getTimeTable,
         calsel_data, setCalselData, myPlan, setMyPlan,
-        getCurrentPlan, checkSubjectSchedule, addSubjectSchedule, removeSubjectSchedule, toggleSubjectSchedule, checkSubjectCollapsed
+        getCurrentPlan, checkSubjectSchedule, addSubjectSchedule, removeSubjectSchedule, toggleSubjectSchedule, checkSubjectCollapsed,
+        createNewPlan
       }}>
         <SubjectSelectorFilterModel classname={font.className}>
-          <section className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
-            <button className='hidden sm:flex'><Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></button>
-            <article className='pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl'>
-              <button className="header text-xl font-medium flex gap-3 group">
-                <h1>แผนเรียนใหม่</h1>
-                <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md -mt-1'>
-                  <i className='bx bx-pencil mt-[3px]'></i>
+          <section className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 h-28 smooth-opacity ${topbarToggle.init ? "opacity-20" : "opacity-100"}`}>
+            <Link href={"/plan"} className='hidden sm:flex'><Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image></Link>
+            { getCurrentPlan().data ?
+              <article className='pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl'>
+                <button className="header text-xl font-medium flex gap-3 group">
+                  <h1>แผนเรียนใหม่</h1>
+                  <span className='text-pr-gray-1/80 group-hover:bg-pr-msu-1 group-hover:text-pr-msu-1-60 aspect-square h-7 rounded-md -mt-1'>
+                    <i className='bx bx-pencil mt-[3px]'></i>
+                  </span>
+                  {/* <PRThemeSwitcher></PRThemeSwitcher> */}
+                </button>
+                <span className='text-md font-light text-pr-gray-1 md:flex gap-3'>
+                  <span className='flex gap-3'>
+                    <span className='flex gap-2'><p>เทอม</p><p>1</p></span>
+                    <span className='flex gap-2'><p>ปีการศึกษา</p><p>2565</p></span>
+                  </span>
+                  <span className='plan-badge flex gap-2'>
+                    <span className='uni-badge text-sm font-bold px-2 rounded-full border-[2px] border-blue-900/30 bg-blue-300 text-blue-900/60'>IT</span>
+                    <span className='uni-badge text-sm font-bold px-2 rounded-full border-[2px] border-pr-msu-1-60/30 bg-pr-msu-1 text-pr-msu-1-60'>MSU</span>
+                  </span>
                 </span>
-                {/* <PRThemeSwitcher></PRThemeSwitcher> */}
-              </button>
-              <span className='text-md font-light text-pr-gray-1 md:flex gap-3'>
-                <span className='flex gap-3'>
-                  <span className='flex gap-2'><p>เทอม</p><p>1</p></span>
-                  <span className='flex gap-2'><p>ปีการศึกษา</p><p>2565</p></span>
-                </span>
-                <span className='plan-badge flex gap-2'>
-                  <span className='uni-badge text-sm font-bold px-2 rounded-full border-[2px] border-blue-900/30 bg-blue-300 text-blue-900/60'>IT</span>
-                  <span className='uni-badge text-sm font-bold px-2 rounded-full border-[2px] border-pr-msu-1-60/30 bg-pr-msu-1 text-pr-msu-1-60'>MSU</span>
-                </span>
-              </span>
-              {/* <button className='absolute right-10 top-1/2 -mt-4 rounded-xl text-pr-msu-1-60 bg-pr-msu-1 border-2 border-pr-msu-1-60/30 p-1 px-2'>เลิอกแผนนี้</button> */}
-            </article>
-            {session ? 
-              <Menu as="div" className="">
+                {/* <button className='absolute right-10 top-1/2 -mt-4 rounded-xl text-pr-msu-1-60 bg-pr-msu-1 border-2 border-pr-msu-1-60/30 p-1 px-2'>เลิอกแผนนี้</button> */}
+              </article>
+              :
+              null
+            }
+            {hasSession ?
+              <Menu as="div" className={font.className}>
                     <div>
                       <Menu.Button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
                         {/* <span className="absolute -inset-1.5" /> */}
@@ -227,10 +263,9 @@ export default function PlanPageLayout({
                         /> */}
                         <div className="text-right hidden md:block mt-2">
                           <p className=''>{session?.user?.name || "User"}</p>
-                          <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p>
+                          {/* <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p> */}
                         </div>
                         <img src={session?.user?.image || ""} alt={`${session?.user?.name || "User"}'s ${session?.user?.name || "Profile"}`} width={50} height={50} className='rounded-full aspect-square object-cover border-2 border-white/30'></img>
-                      
                       </Menu.Button>
                     </div>
                     <Transition
@@ -258,7 +293,7 @@ export default function PlanPageLayout({
                         <Menu.Item>
                           {({ active }) => (
                             <Link
-                              href='/account/plan'
+                              href='/plan'
                               className={
                                 "profile-badge-li block cursor-pointer text-sm py-2 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4"
                               }
@@ -338,7 +373,7 @@ export default function PlanPageLayout({
           </div>
           <ToastContainer
             position="bottom-right"
-            autoClose={5000}
+            autoClose={3000}
             hideProgressBar={false}
             newestOnTop
             closeOnClick
@@ -347,7 +382,6 @@ export default function PlanPageLayout({
             draggable
             pauseOnHover
             theme="light"
-            className=""
           />
         </SubjectSelectorFilterModel>
       </CalendarContext.Provider>

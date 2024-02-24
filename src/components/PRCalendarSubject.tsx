@@ -234,7 +234,7 @@ export default function PRCalendarSubject(props: any) {
                     null
                   }
                   {/* TODO: badge of subjects here */}
-                  {getCurrentPlan().data.map((data:any,dataindex:any)=>{
+                  {getCurrentPlan().subjects.map((data:any,dataindex:any)=>{
                         return getSplitedData(data.time).map((split_date, spindex)=>{
                           return dindex == getDayIndex(split_date.fullDate) && tindex == getHourIndex(split_date.fullDate) ?
                           <ScheduleCard position={{x:tindex, y:dindex}} key={"d-"+dataindex} data={data} time={split_date.fullDate}/>

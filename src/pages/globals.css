@@ -10,6 +10,8 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: #E6EDF3;
   --background-end-rgb: #E6EDF3;
+
+  --toastify-font-family: 'IBM Plex Sans Thai';
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -51,4 +53,22 @@ body {
 .fade-b {
   -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 8px), rgba(0, 0, 0, 0) 100%);
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 8px), rgba(0, 0, 0, 0) 100%);
+}
+
+.logo-rainslide {
+  background: gray url(/assets/images/planriean_rainslide.webp) repeat 0 0;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  height: 100dvh;
+  padding-top: 120px;
+  box-sizing: border-box;
+  animation: slide 30s linear infinite;
+  position: fixed;
+  top: 0;
+}
+
+@keyframes slide {
+    from { background-position: 0 0; }
+    to { background-position: -500px -565px; }
 }
