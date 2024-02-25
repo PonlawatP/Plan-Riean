@@ -2,7 +2,7 @@ import PRCalendarSubject from '@/components/PRCalendarSubject';
 import { ThemeContext } from '@/app/providers';
 import { CalendarContext, CalendarFilterContext } from '@/app/providers/CalendarProvider';
 import Head from 'next/head';
-import { useContext, useEffect, useReducer, useState } from 'react';
+import { ReactElement, useContext, useEffect, useReducer, useState } from 'react';
 import PlanPageLayout from '@/app/layout/planlayout';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';

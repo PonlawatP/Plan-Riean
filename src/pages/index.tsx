@@ -1,3 +1,4 @@
+import { ReactElement } from "react"
 import RootLayout from "../app/layout/homelayout"
 
 const HomePage = () => {

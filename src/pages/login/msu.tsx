@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import Image from "next/image";
 import { useSession, signIn } from "next-auth/react";
 // import { useRouter } from "next/navigation";
@@ -6,7 +6,6 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Player } from "@lottiefiles/react-lottie-player";
 import AuthPageLayout from "@/app/layout/authlayout";
-import { runCheckUserStatus } from "@/app/utils/auth";
 import Head from "next/head";
 
 function LoginPage(props:any) {

@@ -1,5 +1,4 @@
 import PlainPageLayout from "@/app/layout/plainlayout"
-import { runCheckUserStatus } from "@/app/utils/auth";
 import { getUniversityData, getUniversityListData } from "@/app/utils/universityAPI";
 import { Player } from "@lottiefiles/react-lottie-player";
 import { useSession } from "next-auth/react";
@@ -31,19 +30,21 @@ function ProfileFSPage(props:any){
 
     async function updateSession(){
         const bd = {
-            uni_id: Number.parseInt(firstStepData.uni_id), 
-            fac_id: Number.parseInt(firstStepData.fac_id), 
+            uni_id: firstStepData.uni_id, 
+            fac_id: firstStepData.fac_id, 
             major_id: firstStepData.major_id, 
             std_id: firstStepData.std_id.length == 11 ? firstStepData.std_id : "", 
-            cr_id: Number.parseInt(firstStepData.cr_id), 
-            std_start_year: new Date(Date.now()).getFullYear() + 543 - firstStepData.std_year
+            cr_id: firstStepData.cr_id, 
+            std_start_year: new Date(Date.now()).getFullYear() + 543 - (firstStepData.std_year || 0).valueOf()
         }
+
+        let at_ss:any = session;
 
         await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT+"/user/update/fs", {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json',
-                'Authorization': session.accessToken
+                'Authorization': at_ss.accessToken || ""
             },
             body: JSON.stringify(bd)
         }).then((response) => response.json())
@@ -142,7 +143,7 @@ function ProfileFSPage(props:any){
 
 
     function filterUniqueMaxSub(data:any) {
-        const grouped = data.reduce((acc, item) => {
+        const grouped = data.reduce((acc:any, item:any) => {
             const key = item.cr_key;
             // Store the object if it's the first one, or if its cr_id_sub is higher
             if (!acc[key] || item.cr_id_sub > acc[key].cr_id_sub) {
@@ -150,8 +151,7 @@ function ProfileFSPage(props:any){
             }
             return acc;
         }, {});
-    
-       return Object.values(grouped); 
+        return Object.values(grouped);
     }
     function getCourseSetRelation(): Array<any>{
         // if(!firstStepData.fac_id) return []
@@ -286,8 +286,8 @@ function ProfileFSPage(props:any){
                 <div className="flex flex-col items-center justify-center mt-4 md:mt-10">
                     <img src={session?.user?.image || ""} alt={`${session?.user?.name || "User"}'s ${session?.user?.name || "Profile"}`} width={150} height={150} className='rounded-full aspect-square object-cover border-2 border-white/30 drop-shadow-xl'></img>
                     <h3 className='text-xl font-medium mt-4 md:mt-10'>{session?.user?.name || "User"}</h3>
-                    <h3 className='mt-2'>{uniFacData.find((f)=>f.fac_id == firstStepData.fac_id) != null ? uniFacData.find((f)=>f.fac_id == firstStepData.fac_id)['fac_name_'+'th'] : ""}</h3>
-                    <h3 className=''>สาขา{getCourseSetRelation().find((c)=>c.cr_id == firstStepData.cr_id) != null ? getCourseSetRelation().find((c)=>c.cr_id == firstStepData.cr_id)['name_'+'th'] : ""}</h3>
+                    <h3 className='mt-2'>{uniFacData.find((f:any)=>f.fac_id == firstStepData.fac_id) != null ? uniFacData.find((f:any)=>f.fac_id == firstStepData.fac_id)['fac_name_'+'th'] : ""}</h3>
+                    <h3 className=''>สาขา{getCourseSetRelation().find((c:any)=>c.cr_id == firstStepData.cr_id) != null ? getCourseSetRelation().find((c:any)=>c.cr_id == firstStepData.cr_id)['name_'+'th'] : ""}</h3>
                 </div>
             </>,
             check: ()=>{

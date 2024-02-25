@@ -24,7 +24,7 @@ import tailwindConfig from "@/../tailwind.config"; // Your tailwind config
 
 const fullConfig = resolveConfig(tailwindConfig as unknown as Config);
 
-const breakpoints = fullConfig?.theme?.screens || {
+const breakpoints:any = fullConfig?.theme?.screens || {
     xs: "480px",
     sm: "640px",
     md: "768px",

@@ -2,7 +2,7 @@ import PRCalendarSubject from '@/components/PRCalendarSubject';
 import { ThemeContext } from '@/app/providers';
 import { CalendarContext, CalendarFilterContext } from '@/app/providers/CalendarProvider';
 import Head from 'next/head';
-import { useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { ReactElement, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import PlanPageLayout from '@/app/layout/planlayout';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
@@ -12,7 +12,6 @@ import { useSearchParams } from 'next/navigation';
 import { Player, Controls } from '@lottiefiles/react-lottie-player';
 import { List } from 'postcss/lib/list';
 import { toast } from 'react-toastify';
-import { runCheckUserStatus } from '@/app/utils/auth';
 
 function PlanPage() {
   const {theme, setTheme} = useContext(ThemeContext);
@@ -37,7 +36,7 @@ function PlanPage() {
   const animationURL = "/assets/lotties/loading.json";
 
   function getPlanListElem(){
-    const elems:Array<ReactDOM> = []
+    const elems:Array<any> = []
 
     for (let index = 0; index < 20; index++) {
             {/* plan folder */}

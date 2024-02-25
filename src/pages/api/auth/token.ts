@@ -1,4 +1,3 @@
-import { getTokenCookie, setTokenCookie } from '@/app/utils/auth'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { JWT, getToken } from 'next-auth/jwt'
 import * as jose from 'jose'

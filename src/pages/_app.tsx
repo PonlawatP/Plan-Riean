@@ -23,8 +23,8 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 
 export default function MyApp({Component, pageProps}: AppProps){
     const [theme, setTheme] = useState('light');
-
-    const getLayout = Component.getLayout ?? ((page) => page)
+    const layouts:any = Component
+    const getLayout = layouts.getLayout ?? ((page:any) => page)
 
 
     return <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

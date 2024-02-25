@@ -53,3 +53,4 @@ package-lock.json
 image-locations/
 bun.lockb
 .env.local
+.env.development

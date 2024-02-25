@@ -1,33 +1,25 @@
 import { ThemeContext } from '@/app/providers'
 import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google'
-import { Fragment, useContext, useEffect, useRef, useState } from 'react'
+import { Fragment, useContext, useRef, useState } from 'react'
 import 'boxicons/css/boxicons.min.css'
 import Image from 'next/image'
-import { CalendarContext, CalendarFilterContext, ICalendarData, ICalendarFilter } from '@/app/providers/CalendarProvider'
+import { CalendarContext, ICalendarData } from '@/app/providers/CalendarProvider'
 import { ToastContainer, toast } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css';
 import PRSubjectSelector from '../../components/PRSubjectSelector'
-import PRSubjectFilter from '../../components/PRSubjectFilter'
 import PRSidebar from '../../components/PRSidebar'
 import DialogFirstSearch from '../../components/PRSubjectSelector/dialogue/firstSearch'
 import DialogSearchNotFound from '../../components/PRSubjectSelector/dialogue/searchNotFound'
 import DialogLoading from '../../components/PRSubjectSelector/dialogue/loading'
 import DialogError from '../../components/PRSubjectSelector/dialogue/error'
 import SubjectSelectorFilterModel from '../services/subjectSelector/filter'
-import { PRThemeSwitcher } from '@/components/PRThemeSwitcher'
-import { subjectDemoData } from '../utils/test-data/subjects'
 import { IsubjectSectDate, calculateScale, getDayIndex, getHourIndex, getSplitedData } from '../utils/msu/subjectUtils'
 import SubjectList from '@/components/SubjectList'
-import { ThemeProvider } from '@/app/providers/ThemeProvider'
-import AuthProvider from '@/app/providers/AuthProvider'
-import { GoogleAnalytics } from 'nextjs-google-analytics'
 import { useSession, signOut } from "next-auth/react";
 import { Menu, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { deleteTokenCookieClientSide } from '../utils/auth'
-import Cookies from 'js-cookie';
 
 export const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],

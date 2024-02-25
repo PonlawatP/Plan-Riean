@@ -27,10 +27,10 @@ export const authOptions:NextAuthOptions = {
           method: 'POST',
           headers: {
               'Content-type': 'application/json',
-              'Authorization': token.accessToken
+              'Authorization': token.accessToken as string
           },
         }).then((response) => response.json())
-        // console.log(login)
+        
         login.user = {
           ...login.user,
           image: login.user.img,
@@ -38,7 +38,8 @@ export const authOptions:NextAuthOptions = {
         }
         
         session.user = login.user
-        session.accessToken = token.accessToken
+        let tokentemp:any = token;
+        session.accessToken = tokentemp.accessToken
       }
       return session;
     },
@@ -54,7 +55,7 @@ export const authOptions:NextAuthOptions = {
           process.env.JWT_SECRET,
         )
         const alg = 'HS256'
-        const jwt = await new jose.SignJWT(user as JWT)
+        const jwt = await new jose.SignJWT({...user})
           .setProtectedHeader({ alg })
           .sign(secret)
         // session.accessToken = jwt;

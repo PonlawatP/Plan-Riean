@@ -4,12 +4,11 @@ import type { NextRequest } from 'next/server';
 import { getValidSubdomain } from '@/app/utils/subdomain';
 import { getToken } from 'next-auth/jwt';
 import * as jose from 'jose'
-import { getTokenCookie, setTokenCookie } from './app/utils/auth';
 
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
 
-export async function middleware(req: NextRequest) {
+export async function middleware(req: any) {
   // Clone the URL
   const url = req.nextUrl.clone();
 
@@ -29,7 +28,7 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({ req })
     if(token != null){
       const response = NextResponse.next()
-      const user = token.user;
+      const user: any = token.user;
       // console.log(user.study_status.university)
       
       if(user.study_status.university){
