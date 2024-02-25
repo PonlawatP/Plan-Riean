@@ -26,6 +26,8 @@ import { useSession, signOut } from "next-auth/react";
 import { Menu, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { deleteTokenCookieClientSide } from '../utils/auth'
+import Cookies from 'js-cookie';
 
 export const font = IBM_Plex_Sans_Thai({ 
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -180,6 +182,8 @@ export default function PlanPageLayout({
 
     const isSessionLoaded = session != undefined
     const hasSession = session != null
+
+    // console.log(session)
     
   async function createNewPlan(){
     const resolveWithSomeData = new Promise(resolve => setTimeout(() => resolve("world"), 3000));
@@ -317,7 +321,9 @@ export default function PlanPageLayout({
                         <Menu.Item>
                           {({ active }) => (
                             <a
-                              onClick={() => signOut()}
+                              onClick={() => {
+                                signOut()
+                              }}
                               className={
                                 "profile-badge-li block cursor-pointer text-sm py-2 pb-3 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4"
                               }

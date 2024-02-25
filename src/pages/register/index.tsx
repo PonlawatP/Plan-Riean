@@ -5,6 +5,7 @@ import { Player } from "@lottiefiles/react-lottie-player";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactElement, useEffect, useRef, useState } from "react"
 
@@ -24,7 +25,7 @@ type IFirstStepData = {
     std_id: string
 }
 
-function ProfileFSPage(props:any){
+function RegisterPage(props:any){
 
     const { data:session, status:session_status, update} = useSession();
     const redirect = useRouter()
@@ -227,7 +228,7 @@ function ProfileFSPage(props:any){
                         </select>
                         <label
                             className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                คณะของคุณ <p className="text-red-600 ml-1">*</p>
+                                คณะของคุณ
                         </label>
                     </div>
                 <div className="grid grid-cols-[7em_auto] gap-4">
@@ -244,7 +245,7 @@ function ProfileFSPage(props:any){
                             />
                         <label
                             className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                คุณอยู่ปีไหน <p className="text-red-600 ml-1">*</p>
+                                คุณอยู่ปีไหน
                         </label>
                     </div>
                     <div className="mt-8 relative h-10">
@@ -260,7 +261,7 @@ function ProfileFSPage(props:any){
                         </select>
                         <label
                             className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                                สาขาที่ศึกษา <p className="text-red-600 ml-1">*</p>
+                                สาขาที่ศึกษา
                         </label>
                     </div>
                 </div>
@@ -335,10 +336,10 @@ function ProfileFSPage(props:any){
 
     return <>
         <Head>
-          <title>สมาชิกใหม่ : Planriean</title>
+            <title>สมัครสมาชิก : Planriean</title>
         </Head>
         {/* loading overlay */}
-        <div className={`transition-opacity duration-300 fixed top-0 left-0 w-full h-full z-50 bg-white flex items-center justify-center ${session_status == 'authenticated' && !redir ? "opacity-0 pointer-events-none" : ""}`}>
+        <div className={`transition-opacity duration-300 fixed top-0 left-0 w-full h-full z-50 bg-white flex items-center justify-center ${session_status != 'loading' && !redir ? "opacity-0 pointer-events-none" : ""}`}>
           <div className="box text-pr-blue text-center">
             <Player
               src={animationURL}
@@ -355,7 +356,8 @@ function ProfileFSPage(props:any){
         <section className="container mx-auto px-4 h-full relative">
             <div className="flex flex-col justify-between h-full">
                 <div className="relative">
-                    <h2 className={`smooth-all mt-4 font-bold text-2xl text-pr-blue ${step.index+1 == stepContent.length ? "opacity-0":"opacity-100"}`}>เริ่มต้นใช้งาน</h2>
+                    <h2 className={`smooth-all mt-4 font-bold text-2xl text-pr-blue ${step.index+1 == stepContent.length ? "opacity-0":"opacity-100"}`}>สมัครสมาชิก</h2>
+                    <h2 className={`smooth-all text-lg text-pr-blue ${step.index+1 == stepContent.length ? "opacity-0":"opacity-100"}`}>เป็นหนึ่งในครอบครัวแพลนเรียน</h2>
                     <div className={`smooth-all h-10 w-10 absolute right-0 top-2 flex justify-center items-center ${step.index+1 == stepContent.length ? "opacity-0":"opacity-100"}`}>
                         <p className={` absolute mt-1 font-bold text-md text-pr-blue`}>{step.index+1}</p>
                         <CircularProgressbar 
@@ -382,20 +384,28 @@ function ProfileFSPage(props:any){
                         {stepContent[step.index].content}
                     </div>
                 </div>
-                <section className="buttons mb-6 flex justify-end">
-                    <button disabled={step.index <= 0 || step.process != 1} onClick={()=>{handleBackStep()}} className={`smooth-all ${step.index <= 0 || step.process != 1 ? "opacity-50 pointer-events-none" : ""} mt-4 text-pr-text-menu h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80`}>
-                        ย้อนกลับ
-                    </button>
-                    <button disabled={step.process != 1} onClick={()=>{handleNextStep()}} className={`smooth-all ${step.process != 1 ? "opacity-50 pointer-events-none" : ""} mt-4 text-white h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-blue border-b-[3px] border-slate-800/50 hover:bg-white hover:border-[2px] hover:border-b-[4px] hover:border-pr-blue hover:text-pr-blue active:border-0 active:bg-pr-msu-1-60 active:text-white/80`}>
-                        {step.index+1 >= stepContent.length ? "เสร็จสิ้น" : "ถัดไป"}
-                    </button>
+                <section className="buttons mb-6 flex justify-between items-end">
+                    <div className="mb-2 text-xs flex gap-4">
+                        <p className="text-gray-400">เป็นสมาชิกอยู่แล้วเหรอ?</p>
+                        <Link href={{pathname: "/login", query: { fallbackUrl: redirect.query.fallbackUrl }}} className="text-pr-blue">
+                        เข้าสู่ระบบ
+                        </Link>
+                    </div>
+                    <div className="">
+                        <button disabled={step.index <= 0 || step.process != 1} onClick={()=>{handleBackStep()}} className={`smooth-all ${step.index <= 0 || step.process != 1 ? "opacity-50 pointer-events-none" : ""} mt-4 text-pr-text-menu h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80`}>
+                            ย้อนกลับ
+                        </button>
+                        <button disabled={step.process != 1} onClick={()=>{handleNextStep()}} className={`smooth-all ${step.process != 1 ? "opacity-50 pointer-events-none" : ""} mt-4 text-white h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-blue border-b-[3px] border-slate-800/50 hover:bg-white hover:border-[2px] hover:border-b-[4px] hover:border-pr-blue hover:text-pr-blue active:border-0 active:bg-pr-msu-1-60 active:text-white/80`}>
+                            {step.index+1 >= stepContent.length ? "เสร็จสิ้น" : "ถัดไป"}
+                        </button>
+                    </div>
                 </section>
             </div>
         </section>
     </>
 }
 
-ProfileFSPage.getLayout = function getLayout(page: ReactElement) {
+RegisterPage.getLayout = function getLayout(page: ReactElement) {
     return (
       <PlainPageLayout>
          {page}
@@ -403,4 +413,4 @@ ProfileFSPage.getLayout = function getLayout(page: ReactElement) {
     )
   }
   
-export default ProfileFSPage
+export default RegisterPage

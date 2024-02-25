@@ -6,25 +6,23 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Player } from "@lottiefiles/react-lottie-player";
 import AuthPageLayout from "@/app/layout/authlayout";
+import { runCheckUserStatus } from "@/app/utils/auth";
+import Head from "next/head";
 
 function LoginPage(props:any) {
   // console.log(session)
-  const { data:session, status:session_status} = useSession();
-  
-  const redirect = useRouter()
-  if (session_status == "authenticated") {
-    const fallbackUrl = redirect.query.fallbackUrl as string || '/plan';
-    
-    redirect.push(fallbackUrl);
-  }
   const animationURL = "/assets/lotties/loading.json";
-  
+  const { data:session, status:session_status} = useSession();
+  const redirect = useRouter()
 
   return ( 
     <>
+    <Head>
+      <title>เข้าสู่ระบบ : Planriean</title>
+    </Head>
       <section className="relative bg-gradient-to-t from-pr-blue/80 to-pr-bg min-h-screen flex items-center justify-center z-10">
           {/* loading overlay */}
-          <div className={`transition-opacity duration-300 fixed top-0 left-0 w-full h-full z-50 bg-white flex items-center justify-center ${session_status != 'authenticated' ? "opacity-0 pointer-events-none" : ""}`}>
+          <div className={`transition-opacity duration-300 fixed top-0 left-0 w-full h-full z-50 bg-white flex items-center justify-center ${session_status != 'loading' ? "opacity-0 pointer-events-none" : ""}`}>
             <div className="box text-pr-blue text-center">
               <Player
                 src={animationURL}

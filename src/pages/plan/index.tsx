@@ -12,6 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { Player, Controls } from '@lottiefiles/react-lottie-player';
 import { List } from 'postcss/lib/list';
 import { toast } from 'react-toastify';
+import { runCheckUserStatus } from '@/app/utils/auth';
 
 function PlanPage() {
   const {theme, setTheme} = useContext(ThemeContext);
@@ -31,11 +32,8 @@ function PlanPage() {
   // },[])
 
   const { data:session, status:session_status} = useSession();
-  
   const redirect = useRouter()
-  if(session_status == "unauthenticated"){
-    redirect.push({pathname:"/login", query:{fallbackUrl:redirect.asPath}});
-  }
+  
   const animationURL = "/assets/lotties/loading.json";
 
   function getPlanListElem(){
