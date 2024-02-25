@@ -54,3 +54,4 @@ image-locations/
 bun.lockb
 .env.local
 .env.development
+.env.production

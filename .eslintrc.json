@@ -3,9 +3,8 @@
   "plugins": ["react-hooks"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "@next/next/no-img-element": "off"
+    //  "no-unused-vars": "error", <-- later
   }
-  //"rules": {
-  //  "no-unused-vars": "error"
-  //}
 }
