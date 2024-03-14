@@ -6,6 +6,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import PasswordValidator from "password-validator";
 import { ReactElement, useEffect, useRef, useState } from "react"
 
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
@@ -13,9 +14,18 @@ import 'react-circular-progressbar/dist/styles.css';
 
 import { PatternFormat } from 'react-number-format';
 import { toast } from "react-toastify";
+import AvatarEditor from 'react-avatar-editor'
 
-type IFirstStepData = {
+type IRegsterStepData = {
     uni_id: Number
+    username: String
+    email: String
+    phone?: String
+    img?: String
+    password: string
+    passwordc: string
+    std_name: string
+    std_surname: string
     fac_id?: Number
     major_id?: Number
     cr_id?: Number
@@ -76,15 +86,21 @@ function RegisterPage(props:any){
     
     const [step, setStep] = useState({index: 0, process: 0, pre_process: 1})
 
-    const [firstStepData, setFirstStepData] = useState<IFirstStepData>({
+    const [firstStepData, setFirstStepData] = useState<IRegsterStepData>({
         uni_id: 1,
+        username: "",
+        email: "",
+        phone: "",
+        password: "",
+        passwordc: "",
+        std_name: "",
+        std_surname: "",
         std_year: 1,
         std_id: "",
         std_lvl: 1,
         cr_id: -1,
         fac_id: 1,
     })
-    const [invalidInput, setInvalidInput] = useState<Array<Number>>([])
     function getStudentEducatedYear(e:string){
         const val = e.substring(0,2)!= "" ? (new Date(Date.now()).getFullYear() + 543) - Number.parseInt(25+e.substring(0,2)) : (firstStepData.std_year as number || 1)
         return val <= 0 ? 1 : val
@@ -182,22 +198,236 @@ function RegisterPage(props:any){
 
     const ref_fac = useRef<any>()
     const ref_major = useRef<any>()
+
+    const [pwdC, setPwdC] = useState<any>([])
+
+    function handlePasswordCheck(){
+        var schema = new PasswordValidator();
+        schema.is().min(8, "รหัสผ่านต้องยาวไม่น้อยกว่า 8 ตัวอักษร")                                    // Minimum length 8
+        .is().max(100, "รหัสผ่านต้องยาวไม่เกิน 100 ตัวอักษร")                                  // Maximum length 100
+        .has().uppercase(1, "รหัสผ่านต้องมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัวอักษร")                              // Must have uppercase letters
+        .has().lowercase(1, "รหัสผ่านต้องมีตัวพิมพ์เล็กอย่างน้อย 1 ตัวอักษร")                              // Must have lowercase letters
+        .has().digits(2, "รหัสผ่านต้องมีตัวเลขอย่างน้อย 2 ตัว")                                // Must have at least 2 digits
+        .has().not().spaces(1, "รหัสผ่านต้องไม่มีเว้นวรรค")                           // Should not have spaces
+        .is().not().oneOf(['Passw0rd', 'Password123'], "รหัสผ่านต้องไม่ใช่ Passw0rd และ Password123"); // Blacklist these values
+
+        // Get a full list of rules which failed
+        let t = schema.validate(firstStepData.password, { details:true, list: true });
+        setPwdC(t)
+    }
+
+    type ImgState = {
+        image: string | File
+        allowZoomOut: boolean
+        position: Position
+        scale: number
+        rotate: number
+        borderRadius: number
+        preview?: {
+          img: string
+          rect: {
+            x: number
+            y: number
+            width: number
+            height: number
+          }
+          scale: number
+          width: number
+          height: number
+          borderRadius: number
+        }
+        width: number
+        height: number
+        disableCanvasRotation: boolean
+        isTransparent: boolean
+        backgroundColor?: string
+        showGrid: boolean
+      }
+    const [editState, setEditState] = useState(false)
+    const editor = useRef<any>(null)
+    const [imgState, setImgState] = useState<ImgState>({
+        image: "/assets/images/prof.jpg",
+        allowZoomOut: false,
+        position: { x: 0.5, y: 0.5 },
+        scale: 1,
+        rotate: 0,
+        borderRadius: 0,
+        preview: undefined,
+        width: 280,
+        height: 280,
+        disableCanvasRotation: false,
+        isTransparent: false,
+        backgroundColor: undefined,
+        showGrid: false,
+      })
+
+      const handleNewImage = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files?.[0]) {
+            setImgState({ ...imgState, image: e.target.files[0] })
+
+            setEditState(true)
+        }
+      }
+
+      const handleSave = () => {
+          const img = editor.current?.getImageScaledToCanvas().toDataURL()
+          const rect = editor.current?.getCroppingRect()
+      
+          if (!img || !rect) return
+      
+          setImgState({
+            ...imgState,
+            preview: {
+              img,
+              rect,
+              scale: imgState.scale,
+              width: imgState.width,
+              height: imgState.height,
+              borderRadius: imgState.borderRadius,
+            },
+          })
+        }
+    const handlePositionChange = (position: Position) => {
+        setImgState({ ...imgState, position })
+    }
     
     const stepContent = [
         {
             step: 0,
-            title: "test",
+            title: "user info",
             content: <>
-                <h2 className="text-lg font-medium">คุณอยู่มหาวิทยาลัยอะไร</h2>
-                {uniData}
-                <p className="mt-8 text-pr-gray-1">ตอนนี้ยังใช้งานได้แค่มหาวิทยาลัยเดียวเท่านั้น ชาวแพลนเรียนต่างสถาบันอดใจรอหน่อยนะ</p>
+                <h2 className="text-lg font-medium text-pr-blue">ยินดีต้อนรับ</h2>
+                <h2 className="">มาเป็นครอบครัวแพลนเรียนได้ในไม่กี่ขั้นตอน</h2>
+                <div className="relative text-sm flex flex-col gap-4 mt-4">
+                        <input
+                            type="text"
+                            className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                            placeholder=""
+                            value={firstStepData.username ? firstStepData.username as string : ""}
+                            onChange={(e)=>{
+                                setFirstStepData({...firstStepData, username: e.target.value.toLowerCase()})
+                            }}
+                            />
+                        <label
+                            className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                กรอกชื่อผู้ใช้ของคุณ
+                        </label>
+                </div>
+                <div className="relative text-sm flex flex-col gap-4 mt-4">
+                        <input
+                            type="email"
+                            className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                            placeholder=""
+                            value={firstStepData.email ? firstStepData.email as string : ""}
+                            onChange={(e)=>{
+                                setFirstStepData({...firstStepData, email: e.target.value.toLowerCase()})
+                            }}
+                            />
+                        <label
+                            className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                กรอกอีเมลของคุณ
+                        </label>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="relative text-sm flex flex-col gap-4 mt-4">
+                            <input
+                                type="text"
+                                className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                placeholder=""
+                                value={firstStepData.std_name ? firstStepData.std_name as string : ""}
+                                onChange={(e)=>{
+                                    setFirstStepData({...firstStepData, std_name: e.target.value.trim()})
+                                }}
+                                />
+                            <label
+                                className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                    ชื่อของคุณ
+                            </label>
+                    </div>
+                    <div className="relative text-sm flex flex-col gap-4 mt-4">
+                            <input
+                                type="text"
+                                className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                                placeholder=""
+                                value={firstStepData.std_surname ? firstStepData.std_surname as string : ""}
+                                onChange={(e)=>{
+                                    setFirstStepData({...firstStepData, std_surname: e.target.value.trim()})
+                                }}
+                                />
+                            <label
+                                className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                    นามสกุลของคุณ
+                            </label>
+                    </div>
+                </div>
+                    <div className="mt-12 relative">
+                        <input
+                            type="password"
+                            className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                            placeholder=""
+                            value={firstStepData.password ? firstStepData.password as string : ""}
+                            onChange={(e)=>{
+                                setFirstStepData({...firstStepData, password: e.target.value})
+                                handlePasswordCheck()
+                            }}
+                            />
+                        <label
+                            className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                กรอกรหัสผ่านของคุณ
+                        </label>
+                    </div>
+                    <div className="mt-4 relative">
+                        <input
+                            type="password"
+                            className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                            placeholder=""
+                            value={firstStepData.passwordc ? firstStepData.passwordc as string : ""}
+                            onChange={(e)=>{
+                                setFirstStepData({...firstStepData, passwordc: e.target.value})
+                            }}
+                            />
+                        <label
+                            className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+                                ยืนยันรหัสผ่าน
+                        </label>
+                    </div>
+                    <div className="mt-4 relative">
+                        {
+                            firstStepData.password.trim() != "" && pwdC.map((p:any, pind:number)=><div key={pind} className="border border-red-400 bg-red-50 text-red-600 p-2 m-2 text-xs rounded-md">
+                                {p.message}
+                            </div>)
+                        }
+                        {
+                            firstStepData.passwordc.trim() != "" && firstStepData.password !== firstStepData.passwordc ? <div className="border border-red-400 bg-red-50 text-red-600 p-2 m-2 text-xs rounded-md">
+                                รหัสผ่านไม่ตรงกัน
+                            </div> : null
+                        }
+                    </div>
             </>,
             check: ()=>{
-                checkFromStudentId()
+
+                if(firstStepData.username.trim() == ""){
+                    toast.error("โปรดกรอกชื่อผู้ใช้งาน")
+                    return false
+                }
+                if(firstStepData.email.trim() == ""){
+                    toast.error("โปรดกรอกอีเมล")
+                    return false
+                }
+                if(firstStepData.password.trim() == ""){
+                    toast.error("โปรดกรอกรหัสผ่าน")
+                    return false
+                }
+                if(firstStepData.password !== firstStepData.passwordc){
+                    toast.error("รหัสผ่านไม่ตรงกัน")
+                    return false
+                }
+
+                // setFirstStepData({...firstStepData, cr_id: ref_major.current.value, fac_id: ref_fac.current.value})
+
                 return true
             },
             error: ()=>{
-
             }
         },
         {
@@ -206,14 +436,14 @@ function RegisterPage(props:any){
             content: <>
                 <h2 className="text-lg font-medium text-pr-blue">ข้อมูลชีวิตในรั้วมหาวิทยาลัย... ให้เราช่วยกรอกได้นะ</h2>
                 <h2 className="">ใส่รหัสนิสิตของคุณลงมาสิ</h2>
-                <form className="text-sm flex flex-col gap-4 mt-4">
+                <div className="text-sm flex flex-col gap-4 mt-4">
                     <PatternFormat format="###########" value={firstStepData.std_id} onValueChange={(values)=>{checkFromStudentId(values.value)}} className="px-3.5 py-2.5 pb-2 rounded-[7px] border" placeholder="6701121***" valueIsNumericString={true} />
                     {/* <input
                     type="username"
                     className="p-2 rounded-xl border"
                     placeholder="ชื่อผู้ใช้ ที่คุณอยากไช้"
                     /> */}
-                </form>
+                </div>
                     <div className="mt-12 relative h-10">
                         <select 
                             ref={ref_fac}
@@ -282,13 +512,76 @@ function RegisterPage(props:any){
             step: 2,
             title: "test",
             content: <>
-                <h2 className="-mt-14 text-2xl text-center font-medium text-pr-blue">ยินดีต้อนรับ</h2>
+                <h2 className="-mt-14 text-2xl text-center font-medium text-pr-blue">อยากเปลี่ยนรูปมั้ย</h2>
                 <div className="flex flex-col items-center justify-center mt-4 md:mt-10">
-                    <img src={session?.user?.image || ""} alt={`${session?.user?.name || "User"}'s ${session?.user?.name || "Profile"}`} width={150} height={150} className='rounded-full aspect-square object-cover border-2 border-white/30 drop-shadow-xl'></img>
-                    <h3 className='text-xl font-medium mt-4 md:mt-10'>{session?.user?.name || "User"}</h3>
+                    <div className="relative rounded-full overflow-hidden">
+                        <img src={imgState?.preview != undefined ? imgState?.preview?.img : imgState.image as string} onError={(e)=>{
+                            e.preventDefault()
+                            setFirstStepData({...firstStepData, img: "/assets/images/prof.jpg"})
+                        }} alt={`${firstStepData.std_name || "Planriean"}'s Profile`} width={150} height={150} className='rounded-full aspect-square object-cover border-2 border-white/30 drop-shadow-xl'></img>
+                        <button onClick={()=>{setEditState(true)}} className="text-white absolute h-full w-full top-0 bg-black/40 backdrop-blur-sm opacity-0 group hover:opacity-100 smooth-all">
+                            <i className="bx bx-edit text-5xl"></i>
+                            <p className="text-xs">แก้ไขรูปภาพ</p>
+                        </button>
+                    </div>
+                    <input
+                        id="profile"
+                        type="file"
+                        onChange={handleNewImage}
+                        hidden
+                    />
+                    <label htmlFor='profile' className={`cursor-pointer smooth-all flex gap-2 items-center mt-4 text-white h-10 px-3 py-1 mr-2 rounded-lg bg-pr-blue border-b-[3px] border-slate-800/50 hover:bg-white hover:border-[2px] hover:border-b-[4px] hover:border-pr-blue hover:text-pr-blue active:border-0 active:bg-pr-msu-1-60 active:text-white/80`}>
+                        <i className="bx bx-image-add"></i> อัพโหลดภาพ
+                    </label>
+                    <h3 className='text-xl font-medium mt-4 md:mt-10'>{firstStepData.std_name + " " + firstStepData.std_surname || "User"}</h3>
                     <h3 className='mt-2'>{uniFacData.find((f:any)=>f.fac_id == firstStepData.fac_id) != null ? uniFacData.find((f:any)=>f.fac_id == firstStepData.fac_id)['fac_name_'+'th'] : ""}</h3>
                     <h3 className=''>สาขา{getCourseSetRelation().find((c:any)=>c.cr_id == firstStepData.cr_id) != null ? getCourseSetRelation().find((c:any)=>c.cr_id == firstStepData.cr_id)['name_'+'th'] : ""}</h3>
                 </div>
+                {step.index == 2 ? 
+                <div className={`fixed bg-black/30 backdrop-blur-sm w-full h-full left-0 top-0 flex justify-center items-center transition-all duration-300 ${!editState ? "opacity-0 invisible" : ""}`}>
+                    <div className={`rounded-xl drop-shadow-xl overflow-hidden relative bg-white`}>
+                        <div className="flex justify-between items-end">
+                            <h2 className="ml-4 text-xl text-center font-medium text-pr-blue">อัพโหลดภาพ</h2>
+                            <button className="flex items-center p-4" onClick={()=>{setEditState(false)}}><i className="bx bx-x text-2xl text-black/50"></i></button>
+                        </div>
+                        {editState ?
+                            <AvatarEditor
+                                ref={editor}
+                                borderRadius={500}
+                                color={[255,255,255,1]}
+                                position={imgState.position}
+                                image={imgState.image}
+                                width={imgState.width}
+                                height={imgState.height}
+                                scale={imgState.scale}
+                                onPositionChange={handlePositionChange}
+                            />
+                        : null}
+                        <div className="">
+                        <div className="relative px-6">
+                            <p className="text-xs">ขนาดภาพ</p>
+                            <input id="size-range" type="range" value={imgState.scale} onChange={(e)=>{setImgState({...imgState, scale: Number.parseFloat(e.target.value)})}} min="1" step="0.01" max="3" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"/>
+                        </div>
+                        </div>
+                        <div className="flex justify-end pb-4 pr-3">
+                            <input
+                                id="profile"
+                                type="file"
+                                onChange={handleNewImage}
+                                hidden
+                            />
+                            <label htmlFor='profile' className={`cursor-pointer smooth-all flex gap-1 justify-center items-center mt-4 text-pr-text-menu h-10 px-2 py-1 mr-2 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80`}>
+                                <i className="bx bx-image-add"></i> เลือกรูปใหม่
+                            </label>
+                            {/* <button onClick={()=>{}} className={`smooth-all mt-4 text-pr-text-menu h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80`}>
+                                เลือกรูปใหม่
+                            </button> */}
+                            <button onClick={()=>{handleSave(); setEditState(false)}} className={`smooth-all mt-4 text-white h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-blue border-b-[3px] border-slate-800/50 hover:bg-white hover:border-[2px] hover:border-b-[4px] hover:border-pr-blue hover:text-pr-blue active:border-0 active:bg-pr-msu-1-60 active:text-white/80`}>
+                                ใช้รูปนี้
+                            </button>
+                        </div>
+                    </div>
+                </div> : null}
             </>,
             check: ()=>{
                 confirmAccount()

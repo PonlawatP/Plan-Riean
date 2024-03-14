@@ -188,22 +188,6 @@ function ProfileFSPage(props:any){
             step: 0,
             title: "test",
             content: <>
-                <h2 className="text-lg font-medium">คุณอยู่มหาวิทยาลัยอะไร</h2>
-                {uniData}
-                <p className="mt-8 text-pr-gray-1">ตอนนี้ยังใช้งานได้แค่มหาวิทยาลัยเดียวเท่านั้น ชาวแพลนเรียนต่างสถาบันอดใจรอหน่อยนะ</p>
-            </>,
-            check: ()=>{
-                checkFromStudentId()
-                return true
-            },
-            error: ()=>{
-
-            }
-        },
-        {
-            step: 1,
-            title: "test",
-            content: <>
                 <h2 className="text-lg font-medium text-pr-blue">ข้อมูลชีวิตในรั้วมหาวิทยาลัย... ให้เราช่วยกรอกได้นะ</h2>
                 <h2 className="">ใส่รหัสนิสิตของคุณลงมาสิ</h2>
                 <form className="text-sm flex flex-col gap-4 mt-4">
@@ -279,7 +263,7 @@ function ProfileFSPage(props:any){
             }
         },
         {
-            step: 2,
+            step: 1,
             title: "test",
             content: <>
                 <h2 className="-mt-14 text-2xl text-center font-medium text-pr-blue">ยินดีต้อนรับ</h2>
