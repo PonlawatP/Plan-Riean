@@ -45,24 +45,24 @@ export default function SubjectList(props: any) {
                 )
               } */}
             <p className="text-black text-[12px] pt-1 pl-2 overflow-hidden text-ellipsis whitespace-nowrap">
-              {data.code} {data.name}
+              {data.code} {data['name_en']}
             </p>
           </div>
           <span
             className={`pt-1 pr-2 text-sm text-right ${
-              data.remain > 10
+              data.seat_remain > 10
                 ? "text-pr-gray-1"
-                : data.remain != 0
+                : data.seat_remain != 0
                 ? "text-orange-600"
                 : "text-red-700"
             }`}
           >
-            {data.remain}/{data.receive}{" "}
+            {data.seat_remain}/{data.seat_available}{" "}
             <i className="bx bx-chair translate-y-[1px]"></i>
           </span>
         </span>
         <div className="pt-[1.8rem] pb-1 px-2 w-full text-sm">
-          {data.note.trim() !== "" && (
+          {data.note != undefined && data.note.trim() !== "" && (
             <p className="text-pr-gray-1 text-[10px]">{data.note.trim()}</p>
           )}
           {data.lecturer.split(" / ").map((lect: any, lindex: any) => (

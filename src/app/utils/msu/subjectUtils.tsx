@@ -27,7 +27,7 @@ export function getSubjectColor(code:string): ISubjectColor{
 export const getSplitedData = (str_raw:string) => {
     let res:Array<IsubjectSectDate> = []
     
-    str_raw.split(" & ").map((str:string)=>{
+    str_raw.split(";").map((str:string)=>{
       let data_result:IsubjectSectDate = {
         dayName: "",
         dayColor: "",
@@ -96,6 +96,7 @@ export const getSplitedData = (str_raw:string) => {
     const daysOfWeek = ['Mo', 'Tu', 'We', 'Th', 'Fr'];
     const dayName = str.slice(0, 2);
     const index = daysOfWeek.indexOf(dayName);
+    // console.log(daysOfWeek, dayName, index)
     return index >= 0 ? index : 0;
   };
 
