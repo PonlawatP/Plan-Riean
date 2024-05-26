@@ -59,31 +59,27 @@ function RegisterPage(props: any) {
     };
 
     console.log(bd);
-
-    await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT + '/auth/register', {
+    console.log(JSON.stringify(bd));
+    // TODO: register not send body throught api
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {
       method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       mode: 'no-cors',
       body: JSON.stringify(bd),
-    })
-      .then(async (response) => {
-        if (response.status == 200) {
-          setTimeout(() => {
-            redirect.push({ pathname: '/login' });
-          }, 1000);
-        } else {
-          const res = await response.json();
-          //TODO: get back to first state
-          // setStep({...step, index: 0})
-          toast.error('เกิดข้อผิดพลาด');
-          console.log('error:', res);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    });
+    // The return value is *not* serialized
+    // You can return Date, Map, Set, etc.
+
+    // Recommendation: handle errors
+    if (!res.ok) {
+      toast.error('เกิดข้อผิดพลาด');
+      console.log('error:', res.status);
+      return;
+    }
+
+    setTimeout(() => {
+      redirect.push({ pathname: '/login' });
+    }, 1000);
   }
 
   const animationURL = '/assets/lotties/loading.json';
@@ -705,7 +701,7 @@ function RegisterPage(props: any) {
 
   const [redir, setRedir] = useState(false);
   function confirmAccount() {
-    setRedir(true);
+    // setRedir(true);
     updateSession();
   }
 

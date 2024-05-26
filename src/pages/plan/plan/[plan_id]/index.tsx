@@ -68,7 +68,7 @@ function PlanPage(props: any) {
       }}
     >
       <Head>
-        <title>แผนเรียนใหม่</title>
+        <title>{getCurrentPlan().detail?.plan_name} | Planriean</title>
       </Head>
       {/* <button onClick={toggleTheme}>Dark</button> */}
 

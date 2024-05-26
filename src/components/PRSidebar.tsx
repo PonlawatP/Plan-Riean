@@ -64,14 +64,14 @@ export default function PRSidebar(props: any) {
                 <i className={`bx bx-objects-horizontal-left text-2xl ${getBarActive('/', true)}`} />
                 <p className="hidden lg:block">เลือกรายวิชา</p>
               </button>
-              <button className="px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 text-pr-msu-2">
+              {/* <button className="px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 text-pr-msu-2">
                 <i className={`bx bx-git-repo-forked text-2xl rotate-90 ${getBarActive('/', true)}`} />
                 <p className="hidden lg:block">เส้นทางหลักสูตร</p>
               </button>
               <button className="absolute bottom-0 px-4 h-14 w-full text-left flex items-center gap-2 group hover:bg-pr-msu-1 text-pr-msu-2">
                 <i className={`bx bx-cog text-2xl ${getBarActive('/', true)}`} />
                 <p className="hidden lg:block">ตั้งค่า</p>
-              </button>
+              </button> */}
             </>
           ) : (
             <>
@@ -93,12 +93,12 @@ export default function PRSidebar(props: any) {
                 </button>
               ) : null}
 
-              <button className="px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 text-pr-msu-2">
+              {/* <button className="px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 text-pr-msu-2">
                 <span className={`${getBarActive('/', true)}`}>
                   <i className={`bx bx-git-repo-forked text-2xl rotate-90`} />
                 </span>
                 <p className="hidden lg:block">เส้นทางหลักสูตร</p>
-              </button>
+              </button> */}
             </>
           )}
           {/* <button className='px-4 h-14 text-left flex items-center gap-2 group hover:bg-pr-msu-1 hover:text-pr-msu-1-60'>

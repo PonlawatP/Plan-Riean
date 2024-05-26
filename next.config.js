@@ -15,6 +15,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '**',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
         hostname: 'www.msu.ac.th',
         port: '',
         pathname: '**',

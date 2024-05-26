@@ -20,7 +20,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { Menu, Transition } from '@headlessui/react';
 import Link from 'next/link';
 import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { getPlanData } from '../utils/userAPI';
+import { getPlanData, updatePlanData } from '../utils/userAPI';
 import { Player } from '@lottiefiles/react-lottie-player';
 
 export const font = IBM_Plex_Sans_Thai({
@@ -39,11 +39,11 @@ export const newPlanReset = {
   custom_plan_open: false,
   plan_name: `แผนการเรียนใหม่`,
   university: 'MSU',
-  cr_year: 2566,
-  fac_id: 1,
-  cr_id: 1126502,
-  std_year: 1,
-  cr_seamseter: 3,
+  cr_year: 2567,
+  fac_id: -1,
+  cr_id: -1,
+  std_year: -1,
+  cr_seamseter: 1,
   plan_color: null,
   plan_img: null,
   plan_dark: false,
@@ -139,10 +139,31 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
       0
     );
   };
+  const saveSubjectPlanData = () => {
+    const plan = getCurrentPlan();
+
+    updatePlanData(
+      plan.detail.plan_id,
+      plan.subjects.map((d: any) => {
+        return {
+          year: d.year,
+          semester: d.semester,
+          code: d.code,
+          sec: d.sec,
+          mute_alert: d.mute_alert,
+        };
+      }),
+      session?.accessToken,
+      null,
+    );
+  };
   const addSubjectSchedule = (subject: any) => {
     const plan = getCurrentPlan();
+    subject = { ...subject, mute_alert: false };
     plan.subjects.push(subject);
     setMyPlan(plan);
+
+    saveSubjectPlanData();
   };
   const removeSubjectSchedule = (subject: any) => {
     const plan = getCurrentPlan();
@@ -150,12 +171,14 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
       (data: any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec,
     );
     setMyPlan(plan);
+
+    saveSubjectPlanData();
   };
   const openPlan = async (plan_id: number) => {
     // console.log(plan_id, session?.accessToken);
     const res = await getPlanData(plan_id, session?.accessToken, null);
     console.log(res);
-    if (res.error && res.status == 403) {
+    if (res.error) {
       router.push('/plan');
       return;
     }

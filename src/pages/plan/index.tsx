@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { PatternFormat } from 'react-number-format';
 import Link from 'next/link';
 import { createPlan, getPlanListData } from '@/app/utils/userAPI';
-import { getUniversityData } from '@/app/utils/universityAPI';
+import { getUniversityData, getUniversitySeasons } from '@/app/utils/universityAPI';
 import { getStudentEducatedYear } from '../account/first-started';
 
 function PlanPage() {
@@ -35,6 +35,7 @@ function PlanPage() {
 
   const [planList, setPlanList] = useState<any>([]);
   const [uniFacData, setUniFacData] = useState<any>([]);
+  const [uniSeason, setUniSeason] = useState<any>([]);
 
   // TODO: setwebready when load plan in new page
   useEffect(() => {
@@ -70,6 +71,7 @@ function PlanPage() {
     console.log(res);
     if (res.success) {
       toast.update(toastId.current, { render: 'สร้างแพลนเรียนใหม่แล้ว', type: toast.TYPE.SUCCESS, autoClose: 5000 });
+      setNewPlanData(newPlanReset);
       redirect.push(`/plan/plan/${res.result.plan_id}`);
     } else {
       toast.update(toastId.current, {
@@ -84,6 +86,9 @@ function PlanPage() {
     getUniversityData(1, null).then((fac_list: any) => {
       setUniFacData(fac_list.facultys);
       // console.log(fac_list);
+    });
+    getUniversitySeasons(1, null).then((data: any) => {
+      setUniSeason(data.years);
     });
   }, []);
 
@@ -250,17 +255,21 @@ function PlanPage() {
               <select
                 // ref={ref_major}
                 onChange={(e: any) => {
-                  // setFirstStepData({ ...firstStepData, cr_id: e.target.value });
+                  setNewPlanData((prev: any) => ({ ...prev, cr_year: e.target.value }));
                 }}
+                disabled
                 value={newPlanData.cr_year}
                 className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
               >
-                <option value="2567">{`2567`}</option>
+                {uniSeason.map((d: any, dind: number) => (
+                  <option key={dind} value={d.year}>{`${d.year}`}</option>
+                ))}
+                {/* <option value="2567">{`2567`}</option> */}
                 {/* {getCourseSetRelation().map((c: any, cind: number) => (
                   <option key={cind} value={c.cr_id}>{`${c.cr_key} - ${c['name_' + 'th']}`}</option>
                 ))} */}
               </select>
-              <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+              <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                 ปีที่เรียน
               </label>
             </div>
@@ -269,8 +278,9 @@ function PlanPage() {
               <select
                 // ref={ref_major}
                 onChange={(e: any) => {
-                  // setFirstStepData({ ...firstStepData, cr_id: e.target.value });
+                  setNewPlanData((prev: any) => ({ ...prev, cr_seamseter: e.target.value }));
                 }}
+                disabled
                 value={newPlanData.cr_seamseter}
                 className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
               >
@@ -279,7 +289,7 @@ function PlanPage() {
                   <option key={cind} value={c.cr_id}>{`${c.cr_key} - ${c['name_' + 'th']}`}</option>
                 ))} */}
               </select>
-              <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+              <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                 เทอมที่เรียน
               </label>
             </div>

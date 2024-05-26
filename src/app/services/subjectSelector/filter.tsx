@@ -19,6 +19,8 @@ export default function SubjectSelectorFilterModel(props: any) {
     resizePlan,
     toggleHold,
     setTopbarToggle,
+
+    getCurrentPlan,
   } = useContext(CalendarContext);
 
   const [filter, setFilter] = useState<ICalendarFilter>({
@@ -134,8 +136,8 @@ export default function SubjectSelectorFilterModel(props: any) {
       };
 
       const res = await getData(
-        2566,
-        2,
+        getCurrentPlan().detail.cr_year,
+        getCurrentPlan().detail.cr_seamseter,
         filter.group.length == 0 ? '00*' : filter.group.join('|'),
         check_filt,
         abortController.signal,

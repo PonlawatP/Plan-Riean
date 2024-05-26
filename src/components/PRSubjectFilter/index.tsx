@@ -387,7 +387,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
 
       <FilterPanel
         title="หมวดหมู่วิชาเอก"
-        placeholder="รหัสวิชา"
+        placeholder="คณะหรือสาขา"
         isOn={f.majorViewFilter}
         onClose={() => {
           f.setMajorViewFilter(false);
@@ -406,8 +406,9 @@ export default function PRSubjectFilter({ children }: any, props: any) {
             title={fac.name_en}
             desc={fac.name_th}
             className={`h-16`}
-            // img={r.banner}
-            checkedAllText="เลือกหมวดนี้"
+            checkbox
+            img={fac.banner}
+            checkedAllText="ทั้งคณะ"
             // checked={f.getFloorToggledInPlace(fac) > 0}
             // checkedAll={f.getFloorToggledInPlace(fac) == f.getFloorAmountInPlace(fac)}
             onCheckedClick={(e: string) => {

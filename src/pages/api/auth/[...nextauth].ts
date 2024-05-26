@@ -4,6 +4,8 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 
 import * as jose from 'jose';
 
+console.log(process.env.GOOGLE_CLIENT_ID);
+
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [

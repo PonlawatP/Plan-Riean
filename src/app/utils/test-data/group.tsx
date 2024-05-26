@@ -3,6 +3,7 @@ export type IGroupFacultyData = {
   fac_key: string;
   name_en: string;
   name_th: string;
+  banner: string;
   majors: Array<IGroupMajorData>;
 };
 export type IGroupMajorData = {
@@ -15,8 +16,9 @@ export const groupDummy = [
   {
     fac_id: '12*',
     fac_key: 'IT',
-    name_en: 'Informatic',
-    name_th: 'วิทยาการสารสนเทศ',
+    name_en: 'Information Technology',
+    name_th: 'คณะวิทยาการสารสนเทศ',
+    banner: 'https://www.msu.ac.th/wp-content/uploads/2022/06/it.jpg',
     majors: [
       {
         course_code: '1203*',
