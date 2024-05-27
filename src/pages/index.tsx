@@ -2,6 +2,7 @@ import { ReactElement } from 'react';
 import RootLayout from '../app/layout/homelayout';
 import Link from 'next/link';
 import Nav from '../components/hompage/nav_home';
+import Footer from '../components/hompage/footer_home';
 
 
 const HomePage = () => {
@@ -35,6 +36,7 @@ const HomePage = () => {
         </section>
 
       </div>
+      <Footer/>
     </>
   );
 };

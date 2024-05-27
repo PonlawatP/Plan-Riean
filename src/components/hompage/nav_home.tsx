@@ -5,7 +5,7 @@ import Link from "next/link";
 const nav = () =>{
     return(
         <>
-        <nav className='flex justify-between p-5'>
+        <nav className='flex justify-between p-2 items-center'>
             <div className='flex text-xs'>
             <svg width="38" height="51" viewBox="0 0 38 51" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g filter="url(#filter0_d_1397_25906)">
@@ -41,8 +41,8 @@ const nav = () =>{
             </div>
             </div>
             <div className=''>
-                <Link className='rounded-full bg-blue-600 text-white py-0.5 px-2' href="/register">สมัครสมาชิก</Link>
-                <Link className='rounded-full bg-white text-blue-600 py-0.5 px-2 m-2 border-2 border-sky-600' href="/login">เข้าสู่ระบบ</Link>
+                <Link className='max-sm:block rounded-full text-center bg-blue-600 text-white py-0.5 px-2 max-md:m-1 max-md:px-1' href="/register">สมัครสมาชิก</Link>
+                <Link className='max-sm:block rounded-full text-center bg-white text-blue-600 py-0.5 px-2 m-2 border-2 border-sky-600 max-md:m-1 max-md:px-1' href="/login">เข้าสู่ระบบ</Link>
             </div>
       </nav>
         </>
