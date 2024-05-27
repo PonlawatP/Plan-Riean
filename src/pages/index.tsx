@@ -4,10 +4,15 @@ import Link from 'next/link';
 
 const HomePage = () => {
   return (
-    <div className="min-h-[100dvh] flex justify-center items-center">
-      <p>hi สวัสดีครับ</p>
-      <Link href="/plan">จัดตารางเรียน</Link>
-    </div>
+    <>
+      <nav>
+        <img src="/icon-512.png" alt="" />
+      </nav>
+      <div className="min-h-[100dvh] flex justify-center items-center">
+        <p>hi สวัสดีครับ</p>
+        <Link href="/plan">จัดตารางเรียน</Link>
+      </div>
+    </>
   );
 };
 
