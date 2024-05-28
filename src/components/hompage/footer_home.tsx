@@ -3,7 +3,7 @@ import Link from "next/link";
 const nav = () =>{
     return(
         <>
-            <div className="bg-stone-700 p-[5%]">
+            <div className="bg-stone-700 p-[8%]">
                 <div className="max-md:text-start text-center text-white md:flex font-bold justify-between p-3 lg:p-[90px]">
                     <div className="max-md:my-5">
                         <p>WHO WE ARE</p>

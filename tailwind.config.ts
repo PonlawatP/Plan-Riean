@@ -54,6 +54,9 @@ const config: Config = {
       borderRadius: {
         'b25': '18%',
       },
+      inset: {
+        '-10': '-10px',
+      },
     },
   },
   plugins: [

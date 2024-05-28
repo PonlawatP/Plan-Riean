@@ -6,7 +6,7 @@ const nav = () =>{
     return(
         <>
         <nav className='flex justify-between p-2 items-center'>
-            <div className='flex text-xs'>
+            <Link href="/" className='flex text-xs'>
                 <svg width="38" height="51" viewBox="0 0 38 51" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g filter="url(#filter0_d_1397_25906)">
                 <path d="M13.3939 30.2554V30.5663H9.71997V24.5566H10.05V30.2554H13.3939Z" fill="#007AEB"/>
@@ -39,7 +39,7 @@ const nav = () =>{
                     <p>PlanRiean</p>
                     <p>แผนการเรียน</p>
                 </div>
-            </div>
+            </Link>
             <div className="hover:bg-zinc-200 rounded-full p-2">
                 <Link href="/login">
                     <svg width="150" height="50" viewBox="0 0 187 51" fill="none" xmlns="http://www.w3.org/2000/svg">
