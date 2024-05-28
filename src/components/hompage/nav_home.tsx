@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 const nav = () =>{
+    
     return(
         <>
         <nav className='flex justify-between p-2 items-center'>
@@ -40,7 +41,7 @@ const nav = () =>{
                     <p>แผนการเรียน</p>
                 </div>
             </Link>
-            <div className="hover:bg-zinc-200 rounded-full p-2">
+            <div className="hover:bg-zinc-200 rounded-full p-2 ">
                 <Link href="/login">
                     <svg width="150" height="50" viewBox="0 0 187 51" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="162" cy="25.5" r="25" fill="white" fill-opacity="0.4"/>

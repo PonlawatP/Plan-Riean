@@ -1,6 +1,8 @@
 import Link from "next/link";
 
+
 const nav = () =>{
+
     return(
         <>
             <div className="bg-stone-700 p-[8%]">
@@ -25,7 +27,7 @@ const nav = () =>{
                 <hr />
                 <div className="max-md:text-start text-center text-white lg:flex font-bold justify-between p-3 lg:p-[90px]">
                     <div className="lg:w-[33%] max-md:my-5">
-                        <div className="flex items-center">
+                        <div className="flex items-center ">
                             <img width={40} src="/icon-inv.png" alt="logo"/>
                             <p>PlanRiean</p>
                         </div>
