@@ -4,28 +4,28 @@ const nav = () =>{
     return(
         <>
             <div className="bg-stone-700 p-[5%]">
-                <div className="text-center text-white md:flex font-bold justify-between p-3 lg:p-[90px]">
-                    <div>
+                <div className="max-md:text-start text-center text-white md:flex font-bold justify-between p-3 lg:p-[90px]">
+                    <div className="max-md:my-5">
                         <p>WHO WE ARE</p>
                         <div></div>
                     </div>
-                    <div>
+                    <div className="max-md:my-5">
                         <p>SUPPORT</p>
                         <div></div>
                     </div>
-                    <div>
+                    <div className="max-md:my-5">
                         <p>PRODUCT</p>
                         <div></div>
                     </div>
-                    <div>
+                    <div className="max-md:my-5">
                         <p>REPORT A PROBLEM</p>
                         <div></div>
                     </div>
                 </div>
                 <hr />
-                <div className="text-center text-white lg:flex font-bold justify-between p-3 lg:p-[90px]">
-                    <div className="lg:w-[33%]">
-                        <div className="flex items-center max-md:justify-center">
+                <div className="max-md:text-start text-center text-white lg:flex font-bold justify-between p-3 lg:p-[90px]">
+                    <div className="lg:w-[33%] max-md:my-5">
+                        <div className="flex items-center">
                             <img width={40} src="/icon-inv.png" alt="logo"/>
                             <p>PlanRiean</p>
                         </div>
@@ -33,15 +33,15 @@ const nav = () =>{
                             <p>เราเป็นแพลตฟอร์มที่ช่วยให้นักศึกษาสามารถวางแผนการเรียน และค้นหาข้อมูลรายวิชาได้อย่างง่ายดายและรวดเร็ว นักศึกษาสามารถเห็น รายละเอียดวิชาในแบบจำลองตรางเรียนทันที</p>
                         </div>
                     </div>
-                    <div className="lg:w-[33%]">
+                    <div className="lg:w-[33%] max-md:my-5">
                         <p>Contact Us</p>
                         <div className="p-3"></div>
                     </div>
-                    <div className="lg:w-[33%]">
+                    <div className="lg:w-[33%] max-md:my-5">
                         <p>Follow Us</p>
                         <div className="p-3">
                             <p className="text-[10px]">Various platforms</p>
-                            <div className="flex justify-center items-center">
+                            <div className="flex max-md:justify-between justify-center items-center">
                                 <Link href="/">
                                     <svg className="mx-1" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M15.9997 0C7.16338 0 0 7.18983 0 16.0588C0 23.5897 5.16598 29.9091 12.1348 31.6448V20.9663H8.83566V16.0588H12.1348V13.9442C12.1348 8.47839 14.5994 5.94496 19.9458 5.94496C20.9596 5.94496 22.7087 6.14473 23.4242 6.34386V10.7921C23.0466 10.7523 22.3906 10.7324 21.5759 10.7324C18.9526 10.7324 17.9388 11.73 17.9388 14.3231V16.0588H23.165L22.2671 20.9663H17.9388V32C25.8612 31.0397 32 24.2693 32 16.0588C31.9994 7.18983 24.836 0 15.9997 0Z" fill="#E9E9E9"/>
