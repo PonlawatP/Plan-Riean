@@ -13,6 +13,7 @@ const config: Config = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+  
       },
       colors: {
         'pr-blue': '#0075F7',
@@ -49,6 +50,9 @@ const config: Config = {
       },
       fontFamily: {
         'k2d': ['K2D'],
+      },
+      borderRadius: {
+        'b25': '18%',
       },
     },
   },
