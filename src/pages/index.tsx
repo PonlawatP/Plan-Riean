@@ -10,7 +10,7 @@ const HomePage = () => {
   return (
     <>
       <Nav/>
-      <div className="">
+      {/* <div className="">
         <section>
           <div className='flex-col w-full h-full bg-blue-300 align-baseline'>
               <div className='flex pt-20 w-full justify-center'>
@@ -36,7 +36,7 @@ const HomePage = () => {
           </div>
         </section>
 
-      </div>
+      </div> */}
       <FilterSubjectt/>
       <Footer/>
     </>
