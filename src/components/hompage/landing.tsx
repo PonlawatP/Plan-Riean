@@ -8,7 +8,9 @@ import { useScroll , useTransform,useViewportScroll} from "framer-motion";
 
 const landing = () => {
     const { scrollYProgress } = useViewportScroll();
-    const scale = useTransform(scrollYProgress, [0, 0.7], [1, 0.8]);
+    const scale = useTransform(scrollYProgress, [0, 0.8], [0.9, 1]);
+    const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [1, 0, 0]);
+    const opacity_2 = useTransform(scrollYProgress, [0, 0.2, 1], [0, 1, 0]);
     return( 
         
     
@@ -21,7 +23,8 @@ const landing = () => {
                     className='flex pt-60 w-full justify-center max-sm:flex-col max-sm:pt-24 max-lg:flex-col max-lg:pt-20 max-xl:pt-36'
                   
                     style={{
-                        scale
+                        scale,
+                        opacity
                     }}
                     >
                     <div className="max-sm:ww-full flex justify-center mb-10 max-sm:hidden">
@@ -47,7 +50,9 @@ const landing = () => {
             <section>
                 <motion.div 
                     className='flex-col w-full mt-60 max-sm:mt-24 max-lg:mt-30'
-                    style={{scale}}
+                    style={{scale,
+                        opacity:opacity_2
+                    }}
                     >
                     <div className='flex-col text-center w-full'>
                         <h1 className="text-7xl text-[#FFFFFF] max-sm:text-3xl">บริการของเรา</h1>

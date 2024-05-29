@@ -3,11 +3,15 @@ import { useScroll , useTransform,useViewportScroll,motion} from "framer-motion"
 
 const nav = () =>{
     const { scrollYProgress } = useViewportScroll();
-    const scale = useTransform(scrollYProgress, [0, 0.7], [1,  0.8]);
+    const scale = useTransform(scrollYProgress, [0, 0.7], [0.8,  1]);
+    const opacity_2 = useTransform(scrollYProgress, [0,0.7, 1], [0, 1, 0]);
+    
     return(
         <>
             <motion.div className="my-[10%]"
-                style={{scale}}
+                style={{scale,
+                    opacity:opacity_2
+                }}
             >
                 <div className="text-end text-blue-600 mx-5">
                     <h3 className="max-md:text-2xl text-5xl font-bold">คัดกรองรายวิชาทำได้ง่าย</h3>
