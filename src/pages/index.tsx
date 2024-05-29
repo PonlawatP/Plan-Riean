@@ -22,8 +22,8 @@ const HomePage = () => {
          animate={{ opacity: 2, y: 0 }}
          transition={{ duration: 1 }}
       >
-        <Nav/>
-        <Landing/>
+      <Nav/>
+      <Landing/>
       </motion.section>
       <HelpAboutYou/>
       <SearchSubject/>
