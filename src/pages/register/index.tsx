@@ -146,7 +146,7 @@ function RegisterPage(props: any) {
   }, []);
 
   useEffect(() => {
-    getUniversityData(firstStepData.uni_id, null).then((fac_list: any) => {
+    getUniversityData(firstStepData.uni_id, false, null).then((fac_list: any) => {
       const fac: any = [];
       // console.log(fac_list.facultys)
       setUniFacData(fac_list.facultys);

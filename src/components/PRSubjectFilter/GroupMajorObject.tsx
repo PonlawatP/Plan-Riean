@@ -3,14 +3,19 @@ import { getSubjectColor } from '@/app/utils/msu/subjectUtils';
 import { useContext } from 'react';
 
 export default function GroupMajorObject(props: any) {
-  const { title = 'title', desc = 'subtitle', course_code = '' } = props;
+  const { title = 'title', desc = 'subtitle', major_key = '' } = props;
 
-  //   const {} = useContext(CalendarFilterContext);
-  const isActive = false;
-  //   const isActive = isRoomFilterOn(title, place, floor);
+  const { GroupFilterTogglePRC, isGroupFilterOn } = useContext(CalendarFilterContext);
+  // const isActive = false;
+  const isActive = isGroupFilterOn('_M-' + major_key);
 
   return (
-    <button onClickCapture={() => {}} className={`px-2 py-1 group w-full border-b-[1px]`}>
+    <button
+      onClickCapture={() => {
+        GroupFilterTogglePRC('_M-' + major_key, true);
+      }}
+      className={`px-2 py-1 group w-full border-b-[1px]`}
+    >
       <div
         className={`px-3 py-1 rounded-lg flex gap-2 ${
           isActive
@@ -19,7 +24,7 @@ export default function GroupMajorObject(props: any) {
         }`}
       >
         <span className={`text-left ${isActive ? '' : 'group-active:text-white'}`}>
-          {title !== 'title' ? <p>{title}</p> : null}
+          {title !== 'title' ? <p className="font-semibold">{title}</p> : null}
           {desc !== 'subtitle' ? (
             <p className={`text-sm text-pr-gray-1 ${isActive ? '' : 'group-active:text-white/70'}`}>{desc}</p>
           ) : null}

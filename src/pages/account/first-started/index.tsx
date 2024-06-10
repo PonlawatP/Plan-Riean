@@ -133,7 +133,7 @@ function ProfileFSPage(props: any) {
   }, []);
 
   useEffect(() => {
-    getUniversityData(firstStepData.uni_id, null).then((fac_list: any) => {
+    getUniversityData(firstStepData.uni_id, false, null).then((fac_list: any) => {
       setUniFacData(fac_list.facultys);
     });
   }, [firstStepData.uni_id]);

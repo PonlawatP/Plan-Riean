@@ -8,7 +8,7 @@ export default function FilterPreview(props: any) {
 
   function getGroupFormat() {
     if (group.includes('total') || group.length == 0 || group.length == 9) {
-      return 'ทุกวิชา';
+      return 'ทุกหมวด GE';
     }
 
     const res: any[] = [];
@@ -87,14 +87,16 @@ export default function FilterPreview(props: any) {
 
   return (
     <div className="flex flex-wrap gap-2 p-2 pt-3 pb-5 text-pr-gray-1 bg-gradient-to-t from-transparent via-white/50 via-20% to-white/80 to-50% sticky top-0 backdrop-blur-sm z-10">
-      <span className="flex gap-1 items-center">
-        <i className="bx bxs-book text-2xl"></i>
-        <p>{getGroupFormat()}</p>
-      </span>
+      {subject.length == 0 && (
+        <span className="flex gap-1 items-center">
+          <i className="bx bxs-book text-2xl"></i>
+          <p>{getGroupFormat()}</p>
+        </span>
+      )}
       {subject.length > 0 && (
         <span className="flex gap-1 items-center">
           <i className="bx bx-search-alt-2 text-2xl"></i>
-          <p>ทั้งหมด</p>
+          <p>{subject.length} วิชา</p>
         </span>
       )}
       {day.length > 0 && (
@@ -118,7 +120,7 @@ export default function FilterPreview(props: any) {
       {master.length > 0 && (
         <span className="flex gap-1 items-center">
           <i className="bx bx-id-card text-2xl"></i>
-          <p>ทั้งหมด</p>
+          <p>{master.length} คน</p>
         </span>
       )}
     </div>

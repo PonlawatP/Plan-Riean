@@ -1,5 +1,5 @@
 import { CalendarContext, CalendarFilterContext, ICalendarFilter } from '@/app/providers/CalendarProvider';
-import { Ifilter, getData, getUpdatedData } from '@/app/utils/subjectAPI';
+import { Ifilter, getCoursesByKey, getData, getUpdatedData } from '@/app/utils/subjectAPI';
 import { IFloorData, IRoomData } from '@/app/utils/test-data/rooms';
 import { subjectDemoData } from '@/app/utils/test-data/subjects';
 import { name_days } from '@/components/PRCalendarSubject';
@@ -21,6 +21,8 @@ export default function SubjectSelectorFilterModel(props: any) {
     setTopbarToggle,
 
     getCurrentPlan,
+
+    uniFacGroupData,
   } = useContext(CalendarContext);
 
   const [filter, setFilter] = useState<ICalendarFilter>({
@@ -135,10 +137,15 @@ export default function SubjectSelectorFilterModel(props: any) {
                 .join('-'),
       };
 
+      // console.log(filter.group.find((f) => f.startsWith('_M-')).substring(3));
+      // console.log(uniFacGroupData.);
+
+      // console.log(getCoursesByKey(uniFacGroupData, filter.group.find((f) => f.startsWith('_M-')).substring(3)));
+
       const res = await getData(
         getCurrentPlan().detail.cr_year,
         getCurrentPlan().detail.cr_seamseter,
-        filter.group.length == 0 ? '00*' : filter.group.join('|'),
+        filter.subject.length == 0 ? '00*' : filter.subject.join('|'),
         check_filt,
         abortController.signal,
       ); // Pass the signal to the getData function
@@ -201,8 +208,12 @@ export default function SubjectSelectorFilterModel(props: any) {
     return group.includes(name);
   }
 
-  function GroupFilterTogglePRC(name: string) {
+  function GroupFilterTogglePRC(name: string, majorgroup = false) {
     let temp_group = group;
+
+    if (majorgroup) {
+      temp_group = group.filter((item: string) => !item.startsWith('_M-'));
+    }
 
     if (group.includes(name)) {
       temp_group = group.filter((item: string) => item !== name);
@@ -211,6 +222,10 @@ export default function SubjectSelectorFilterModel(props: any) {
     }
 
     setFilter({ ...filter, group: temp_group });
+  }
+
+  function getGroupMajorFilterNamePRC(majorgroup = false) {
+    return group.find((item: string) => item.startsWith('_M-'))?.substring(3) || 'เลือกสาขา';
   }
 
   function isDayFilterOn(name: string = '') {
@@ -267,6 +282,10 @@ export default function SubjectSelectorFilterModel(props: any) {
       }
     } else if (time_start !== '' && time_stop !== '') {
       temp_time = [time_start, time_stop];
+    } else if (time_start !== '') {
+      temp_time = [time_start];
+    } else {
+      temp_time = [];
     }
 
     // day select
@@ -375,6 +394,7 @@ export default function SubjectSelectorFilterModel(props: any) {
   const [roomViewFilter, setRoomViewFilter] = useState(false);
   const [masterViewFilter, setMasterViewFilter] = useState(false);
   const [majorViewFilter, setMajorViewFilter] = useState(false);
+  const [timeSetViewFilter, setTimeSetViewFilter] = useState(false);
   const [filterDebounceProgress, setFilterDebounceProgress] = useState(0);
   const [filterDebounceProgressFunc, setFilterDebounceProgressFunc] = useState<any>();
 
@@ -398,6 +418,9 @@ export default function SubjectSelectorFilterModel(props: any) {
   }
   function handleMajorViewFilter() {
     setMajorViewFilter(false);
+  }
+  function handleTimeSetViewFilter() {
+    setTimeSetViewFilter(false);
   }
   function resetMajorViewFilter() {
     setFilter({ ...filter, group: [] });
@@ -441,6 +464,7 @@ export default function SubjectSelectorFilterModel(props: any) {
         isMasterFilterOn,
         isRoomFilterOn,
         GroupFilterTogglePRC,
+        getGroupMajorFilterNamePRC,
         DayFilterTogglePRC,
         TimeFilterTogglePRC,
         SingleTimeFilterTogglePRC,
@@ -468,6 +492,9 @@ export default function SubjectSelectorFilterModel(props: any) {
         resetRoomViewFilter,
         handleMajorViewFilter,
         resetMajorViewFilter,
+        timeSetViewFilter,
+        setTimeSetViewFilter,
+        handleTimeSetViewFilter,
       }}
     >
       <div

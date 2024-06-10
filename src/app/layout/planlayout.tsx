@@ -240,6 +240,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     });
   }
 
+  const [uniFacGroupData, setUniFacGroupData] = useState<Any>([]);
+  const [uniGroupSubjectData, setUniGroupSubjectData] = useState<Any>([]);
+  const [uniLecturerData, setUniLecturerData] = useState<Any>([]);
+
   return (
     <>
       <style jsx global>{`
@@ -297,6 +301,12 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
           newPlanData,
           setNewPlanData,
           openPlan,
+          uniFacGroupData,
+          setUniFacGroupData,
+          uniGroupSubjectData,
+          setUniGroupSubjectData,
+          uniLecturerData,
+          setUniLecturerData,
         }}
       >
         <SubjectSelectorFilterModel classname={font.className}>

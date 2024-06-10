@@ -83,7 +83,7 @@ function PlanPage() {
   }
 
   useEffect(() => {
-    getUniversityData(1, null).then((fac_list: any) => {
+    getUniversityData(1, false, null).then((fac_list: any) => {
       setUniFacData(fac_list.facultys);
       // console.log(fac_list);
     });
