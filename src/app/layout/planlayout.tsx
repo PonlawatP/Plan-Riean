@@ -98,7 +98,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     if (canvasElem instanceof HTMLElement && planElem instanceof HTMLElement) {
       const canvas = canvasElem?.offsetWidth || 0;
       const plan = planElem?.offsetWidth || 0;
-
+      console.log(canvas, plan);
       if (canvas / plan <= 1) {
         setPlanSize(canvas / plan);
         setPlanWidth(canvas);

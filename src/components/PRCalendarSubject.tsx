@@ -165,10 +165,10 @@ export default function PRCalendarSubject(props: any) {
   }
 
   return (
-    <>
+    <div className="w-full h-full relative flex flex-col items-center">
       <div
         className={`
-      p-canvas-plan relative w-full h-full ${toggleSidebar ? 'm-8' : ''} md:ml-0 flex justify-center items-center
+      p-canvas-plan relative w-11/12 h-full ${toggleSidebar ? '' : ''} md:ml-0 flex justify-center items-center
     `}
       >
         <div
@@ -302,8 +302,8 @@ export default function PRCalendarSubject(props: any) {
               <span>
                 {getCurrentPlan()
                   .subjects.map((s: any) => Number.parseInt(s.credit.split(' ')[0]))
-                  .reduce((a, b) => a + b, 0)}
-                /21 หน่วยกิต
+                  .reduce((a, b) => a + b, 0)}{' '}
+                หน่วยกิต
               </span>
             </div>
 
@@ -316,13 +316,14 @@ export default function PRCalendarSubject(props: any) {
               <button id="plan-download" aria-label="plan-download" className="hover:text-black/60">
                 <i className="text-2xl bx bx-download"></i>
               </button>
-              <button id="plan-share" aria-label="plan-share" className="hover:text-black/60">
+              {/* TODO: share function */}
+              {/* <button id="plan-share" aria-label="plan-share" className="hover:text-black/60">
                 <i className="text-2xl bx bx-share"></i>
-              </button>
+              </button> */}
             </span>
           </span>
         </div>
       </div>
-    </>
+    </div>
   );
 }

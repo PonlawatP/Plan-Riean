@@ -630,13 +630,6 @@ export default function PRSubjectFilter({ children }: any, props: any) {
           setTimeSlotToggle(-1);
         }}
       >
-        {/*  */}
-        {/* {getTimeNotAll().length} */}
-        {/* {getTimeNotAll(0)} */}
-        {/* {getTimeNotAll(0).replaceAll('-', ''),
-                          () => f.SingleTimeFilterTogglePRC(getTimeNotAll(0)),
-                          f.isTimeFilterOn(false, getTimeNotAll(0)),} */}
-
         <section className="pr-subject-filter-content relative h-full overflow-auto fade-y p-5">
           <div className="pr-filter-group relative h-full grid grid-rows-[auto_1fr]">
             <div className="">
