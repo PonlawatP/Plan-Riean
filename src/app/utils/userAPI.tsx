@@ -65,6 +65,7 @@ export async function getPlanData(plan_id: number, token: string, signal: any) {
   return res.json();
 }
 export async function updatePlanData(plan_id: number, plan_data: any, token: string, signal: any) {
+  // console.log(plan_data);
   const requestOptions = {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', Authorization: token },

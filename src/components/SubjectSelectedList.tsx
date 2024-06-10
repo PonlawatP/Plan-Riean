@@ -8,28 +8,18 @@ import {
   getHourIndex,
   getSplitedData,
 } from '@/app/utils/msu/subjectUtils';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 
-export default function SubjectList(props: any) {
-  const { calsel_data, checkSubjectSchedule, checkSubjectCollapsed, toggleSubjectSchedule } =
+export default function SubjectSelectedList(props: any) {
+  const { getCurrentPlan, checkSubjectSchedule, checkSubjectCollapsed, toggleSubjectSchedule } =
     useContext(CalendarContext);
 
-  return calsel_data.result.data.map((data: any, dind: number) => {
+  return getCurrentPlan().subjects.map((data: any, dind: number) => {
     const date_data = getSplitedData(data.time);
     return (
       <div
         key={dind}
-        className={`mt-3 mx-4 py-1 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-pr-bg relative border-[2px] cursor-pointer ${
-          checkSubjectSchedule(data) ? 'border-green-400/90 shadow-green-400/40 shadow-md' : 'border-black/10'
-        } ${
-          checkSubjectCollapsed(data) && !checkSubjectSchedule(data) ? 'brightness-75 contrast-[30%]' : 'brightness-100'
-        }`}
-        onClick={(e) => {
-          if (!checkSubjectCollapsed(data) || checkSubjectSchedule(data)) toggleSubjectSchedule(data);
-        }}
-        // onTouchEnd={(e) => {
-        //   if (!checkSubjectCollapsed(data) || checkSubjectSchedule(data)) toggleSubjectSchedule(data);
-        // }}
+        className={`mt-3 py-1 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-pr-bg relative border-[2px] cursor-pointer border-black/10`}
       >
         <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col">
           <div className="relative grid grid-flow-col grid-cols-[auto_1fr]">
@@ -74,6 +64,30 @@ export default function SubjectList(props: any) {
                 </div>
               </span>
             ))}
+          </div>
+          <div className="pt-1">
+            {data.exam_mid != null ? (
+              <span className="flex gap-4 items-center pt-1 relative">
+                <span className={'bg-white px-2 rounded-lg text-center font-medium w-16'}>Mid</span>
+                <span className="bg-pr-bg-1 px-2 rounded-lg">{data.exam_mid.split(' ')[0]}</span>
+                <div className="absolute right-0">
+                  <span className="bg-slate-400/30 px-2 rounded-lg">
+                    {data.exam_mid.split(' ')[2].substring(0, 5)} - {data.exam_mid.split(' ')[4].substring(0, 5)}
+                  </span>
+                </div>
+              </span>
+            ) : null}
+            {data.exam_final != null ? (
+              <span className="flex gap-4 items-center pt-1 relative">
+                <span className={'bg-white px-2 rounded-lg text-center font-medium w-16'}>Final</span>
+                <span className="bg-pr-bg-1 px-2 rounded-lg">{data.exam_final.split(' ')[0]}</span>
+                <div className="absolute right-0">
+                  <span className="bg-slate-400/30 px-2 rounded-lg">
+                    {data.exam_final.split(' ')[2].substring(0, 5)} - {data.exam_final.split(' ')[4].substring(0, 5)}
+                  </span>
+                </div>
+              </span>
+            ) : null}
           </div>
         </div>
       </div>

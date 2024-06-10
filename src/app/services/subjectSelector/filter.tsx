@@ -3,7 +3,7 @@ import { Ifilter, getCoursesByKey, getData, getUpdatedData } from '@/app/utils/s
 import { IFloorData, IRoomData } from '@/app/utils/test-data/rooms';
 import { subjectDemoData } from '@/app/utils/test-data/subjects';
 import { name_days } from '@/components/PRCalendarSubject';
-import { SetStateAction, useContext, useEffect, useState } from 'react';
+import { SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 
 export default function SubjectSelectorFilterModel(props: any) {
   const { children } = props;
@@ -44,8 +44,11 @@ export default function SubjectSelectorFilterModel(props: any) {
     };
   }
 
+  const pinch_ref = useRef<any>(null);
+
   function handleOpenSubjectSelect() {
     setViewState(true);
+
     setViewFilter(calsel_data.isFirstLoading);
 
     setTimeout(() => {
@@ -53,7 +56,10 @@ export default function SubjectSelectorFilterModel(props: any) {
     }, 250);
   }
 
+  const [calSearch, setCalSearch] = useState(false);
+
   function handleReleaceHoldClick(e: any) {
+    if (pinch_ref.current.sad > 5) return;
     if (topbarToggle.init) {
       if (focusTime.start_time < focusTime.end_time) {
         TimeFilterTogglePRC(
@@ -72,14 +78,31 @@ export default function SubjectSelectorFilterModel(props: any) {
       }
 
       setViewState(true);
-      setViewFilter(true);
+
+      if (calsel_data.isFirstLoading) {
+        setViewFilter(true);
+      } else {
+        setCalSearch(true);
+      }
+
       setTimeout(() => {
         resizePlan();
       }, 250);
     }
+
     clearTimeout(toggleHold);
     setTopbarToggle({ pre: false, init: false });
+
+    pinch_ref.current.instance.setup.disabled = false;
+    pinch_ref.current.instance.setup.panning.disabled = false;
   }
+
+  useEffect(() => {
+    if (calSearch) {
+      handleFilterSubmit();
+      setCalSearch(false);
+    }
+  }, [calSearch]);
 
   function handleFilterPanel() {
     setViewFilter(!viewFilter);
@@ -146,13 +169,13 @@ export default function SubjectSelectorFilterModel(props: any) {
       const res = await getData(
         getCurrentPlan().detail.cr_year,
         getCurrentPlan().detail.cr_seamseter,
-        filter.subject.length == 0 ? '00*' : filter.subject.join('|'),
+        // filter.subject.length == 0 ? '00*' : filter.subject.join('|'),
         check_filt,
         abortController.signal,
       ); // Pass the signal to the getData function
 
       // setSubjectShowData(res);
-      console.log(check_filt, res);
+      // console.log(check_filt, res);
 
       // abortUpdateController = new AbortController(); // Create a new AbortController instance
       // await getUpdatedData(abortUpdateController.signal).then(res2=> {
@@ -192,13 +215,20 @@ export default function SubjectSelectorFilterModel(props: any) {
   }
 
   function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
+    // console.log('test', pinch_ref.current.sad);
     if (viewSchedule) {
       setViewState(false);
       setViewFilter(false);
     } else {
+      if (pinch_ref.current.sad > 5) return;
       if (tindex >= 0) SingleTimeFilterTogglePRC((8 + tindex).toString().padStart(2, '0') + ':00', true, dindex);
       setViewState(true);
-      setViewFilter(calsel_data.isFirstLoading);
+
+      if (calsel_data.isFirstLoading) {
+        setViewFilter(true);
+      } else {
+        setCalSearch(true);
+      }
     }
     setTimeout(() => {
       resizePlan();
@@ -496,6 +526,7 @@ export default function SubjectSelectorFilterModel(props: any) {
         timeSetViewFilter,
         setTimeSetViewFilter,
         handleTimeSetViewFilter,
+        pinch_ref,
       }}
     >
       <div

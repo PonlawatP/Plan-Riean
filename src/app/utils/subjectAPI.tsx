@@ -7,7 +7,7 @@ export interface Ifilter {
   master: Array<string>;
 }
 
-export async function getData(year: number, semester: number, coursecode: string, filter: Ifilter, signal: any) {
+export async function getData(year: number, semester: number, filter: Ifilter, signal: any) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -17,10 +17,7 @@ export async function getData(year: number, semester: number, coursecode: string
     signal,
   };
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/course/${year}/${semester}/${coursecode}`,
-    requestOptions,
-  );
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/course/${year}/${semester}`, requestOptions);
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
 

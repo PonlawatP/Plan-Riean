@@ -542,6 +542,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         }}
         onClose={() => {
           f.setMasterViewFilter(false);
+          setUniLecturerData([]);
           setFilterMasterTemp([]);
         }}
         onClear={() => {
@@ -575,6 +576,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
           });
         }}
         onClose={() => {
+          setUniFacGroupData([]);
           f.setMajorViewFilter(false);
         }}
         onClear={() => {

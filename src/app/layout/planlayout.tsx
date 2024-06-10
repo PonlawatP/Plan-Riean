@@ -98,7 +98,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     if (canvasElem instanceof HTMLElement && planElem instanceof HTMLElement) {
       const canvas = canvasElem?.offsetWidth || 0;
       const plan = planElem?.offsetWidth || 0;
-      console.log(canvas, plan);
+      // console.log(canvas, plan);
       if (canvas / plan <= 1) {
         setPlanSize(canvas / plan);
         setPlanWidth(canvas);
@@ -158,19 +158,21 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     );
   };
   const addSubjectSchedule = (subject: any) => {
-    const plan = getCurrentPlan();
     subject = { ...subject, mute_alert: false };
-    plan.subjects.push(subject);
-    setMyPlan(plan);
+    setMyPlan((prev: any) => {
+      prev.subjects.push(subject);
+      return { ...prev };
+    });
 
     saveSubjectPlanData();
   };
   const removeSubjectSchedule = (subject: any) => {
-    const plan = getCurrentPlan();
-    plan.subjects = plan.subjects.filter(
-      (data: any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec,
-    );
-    setMyPlan(plan);
+    setMyPlan((prev: any) => {
+      prev.subjects = prev.subjects.filter(
+        (data: any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec,
+      );
+      return { ...prev };
+    });
 
     saveSubjectPlanData();
   };
@@ -240,9 +242,9 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     });
   }
 
-  const [uniFacGroupData, setUniFacGroupData] = useState<Any>([]);
-  const [uniGroupSubjectData, setUniGroupSubjectData] = useState<Any>([]);
-  const [uniLecturerData, setUniLecturerData] = useState<Any>([]);
+  const [uniFacGroupData, setUniFacGroupData] = useState<any>([]);
+  const [uniGroupSubjectData, setUniGroupSubjectData] = useState<any>([]);
+  const [uniLecturerData, setUniLecturerData] = useState<any>([]);
 
   return (
     <>
@@ -373,7 +375,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                       {/* <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p> */}
                     </div>
                     <img
-                      src={session?.user?.image as string}
+                      src={session?.user?.image || '/assets/images/prof.jpg'}
                       onError={(e: any) => {
                         e.target.src = '/assets/images/prof.jpg';
                       }}

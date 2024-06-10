@@ -25,7 +25,7 @@ export default function FilterPanel(props: any) {
     } else {
       setTimeout(() => {
         setTempOn(false);
-      }, 150);
+      }, 200);
     }
   }, [isOn]);
 
