@@ -82,7 +82,7 @@ export default function FilterPreview(props: any) {
 
   function getTimeFormat() {
     const temp_time = time.filter((t: string) => t === t.replaceAll('-', '')).map((t: string) => t.split(':')[0]);
-    return temp_time.length == 1 ? temp_time + ':00' : temp_time.join(' - ');
+    return temp_time.length == 1 ? temp_time + ':00' : temp_time.join('-');
   }
 
   return (

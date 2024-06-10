@@ -46,6 +46,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
   const { isBelowLg } = useBreakpoint('lg');
 
   const [filterTemp, setFilterTemp] = useState([]);
+  const [filterMasterTemp, setFilterMasterTemp] = useState([]);
 
   function elemButton(
     msg: any,
@@ -97,6 +98,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
   }, [viewFilter]);
 
   const [timeSlotToggle, setTimeSlotToggle] = useState(-1);
+  const [ctimeSlotToggle, setCTimeSlotToggle] = useState(0);
   const times = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
 
   return (
@@ -540,6 +542,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         }}
         onClose={() => {
           f.setMasterViewFilter(false);
+          setFilterMasterTemp([]);
         }}
         onClear={() => {
           f.resetMasterViewFilter();
@@ -547,11 +550,15 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         onSearch={(e: string) => {
           // search
           console.log(e);
+          const res = uniLecturerData.filter((l: string) => l.includes(e));
+          setFilterMasterTemp(res.length == 0 ? [null] : res);
         }}
       >
-        {uniLecturerData.map((l: string, lIndex: number) => (
-          <MasterObject key={lIndex} name={l} />
-        ))}
+        {(filterMasterTemp.length == 0 ? uniLecturerData : filterMasterTemp)
+          .filter((m: any) => m != null)
+          .map((l: string, lIndex: number) => (
+            <MasterObject key={lIndex} name={l} />
+          ))}
         {/* <MasterObject name="ผศ.ดร. วรัญญู แก้วดวงตา" other_name="Waranyoo Kaewduangta" />
         <MasterObject name="อ. นนทิวรรธน์ จันทนะผะลิน" />
         <MasterObject name="Ms. Tyeyoung Yang" other_name="Tyeyoung Yang" /> */}
@@ -616,9 +623,11 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         onOpen={() => {}}
         onClose={() => {
           f.setTimeSetViewFilter(false);
+          setTimeSlotToggle(-1);
         }}
         onClear={() => {
           f.TimeFilterTogglePRC(false);
+          setTimeSlotToggle(-1);
         }}
       >
         {/*  */}
@@ -689,6 +698,8 @@ export default function PRSubjectFilter({ children }: any, props: any) {
                           `${t.toString().padStart(2, `0`)}:00`,
                           getTimeNotAll().length == 2 ? getTimeNotAll(1) : '',
                         );
+                        setTimeSlotToggle(1);
+                        setCTimeSlotToggle(1);
                       } else {
                         // console.log(getTimeNotAll().length == 0 ? '08:00' : getTimeNotAll(0));
                         f.TimeFilterTogglePRC(
@@ -696,6 +707,10 @@ export default function PRSubjectFilter({ children }: any, props: any) {
                           getTimeNotAll().length == 0 || getTimeNotAll(0).includes('-') ? '08:00' : getTimeNotAll(0),
                           `${t.toString().padStart(2, `0`)}:00`,
                         );
+                        if (ctimeSlotToggle == 1) {
+                          setCTimeSlotToggle(0);
+                          f.setTimeSetViewFilter(false);
+                        }
                       }
                     }}
                     disabled={

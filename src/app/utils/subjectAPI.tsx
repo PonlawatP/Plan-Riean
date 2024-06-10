@@ -4,6 +4,7 @@ export interface Ifilter {
   code: Array<string>;
   date: Array<string>;
   time: string;
+  master: Array<string>;
 }
 
 export async function getData(year: number, semester: number, coursecode: string, filter: Ifilter, signal: any) {

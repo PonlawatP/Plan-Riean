@@ -135,6 +135,7 @@ export default function SubjectSelectorFilterModel(props: any) {
                   return t.toString().split(':')[0];
                 })
                 .join('-'),
+        master: filter.master,
       };
 
       // console.log(filter.group.find((f) => f.startsWith('_M-')).substring(3));
