@@ -39,7 +39,7 @@ export default function FilterPanel(props: any) {
     >
       {isOn || tempOn ? (
         <div
-          className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] md:w-[450px] h-full overflow-auto p-1 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}
+          className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] md:w-[450px] h-full overflow-auto p-1 rounded-t-3xl lg:rounded-b-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}
         >
           {/* header */}
           <section className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-slate-400/50">

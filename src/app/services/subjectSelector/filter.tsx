@@ -62,7 +62,7 @@ export default function SubjectSelectorFilterModel(props: any) {
 
   function handleReleaceHoldClick(e: any) {
     console.log(isMobile);
-    if (isMobile) {
+    if (isMobile && pinch_ref.current != null) {
       if (pinch_ref.current.sad > 5) return;
       pinch_ref.current.instance.setup.disabled = false;
       pinch_ref.current.instance.setup.panning.disabled = false;
@@ -224,7 +224,7 @@ export default function SubjectSelectorFilterModel(props: any) {
       setViewState(false);
       setViewFilter(false);
     } else {
-      if (isMobile) {
+      if (isMobile && pinch_ref.current != null) {
         if (pinch_ref.current.sad > 5) return;
       }
       if (tindex >= 0) SingleTimeFilterTogglePRC((8 + tindex).toString().padStart(2, '0') + ':00', true, dindex);

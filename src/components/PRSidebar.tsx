@@ -41,7 +41,7 @@ export default function PRSidebar(props: any) {
           </button>
         ) : null}
 
-        <div className="content relative flex flex-col h-full bg-white/60 border-[1px] rounded-3xl overflow-hidden">
+        <div className="content relative flex flex-col h-full bg-white/90 border-[1px] rounded-3xl overflow-hidden">
           {redirect.pathname == '/plan/plan/[plan_id]' ? (
             <>
               <Link

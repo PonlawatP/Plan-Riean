@@ -181,8 +181,13 @@ export default function PRCalendarSubject(props: any) {
   return (
     <TransformWrapper
       ref={pinch_ref}
-      disabled={!isMobile}
-      panning={{ disabled: !isMobile }}
+      onPanningStart={(e) => {
+        if (!isMobile) {
+          e.resetTransform();
+          pinch_ref.current.instance.setup.disabled = true;
+          pinch_ref.current.instance.setup.panning.disabled = true;
+        }
+      }}
       onPanning={(e) => {
         // console.log('test', e.instance);
         pinch_ref.current.sad = pinch_ref.current.sad == undefined ? 1 : pinch_ref.current.sad + 1;
@@ -193,6 +198,13 @@ export default function PRCalendarSubject(props: any) {
           pinch_ref.current.sad = 0;
           // console.log(pinch_ref.current.sad);
         }, 100);
+      }}
+      onPinchingStart={(e) => {
+        if (!isMobile) {
+          e.resetTransform();
+          pinch_ref.current.instance.setup.disabled = true;
+          pinch_ref.current.instance.setup.panning.disabled = true;
+        }
       }}
       onPinching={(e) => {
         // console.log('test', e.instance);
@@ -209,6 +221,7 @@ export default function PRCalendarSubject(props: any) {
       <TransformComponent
         contentStyle={{ width: '100%', height: '100%' }}
         wrapperStyle={{ width: '100%', height: '100%' }}
+        wrapperClass="fade-x"
       >
         <div className="w-full h-full relative flex flex-col items-center">
           <div
