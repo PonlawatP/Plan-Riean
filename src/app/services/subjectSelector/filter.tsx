@@ -2,8 +2,10 @@ import { CalendarContext, CalendarFilterContext, ICalendarFilter } from '@/app/p
 import { Ifilter, getCoursesByKey, getData, getUpdatedData } from '@/app/utils/subjectAPI';
 import { IFloorData, IRoomData } from '@/app/utils/test-data/rooms';
 import { subjectDemoData } from '@/app/utils/test-data/subjects';
+import { useBreakpoint } from '@/app/utils/useBreakpoint';
 import { name_days } from '@/components/PRCalendarSubject';
 import { SetStateAction, useContext, useEffect, useRef, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 
 export default function SubjectSelectorFilterModel(props: any) {
   const { children } = props;
@@ -59,7 +61,12 @@ export default function SubjectSelectorFilterModel(props: any) {
   const [calSearch, setCalSearch] = useState(false);
 
   function handleReleaceHoldClick(e: any) {
-    if (pinch_ref.current.sad > 5) return;
+    console.log(isMobile);
+    if (isMobile) {
+      if (pinch_ref.current.sad > 5) return;
+      pinch_ref.current.instance.setup.disabled = false;
+      pinch_ref.current.instance.setup.panning.disabled = false;
+    }
     if (topbarToggle.init) {
       if (focusTime.start_time < focusTime.end_time) {
         TimeFilterTogglePRC(
@@ -92,9 +99,6 @@ export default function SubjectSelectorFilterModel(props: any) {
 
     clearTimeout(toggleHold);
     setTopbarToggle({ pre: false, init: false });
-
-    pinch_ref.current.instance.setup.disabled = false;
-    pinch_ref.current.instance.setup.panning.disabled = false;
   }
 
   useEffect(() => {
@@ -220,7 +224,9 @@ export default function SubjectSelectorFilterModel(props: any) {
       setViewState(false);
       setViewFilter(false);
     } else {
-      if (pinch_ref.current.sad > 5) return;
+      if (isMobile) {
+        if (pinch_ref.current.sad > 5) return;
+      }
       if (tindex >= 0) SingleTimeFilterTogglePRC((8 + tindex).toString().padStart(2, '0') + ':00', true, dindex);
       setViewState(true);
 

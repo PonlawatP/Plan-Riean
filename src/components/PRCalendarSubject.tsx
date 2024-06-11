@@ -6,6 +6,8 @@ import ScheduleCard from './PRScheduleCard';
 import { getDayIndex, getHourIndex, getSplitedData } from '@/app/utils/msu/subjectUtils';
 
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { useBreakpoint } from '@/app/utils/useBreakpoint';
+import { isMobile } from 'react-device-detect';
 
 export const name_days = [
   {
@@ -149,10 +151,12 @@ export default function PRCalendarSubject(props: any) {
       setTimeout(() => {
         // feat: pinch & pan plan ratio
         // it counting per tick while moving plan. so if it not gather than 5 = not meant to filter => just ignore it
-        if (pinch_ref.current.sad > 2) return;
+        if (isMobile) {
+          if (pinch_ref.current.sad > 2) return;
 
-        pinch_ref.current.instance.setup.disabled = true;
-        pinch_ref.current.instance.setup.panning.disabled = true;
+          pinch_ref.current.instance.setup.disabled = true;
+          pinch_ref.current.instance.setup.panning.disabled = true;
+        }
         setFocusTime({ day: dindex, start_time: t, end_time: t });
         setTopbarHtml(
           <>
@@ -177,6 +181,8 @@ export default function PRCalendarSubject(props: any) {
   return (
     <TransformWrapper
       ref={pinch_ref}
+      disabled={!isMobile}
+      panning={{ disabled: !isMobile }}
       onPanning={(e) => {
         // console.log('test', e.instance);
         pinch_ref.current.sad = pinch_ref.current.sad == undefined ? 1 : pinch_ref.current.sad + 1;

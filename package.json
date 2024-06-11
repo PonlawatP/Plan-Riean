@@ -27,6 +27,7 @@
     "react": "latest",
     "react-avatar-editor": "^13.0.2",
     "react-circular-progressbar": "^2.1.0",
+    "react-device-detect": "^2.2.3",
     "react-dom": "latest",
     "react-number-format": "^5.3.1",
     "react-responsive": "^9.0.2",
