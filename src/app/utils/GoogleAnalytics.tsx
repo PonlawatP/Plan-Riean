@@ -1,24 +1,20 @@
-'use client'
+'use client';
 
-import Script from "next/script"
-import * as gtag from "../../../gtag.jsx"
+import Script from 'next/script';
+import * as gtag from '../../../gtag.jsx';
 
 const GoogleAnalytics = () => {
+  //You can show in the console the GA_TRACKING_ID to confirm
+  // console.log(gtag.GA_TRACKING_ID)
 
-    //You can show in the console the GA_TRACKING_ID to confirm
-    console.log(gtag.GA_TRACKING_ID)
-
-    return (
-        <>
-            <Script
-                strategy="afterInteractive"
-                src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
-            />
-            <Script
-                id="gtag-init"
-                strategy="afterInteractive"
-                dangerouslySetInnerHTML={{
-                    __html: `
+  return (
+    <>
+      <Script strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`} />
+      <Script
+        id="gtag-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
                       window.dataLayer = window.dataLayer || [];
                       function gtag(){dataLayer.push(arguments);}
                       gtag('js', new Date());
@@ -26,10 +22,10 @@ const GoogleAnalytics = () => {
                       page_path: window.location.pathname,
                       });
                     `,
-                }}
-            />
-        </>
-    )
-}
+        }}
+      />
+    </>
+  );
+};
 
-export default GoogleAnalytics
+export default GoogleAnalytics;

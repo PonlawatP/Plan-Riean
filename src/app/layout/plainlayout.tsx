@@ -34,13 +34,10 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
         :root {
           --toastify-font-family: ${font.style.fontFamily};
         }
-        body {
-          touch-action: none;
-        }
       `}</style>
 
       <div className={`grid grid-rows-[auto_minmax(0,1fr)] h-[100dvh] ${font.className}`}>
-        <section className={`pr-topbar flex justify-between items-center p-6 sm:p-8 py-4 h-28 smooth-opacity`}>
+        <section className={`pr-topbar flex justify-between items-center p-6 sm:p-8 py-4 h-18 sm:h-28 smooth-opacity`}>
           <div className="flex">
             <Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image>
           </div>
@@ -53,7 +50,7 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
                     {/* <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p> */}
                   </div>
                   <img
-                    src={session?.user?.image as string}
+                    src={session?.user?.image || '/assets/images/prof.jpg'}
                     onError={(e: any) => {
                       e.target.src = '/assets/images/prof.jpg';
                     }}
@@ -76,17 +73,24 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
                 <Menu.Items className="absolute overflow-hidden right-8 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <Menu.Item>
                     {({ active }) => (
-                      <Link
-                        href="/account"
+                      <p
                         className={
-                          'profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu hover:bg-pr-msu-1'
+                          'profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu bg-pr-msu-1'
                         }
                       >
                         {session?.user?.name || 'User'}
-                      </Link>
+                      </p>
+                      // <Link
+                      //   href="/account"
+                      //   className={
+                      //     'profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu hover:bg-pr-msu-1'
+                      //   }
+                      // >
+                      //   {session?.user?.name || 'User'}
+                      // </Link>
                     )}
                   </Menu.Item>
-                  <Menu.Item>
+                  {/* <Menu.Item>
                     {({ active }) => (
                       <Link
                         href="/plan"
@@ -109,7 +113,7 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
                         จัดการบัญชี
                       </Link>
                     )}
-                  </Menu.Item>
+                  </Menu.Item> */}
                   <Menu.Item>
                     {({ active }) => (
                       <a

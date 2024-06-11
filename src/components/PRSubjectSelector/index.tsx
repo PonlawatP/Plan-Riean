@@ -43,7 +43,7 @@ export default function PRSubjectSelector(props: any) {
         }`}
       >
         {viewSchedule || tempOn ? (
-          <div className="pr-subject-select-body relative grid grid-rows-[auto_1fr] md:w-[450px] h-full overflow-auto p-1 rounded-t-3xl lg:rounded-b-3xl border-[1px] border-pr-bg-1 bg-white/90">
+          <div className="pr-subject-select-body relative grid grid-rows-[auto_1fr] md:w-[450px] h-full overflow-auto p-1 pb-0 rounded-t-3xl lg:rounded-b-3xl border-[1px] border-pr-bg-1 bg-white/90">
             {/* header */}
             <section className="pr-subject-header flex justify-between p-2 py-3 border-b-[1px] border-slate-400/50">
               <div className="flex gap-2 items-center font-semibold text-xl">
@@ -72,7 +72,7 @@ export default function PRSubjectSelector(props: any) {
               </button>
             </section>
             {/* content */}
-            <section className="pr-subject-content relative h-full overflow-auto">
+            <section className="pr-subject-content relative h-full overflow-auto pb-4">
               {isShowDialog ? <FilterPreview /> : null}
               {children}
             </section>

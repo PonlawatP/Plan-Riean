@@ -1,13 +1,19 @@
 import { ReactElement } from 'react';
 import RootLayout from '../app/layout/homelayout';
 import Link from 'next/link';
+import Head from 'next/head';
 
 const HomePage = () => {
   return (
-    <div className="min-h-[100dvh] flex justify-center items-center">
-      <p>hi สวัสดีครับ</p>
-      <Link href="/plan">จัดตารางเรียน</Link>
-    </div>
+    <>
+      <Head>
+        <title>Planriean: จัดตารางเรียนง่ายๆ ไม่ต้องปวดหัวอีกต่อไป</title>
+      </Head>
+      <div className="min-h-[100dvh] flex justify-center items-center">
+        <p>hi สวัสดีครับ</p>
+        <Link href="/plan">จัดตารางเรียน</Link>
+      </div>
+    </>
   );
 };
 

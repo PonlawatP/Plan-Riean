@@ -8,19 +8,20 @@ export const font = IBM_Plex_Sans_Thai({
 
 export default function AuthPageLayout({ children }: { children: React.ReactNode }) {
   return (
-      <>
-        <style jsx global>{`
-            :root {
-              --toastify-font-family: ${font.style.fontFamily};
-            }
-            body {
-              touch-action: none;
-              overflow: hidden;
-            }
-        `}</style>
-        <div className={`${font.className}`} >
-          {children}
-        </div>
-      </>
+    <>
+      <style jsx global>{`
+        :root {
+          --toastify-font-family: ${font.style.fontFamily};
+        }
+        body {
+          touch-action: none;
+          overflow: hidden;
+        }
+        html {
+          overflow: hidden;
+        }
+      `}</style>
+      <div className={`${font.className}`}>{children}</div>
+    </>
   );
 }

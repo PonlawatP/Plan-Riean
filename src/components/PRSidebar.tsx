@@ -31,7 +31,7 @@ export default function PRSidebar(props: any) {
     >
       {/* main sidebar */}
       <div className={`grid gap-8 ${redirect.pathname != '/plan/plan/[plan_id]' ? '' : 'h-full'}`}>
-        {redirect.pathname != '/plan/plan/[plan_id]' ? (
+        {/* {redirect.pathname != '/plan/plan/[plan_id]' ? (
           <button
             onClick={(e) => createNewPlan()}
             className="content relative w-full p-4 py-3 flex items-center gap-2 bg-white/60 hover:bg-pr-msu-1 text-pr-msu-2 border-pr-msu-1 group border-[2px] rounded-3xl overflow-hidden"
@@ -39,22 +39,20 @@ export default function PRSidebar(props: any) {
             <i className={`bx bx-plus text-2xl font-bold ${getBarActive('/', true)}`}></i>{' '}
             <p className="hidden lg:block">สร้างแผนใหม่</p>
           </button>
-        ) : null}
+        ) : null} */}
 
         <div className="content relative flex flex-col h-full bg-white/90 border-[1px] rounded-3xl overflow-hidden">
-          {redirect.pathname == '/plan/plan/[plan_id]' ? (
+          {redirect.pathname == '/plan/plan/[plan_id]' || redirect.pathname == '/plan' ? (
             <>
-              <Link
+              {/* <Link
                 href="/plan"
                 className={`px-4 h-14 text-left flex items-center gap-2 group ${getBarActive('/plan')}`}
               >
                 <i className={`bx bx-home text-2xl ${getBarActive('/plan', true)}`} />
                 <p className="hidden lg:block">หน้าแรก</p>
-              </Link>
-              <button
-                className={`px-4 h-14 text-left flex items-center gap-2 group ${getBarActive('/plan/plan/[plan_id]')}`}
-              >
-                <i className={`bx bx-task text-2xl ${getBarActive('/plan/plan/[plan_id]', true)}`} />
+              </Link> */}
+              <button className={`px-4 h-14 text-left flex items-center gap-2 group ${getBarActive('/plan')}`}>
+                <i className={`bx bx-task text-2xl ${getBarActive('/plan', true)}`} />
                 <p className="hidden lg:block">แผนเรียน</p>
               </button>
               <button

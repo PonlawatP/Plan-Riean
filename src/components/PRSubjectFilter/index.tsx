@@ -112,7 +112,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
       >
         {viewFilter || tempOn ? (
           <div
-            className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 md:w-[450px] h-full overflow-auto p-1 lg:pt-6 rounded-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}
+            className={`pr-subject-filter-body pointer-events-auto relative grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 md:w-[450px] h-full overflow-auto p-1 lg:pt-6 rounded-t-3xl lg:rounded-b-3xl border-[1px] border-pr-bg-3/20 bg-white backdrop-blur-lg`}
           >
             {/* header */}
             <section className="pr-subject-header flex lg:hidden justify-between p-2 py-3 border-b-[1px] border-slate-400/50">
@@ -348,7 +348,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         onOpen={() => {
           getSubjectDataByGroup(getCurrentPlan().detail?.cr_year, getCurrentPlan().detail?.cr_seamseter, null).then(
             (res: any) => {
-              console.log(res.data);
+              // console.log(res.data);
               setUniGroupSubjectData(res.data);
             },
           );
@@ -359,7 +359,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         }}
         onSearch={(e: string) => {
           // search
-          console.log(e);
+          // console.log(e);
           if (e.trim() == '') {
             setFilterTemp([]);
             return;
@@ -534,7 +534,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         onOpen={() => {
           getLecturerDataBySemaster(getCurrentPlan().detail?.cr_year, getCurrentPlan().detail?.cr_seamseter, null).then(
             (res: any) => {
-              console.log(res.data);
+              // console.log(res.data);
               setUniLecturerData(res.data);
               // setUniGroupSubjectData(res.data);
             },
@@ -550,7 +550,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         }}
         onSearch={(e: string) => {
           // search
-          console.log(e);
+          // console.log(e);
           const res = uniLecturerData.filter((l: string) => l.includes(e));
           setFilterMasterTemp(res.length == 0 ? [null] : res);
         }}

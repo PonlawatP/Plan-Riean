@@ -4,7 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 
 import * as jose from 'jose';
 
-console.log(process.env.GOOGLE_CLIENT_ID);
+// console.log(process.env.GOOGLE_CLIENT_ID);
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token, user }) {
       if (token) {
         if (token.username != '') {
-          console.log(token);
+          // console.log(token);
           let user_fin: any = token;
           user_fin = {
             ...user_fin.user,
@@ -114,6 +114,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user, trigger, account, session }) {
+      // console.log(user);
       if (trigger === 'update') {
         return { ...token, ...session };
       }
@@ -129,6 +130,7 @@ export const authOptions: NextAuthOptions = {
           let user_fin: any = user;
           user_fin = {
             ...user_fin,
+            image: user.image,
             name: user_fin.std_name + ' ' + user_fin.std_surname,
           };
           return {
@@ -147,6 +149,7 @@ export const authOptions: NextAuthOptions = {
         // console.log(login)
         login.user = {
           ...login.user,
+          image: user.image,
           name: login.user.std_name + ' ' + login.user.std_surname,
         };
 
