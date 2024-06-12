@@ -10,6 +10,7 @@ import {
 } from '@/app/utils/msu/subjectUtils';
 import { useContext, useEffect, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
+import { isMobile } from 'react-device-detect';
 
 export default function SubjectSelectedList(props: any) {
   const {
@@ -248,16 +249,17 @@ export default function SubjectSelectedList(props: any) {
             </div>
           </div>
         </div>
-
-        <button
-          onClick={() => {
-            setCurrentPlanRemoved((prev) => [...prev, data]);
-            removeSubjectSchedule(data);
-          }}
-          className="pr-subject-remove transition-all ease-pr-bounce scale-0 group-hover:scale-100 absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white drop-shadow-pr-shadow-text flex justify-center items-center rounded-full"
-        >
-          <i className="bx bx-x"></i>
-        </button>
+        {isMobile ? null : (
+          <button
+            onClick={() => {
+              setCurrentPlanRemoved((prev) => [...prev, data]);
+              removeSubjectSchedule(data);
+            }}
+            className="pr-subject-remove transition-all ease-pr-bounce scale-0 group-hover:scale-100 absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white drop-shadow-pr-shadow-text flex justify-center items-center rounded-full"
+          >
+            <i className="bx bx-x"></i>
+          </button>
+        )}
       </div>
     );
   });
