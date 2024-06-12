@@ -2,9 +2,7 @@ import { CalendarContext } from '@/app/providers/CalendarProvider';
 import { useContext, useEffect, useRef, useState } from 'react';
 import DialogNoSubjects from './dialogue/noSubjects';
 import { toast } from 'react-toastify';
-import copy from 'copy-text-to-clipboard';
 import TableSubject from './dialogue/tableSubject';
-import ExamSubject from './dialogue/examSubject';
 import SubjectSelectedList from '../SubjectSelectedList';
 
 export default function PRSummaryContent() {
