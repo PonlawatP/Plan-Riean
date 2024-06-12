@@ -15,8 +15,10 @@ export default function SubjectSelectorFilterModel(props: any) {
     focusTime,
 
     viewSchedule,
+    viewSummary,
 
     setViewState,
+    setViewSummary,
     setViewFilter,
     resizePlan,
     toggleHold,
@@ -50,6 +52,7 @@ export default function SubjectSelectorFilterModel(props: any) {
 
   function handleOpenSubjectSelect() {
     setViewState(true);
+    setViewSummary(false);
 
     setViewFilter(calsel_data.isFirstLoading);
 
@@ -61,7 +64,7 @@ export default function SubjectSelectorFilterModel(props: any) {
   const [calSearch, setCalSearch] = useState(false);
 
   function handleReleaceHoldClick(e: any) {
-    console.log(isMobile);
+    // console.log(isMobile);
     if (isMobile && pinch_ref.current != null) {
       if (pinch_ref.current.sad > 5) return;
       pinch_ref.current.instance.setup.disabled = false;
@@ -220,7 +223,7 @@ export default function SubjectSelectorFilterModel(props: any) {
 
   function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
     // console.log('test', pinch_ref.current.sad);
-    if (viewSchedule) {
+    if (viewSchedule || viewSummary) {
       setViewState(false);
       setViewFilter(false);
     } else {
@@ -435,6 +438,14 @@ export default function SubjectSelectorFilterModel(props: any) {
   const [filterDebounceProgress, setFilterDebounceProgress] = useState(0);
   const [filterDebounceProgressFunc, setFilterDebounceProgressFunc] = useState<any>();
 
+  function closeAllViewFilter() {
+    setSubjectViewFilter(false);
+    setRoomViewFilter(false);
+    setMasterViewFilter(false);
+    setMajorViewFilter(false);
+    setTimeSetViewFilter(false);
+  }
+
   function handleSubjectFilterSubmit() {
     setSubjectViewFilter(false);
   }
@@ -533,10 +544,11 @@ export default function SubjectSelectorFilterModel(props: any) {
         setTimeSetViewFilter,
         handleTimeSetViewFilter,
         pinch_ref,
+        closeAllViewFilter,
       }}
     >
       <div
-        className={'bg-pr-bg dark:bg-pr-bg-3 pr-layout h-[100dvh] grid grid-rows-[auto_1fr] ' + props.classname}
+        className={'bg-pr-bg dark:bg-pr-bg-3 pr-layout h-[100dvh] grid grid-rows-[auto_1fr_auto] ' + props.classname}
         onMouseUp={handleReleaceHoldClick}
       >
         {children}

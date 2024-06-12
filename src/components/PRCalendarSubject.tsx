@@ -51,6 +51,7 @@ export default function PRCalendarSubject(props: any) {
   const {
     webReady,
     viewSchedule,
+    viewSummary,
     topbarToggle,
     setTopbarToggle,
     setTopbarHtml,
@@ -174,13 +175,14 @@ export default function PRCalendarSubject(props: any) {
             clearTimeout(toggleHold);
           }, 500),
         );
-      }, 150),
+      }, 200),
     );
   }
 
   return (
     <TransformWrapper
       ref={pinch_ref}
+      maxScale={3}
       onPanningStart={(e) => {
         if (!isMobile) {
           e.resetTransform();
@@ -217,6 +219,7 @@ export default function PRCalendarSubject(props: any) {
           // console.log(pinch_ref.current.sad);
         }, 100);
       }}
+      disabled={!isMobile}
     >
       <TransformComponent
         contentStyle={{ width: '100%', height: '100%' }}
@@ -296,7 +299,7 @@ export default function PRCalendarSubject(props: any) {
                           >
                             <span
                               className={`smooth-opacity opacity-0 ${
-                                !topbarToggle.init && !viewSchedule ? 'group-hover:opacity-100' : ''
+                                !topbarToggle.init && !viewSchedule && !viewSummary ? 'group-hover:opacity-100' : ''
                               } relative rounded-lg text-sm w-11/12 h-5/6 bg-black/40 text-white/80 flex justify-center items-center`}
                               id={'planhover-' + t.toString().padStart(2, '0') + '-' + dindex}
                             >

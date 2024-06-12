@@ -5,18 +5,18 @@ import { useContext } from 'react';
 
 export default function ScheduleCard(props: any) {
   const { data, time } = props;
-  const { viewSchedule, removeSubjectSchedule } = useContext(CalendarContext);
+  const { viewSchedule, viewSummary, removeSubjectSchedule } = useContext(CalendarContext);
   // const [clicked, setClicked] = useState(false);
 
   function fnHandleClickedOnScheduleCard(data: any) {
     // setClicked(!clicked)
-    if (!viewSchedule) {
+    if (!viewSchedule && !viewSummary) {
       removeSubjectSchedule(data);
     }
   }
 
   return (
-    <div className={`absolute top-0 w-full h-full ${viewSchedule ? 'pointer-events-none' : ''}`}>
+    <div className={`absolute top-0 w-full h-full ${viewSchedule || viewSummary ? 'pointer-events-none' : ''}`}>
       <div
         className={`relative h-full z-40 p-2 text-[13px] font-normal group`}
         style={{ width: calculateScale(time) * 100 + '%' }}

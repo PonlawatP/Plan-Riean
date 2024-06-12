@@ -11,11 +11,12 @@ import {
 import { useContext, useEffect, useState } from 'react';
 
 export default function SubjectList(props: any) {
-  const { calsel_data, checkSubjectSchedule, checkSubjectCollapsed, toggleSubjectSchedule } =
+  const { calsel_data, checkSubjectSchedule, checkSubjectCollapsed, toggleSubjectSchedule, getDuplicatedSubject } =
     useContext(CalendarContext);
 
   return calsel_data.result.data.map((data: any, dind: number) => {
     const date_data = getSplitedData(data.time);
+    const isDup = getDuplicatedSubject(data.code);
     return (
       <div
         key={dind}
@@ -41,6 +42,8 @@ export default function SubjectList(props: any) {
                   <FontAwesomeIcon className='pl-2 pt-1' icon={faLock} style={{color: "#73787e"}}/>
                 )
               } */}
+
+            {isDup ? <i className="bx bx-duplicate pl-2 pt-1" /> : null}
             <p className="text-black text-[12px] pt-1 pl-2 overflow-hidden text-ellipsis whitespace-nowrap">
               {data.code} {data['name_en']}
             </p>

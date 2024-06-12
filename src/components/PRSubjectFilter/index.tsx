@@ -11,6 +11,7 @@ import MasterObject from './MasterObject';
 import RoomFloorObject from './RoomFloorObject';
 import { IFloorData, IRoomData, roomsDummy } from '@/app/utils/test-data/rooms';
 import { Ifilter, getData, getLecturerDataBySemaster, getSubjectDataByGroup } from '@/app/utils/subjectAPI';
+import { isMobile } from 'react-device-detect';
 import {
   IGroupCoursesetData,
   IGroupCoursesetGroupData,
@@ -24,6 +25,7 @@ import { getUniversityData } from '@/app/utils/universityAPI';
 export default function PRSubjectFilter({ children }: any, props: any) {
   const {
     viewSchedule,
+    viewSummary,
     viewFilter,
     topbarToggle,
     calsel_data,
@@ -105,7 +107,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
     <>
       <section
         className={`pr-subject-filter pointer-events-none smooth-all absolute lg:left-[465px] md:p-8 w-full md:w-auto bottom-0 h-full grid z-10 lg:z-auto ${
-          !viewSchedule || topbarToggle.init || topbarToggle.pre || !viewFilter
+          (!viewSchedule && !viewSummary) || topbarToggle.init || topbarToggle.pre || !viewFilter
             ? 'opacity-0 translate-y-10 lg:translate-y-0 lg:-translate-x-10 invisible'
             : ''
         }`}
@@ -121,7 +123,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
                   onClick={f.handleFilterPanel}
                   className="lg:hidden hover:bg-pr-bg active:bg-slate-300 rounded-lg aspect-square w-10"
                 >
-                  <i className="bx bx-chevron-left text-3xl translate-y-[2px]"></i>
+                  <i className={`bx ${isMobile ? 'bx-x' : 'bx-chevron-left'} text-3xl translate-y-[2px]`}></i>
                 </button>
                 <div className="">
                   <h1>คัดกรองรายวิชา</h1>
@@ -355,6 +357,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         }}
         onClose={() => {
           f.setSubjectViewFilter(false);
+          f.handleFilterSubmit();
           setFilterTemp([]);
         }}
         onSearch={(e: string) => {
@@ -490,6 +493,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         isOn={f.roomViewFilter}
         onClose={() => {
           f.setRoomViewFilter(false);
+          f.handleFilterSubmit();
         }}
         onClear={() => {
           f.resetRoomViewFilter();
@@ -542,6 +546,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         }}
         onClose={() => {
           f.setMasterViewFilter(false);
+          f.handleFilterSubmit();
           setUniLecturerData([]);
           setFilterMasterTemp([]);
         }}
@@ -578,6 +583,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         onClose={() => {
           setUniFacGroupData([]);
           f.setMajorViewFilter(false);
+          f.handleFilterSubmit();
         }}
         onClear={() => {
           f.GroupFilterTogglePRC('_M-', true);
@@ -626,6 +632,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
         onClose={() => {
           f.setTimeSetViewFilter(false);
           setTimeSlotToggle(-1);
+          f.handleFilterSubmit();
         }}
         onClear={() => {
           f.TimeFilterTogglePRC(false);

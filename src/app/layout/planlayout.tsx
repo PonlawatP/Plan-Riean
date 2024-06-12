@@ -22,6 +22,8 @@ import Link from 'next/link';
 import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { getPlanData, updatePlanData } from '../utils/userAPI';
 import { Player } from '@lottiefiles/react-lottie-player';
+import PRPlanFootbar from '@/components/PRPlanFootbar';
+import PRSubjectSummary from '@/components/PRSubjectSummary';
 
 export const font = IBM_Plex_Sans_Thai({
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -56,6 +58,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
 
   const [viewSchedule, setViewState] = useState(false);
   const [viewFilter, setViewFilter] = useState(false);
+  const [viewSummary, setViewSummary] = useState(false);
   const [webReady, setWebReady] = useState(false);
   const [scrolled, setScrolled] = useState(0);
   const [topbarToggle, setTopbarToggle] = useState({ pre: false, init: false });
@@ -98,8 +101,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     if (canvasElem instanceof HTMLElement && planElem instanceof HTMLElement) {
       const canvas = canvasElem?.offsetWidth || 0;
       const plan = planElem?.offsetWidth || 0;
+      const canvasH = canvasElem?.offsetHeight || 0;
+      const planH = planElem?.offsetHeight || 0;
       // console.log(canvas, plan);
-      if (canvas / plan <= 1) {
+      if (canvas / plan <= 1 || canvasH / planH <= 1) {
         setPlanSize(canvas / plan);
         setPlanWidth(canvas);
       } else {
@@ -139,9 +144,15 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
       0
     );
   };
+  function getDuplicatedSubject(code: string) {
+    return getCurrentPlan()?.subjects.filter((m: any) => m.code == code).length > 1;
+  }
+  const updateScheduleTimeRange = (numb: any) => {
+    setMAX_SUBJECT_TIME(numb > 18 ? numb - 1 : 18);
+  };
   const saveSubjectPlanData = (plan_id = -1, plan_subjects = [null]) => {
     const plan = getCurrentPlan();
-    console.log(plan.subjects);
+    // console.log(plan.subjects);
 
     updatePlanData(
       plan_id != -1 ? plan_id : plan.detail.plan_id,
@@ -165,6 +176,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
       temp = prev;
       prev.subjects.push(subject);
       saveSubjectPlanData(prev.detail.plan_id, prev.subjects);
+      const c = prev.subjects
+        .map((m: any) => getSplitedData(m.time).map((m: any) => Number.parseInt(m.to.substring(0, 2))))
+        .flatMap((m: any) => m);
+      updateScheduleTimeRange(Math.max(...c));
       return { ...prev };
     });
   };
@@ -174,6 +189,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
         (data: any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec,
       );
       saveSubjectPlanData(prev.detail.plan_id, prev.subjects);
+      const c = prev.subjects
+        .map((m: any) => getSplitedData(m.time).map((m: any) => Number.parseInt(m.to.substring(0, 2))))
+        .flatMap((m: any) => m);
+      updateScheduleTimeRange(Math.max(...c));
       return { ...prev };
     });
   };
@@ -185,6 +204,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
       router.push('/plan');
       return;
     }
+    const c = res.subjects
+      .map((m: any) => getSplitedData(m.time).map((m: any) => Number.parseInt(m.to.substring(0, 2))))
+      .flatMap((m: any) => m);
+    updateScheduleTimeRange(Math.max(...c));
     setMyPlan(res);
   };
 
@@ -246,6 +269,19 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
   const [uniFacGroupData, setUniFacGroupData] = useState<any>([]);
   const [uniGroupSubjectData, setUniGroupSubjectData] = useState<any>([]);
   const [uniLecturerData, setUniLecturerData] = useState<any>([]);
+
+  // summary zone
+  function toggleSummaryZone(force = false) {
+    if (force) {
+      setViewState(false);
+      setViewFilter(false);
+    }
+    setViewSummary((prev) => (!force ? !prev : true));
+
+    setTimeout(() => {
+      resizePlan();
+    }, 250);
+  }
 
   return (
     <>
@@ -313,6 +349,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
           setUniGroupSubjectData,
           uniLecturerData,
           setUniLecturerData,
+          viewSummary,
+          setViewSummary,
+          toggleSummaryZone,
+          getDuplicatedSubject,
         }}
       >
         <SubjectSelectorFilterModel classname={font.className}>
@@ -484,7 +524,6 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
               </Link>
             )}
           </section>
-
           <div
             className={`pr-main select-none grid ${
               toggleSidebar ? 'md:grid-cols-[auto_1fr]' : ''
@@ -510,7 +549,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                 <DialogSearchNotFound />
               )}
             </PRSubjectSelector>
+            <PRSubjectSummary />
+            {/*  */}
           </div>
+          <PRPlanFootbar></PRPlanFootbar>
           <ToastContainer
             position="bottom-right"
             autoClose={3000}
