@@ -108,9 +108,12 @@ export default function SubjectSelectedList(props: any) {
     const swipeState = swipeStates.find((state: any) => state.code === data.code && state.sec === data.sec);
 
     return (
-      <div key={dind} className={`relative transition-all duration-300 ${incommingRemoving ? 'scale-0 h-0' : ''}`}>
+      <div
+        key={dind}
+        className={`relative group transition-all duration-300 ${incommingRemoving ? 'opacity-0 scale-0 h-0' : ''}`}
+      >
         <div
-          className={`transition-all duration-300 absolute w-full h-full bg-red-200 rounded-xl border-yellow-400/90 shadow-yellow-400/40 shadow-md text-pr-dark/50 ${
+          className={`pr-subject-object transition-all duration-300 absolute w-full h-full bg-red-200 rounded-xl border-yellow-400/90 shadow-yellow-400/40 shadow-md text-pr-dark/50 ${
             swipeState && swipeState.toggle ? '' : 'scale-90 opacity-0'
           }`}
         >
@@ -245,6 +248,16 @@ export default function SubjectSelectedList(props: any) {
             </div>
           </div>
         </div>
+
+        <button
+          onClick={() => {
+            setCurrentPlanRemoved((prev) => [...prev, data]);
+            removeSubjectSchedule(data);
+          }}
+          className="pr-subject-remove transition-all ease-pr-bounce scale-0 group-hover:scale-100 absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white drop-shadow-pr-shadow-text flex justify-center items-center rounded-full"
+        >
+          <i className="bx bx-x"></i>
+        </button>
       </div>
     );
   });

@@ -220,6 +220,7 @@ export default function PRCalendarSubject(props: any) {
         }, 100);
       }}
       disabled={!isMobile}
+      doubleClick={{ disabled: true }}
     >
       <TransformComponent
         contentStyle={{ width: '100%', height: '100%' }}
