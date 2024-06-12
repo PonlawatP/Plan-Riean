@@ -86,7 +86,7 @@ export default function PRSummaryContent() {
               </div>
               <div className="mt-8 pb-8">
                 {/* <p className="font-semibold text-lg text-pr-blue">วันสอบ</p> */}
-                <div className="bg-white w-full relative pb-3 px-4 border border-pr-bg-1 rounded-lg">
+                <div className="bg-white w-full relative pb-3 px-4 border border-pr-bg-1 rounded-lg overflow-hidden">
                   {/* <ExamSubject></ExamSubject> */}
                   <SubjectSelectedList></SubjectSelectedList>
                 </div>

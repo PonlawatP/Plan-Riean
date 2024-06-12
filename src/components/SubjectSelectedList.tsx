@@ -8,11 +8,18 @@ import {
   getHourIndex,
   getSplitedData,
 } from '@/app/utils/msu/subjectUtils';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useSwipeable } from 'react-swipeable';
 
 export default function SubjectSelectedList(props: any) {
-  const { getCurrentPlan, checkSubjectSchedule, checkSubjectCollapsed, toggleSubjectSchedule, getDuplicatedSubject } =
-    useContext(CalendarContext);
+  const {
+    getCurrentPlan,
+    checkSubjectSchedule,
+    checkSubjectCollapsed,
+    toggleSubjectSchedule,
+    getDuplicatedSubject,
+    removeSubjectSchedule,
+  } = useContext(CalendarContext);
 
   function getDateMidterm(data: any) {
     let start_time = data.exam_mid.split(' ')[2].substring(0, 5);
@@ -30,16 +37,98 @@ export default function SubjectSelectedList(props: any) {
     return `${start_time_f} - ${end_time_f}`;
   }
 
-  return getCurrentPlan().subjects.map((data: any, dind: number) => {
+  const [swipetState, setSwipetState] = useState({ toggle: false, code: 'null', sec: 0, x: 0, dir: 'center' });
+
+  // const [s, sS] = useState(false);
+  // useEffect(() => {
+  //   if (s) {
+  //     console.log('removeSec', swipetState);
+  //     sS(false);
+  //     removeSubjectSchedule({ code: swipetState.code, sec: swipetState.sec });
+  //     setSwipetState((prev: any) => ({ ...prev, toggle: false, code: 'null', sec: 0, x: 0, dir: 'center' }));
+  //   }
+  // }, [s]);
+
+  const [currentPlanRightNow, sCRN] = useState({ ...getCurrentPlan() });
+  const [currentPlanRemoved, sCR] = useState([]);
+
+  return currentPlanRightNow.subjects.map((data: any, dind: number) => {
     const date_data = getSplitedData(data.time);
     const isDup = getDuplicatedSubject(data.code);
+
+    const handlers = useSwipeable({
+      onSwiped: (eventData) => {
+        console.log(swipetState.x, data);
+        if (Math.abs(swipetState.x) >= 100) {
+          // sS(true);
+          removeSubjectSchedule(data);
+          sCR((prev: any) => {
+            prev.push({ code: data.code, sec: data.sec });
+            return prev;
+          });
+          setSwipetState((prev: any) => ({ ...prev, toggle: false, code: 'null', sec: 0, x: 0, dir: 'center' }));
+          // TODO: swipe to remove data inside (error right now whytf?)
+          // setTimeout(() => {
+          //   sCRN((prev: any) => {
+          //     // prev.push({ code: data.code, sec: data.sec });
+          //     return { ...prev, subjects: prev.subjects.filter((p: any) => p.code != data.code && p.sec != data.sec) };
+          //   });
+          // }, 500);
+        } else {
+          setSwipetState((prev: any) => ({ ...prev, toggle: false, code: 'null', sec: 0, x: 0, dir: 'center' }));
+        }
+        // console.log('User Swiped!', eventData);
+      },
+      onSwiping: (e: any) => {
+        // console.log('User Swiping!', e);
+        setSwipetState((prev: any) => ({
+          ...prev,
+          toggle: true,
+          code: data.code,
+          sec: data.sec,
+          x: e.deltaX * 0.4,
+          dir: e.dir,
+        }));
+      },
+      delta: 80, // min distance(px) before a swipe starts. *See Notes*
+      preventScrollOnSwipe: true, // prevents scroll during swipe (*See Details*)
+      trackTouch: true, // track touch input
+      trackMouse: false, // track mouse input
+      rotationAngle: 0, // set a rotation angle
+      swipeDuration: Infinity, // allowable duration of a swipe (ms). *See Notes*
+      touchEventOptions: { passive: false }, // options for touch listeners (*See Details*)
+    });
+
     return (
-      <div className="relative">
+      <div key={dind} className="relative">
         <div
-          key={dind}
+          className={`transition-all duration-300 absolute w-full h-full bg-red-200 rounded-xl border-yellow-400/90 shadow-yellow-400/40 shadow-md text-pr-dark/50 ${
+            swipetState.code == data.code && swipetState.sec == data.sec && swipetState.toggle
+              ? ''
+              : 'scale-90 opacity-0'
+          }`}
+        >
+          <div
+            className={`relative h-full px-4 flex flex-col justify-center ${
+              swipetState.x < 0 ? 'items-end' : 'items-start'
+            }`}
+          >
+            <p>ปัดเพื่อลบ</p>
+            <p>ลบเพื่อลืม</p>
+          </div>
+        </div>
+        <div
+          data-subject-code={data.code}
+          data-subject-sec={data.sec}
+          {...handlers}
           className={`mt-3 py-1 min-h-[5rem] rounded-xl overflow-hidden flex items-end bg-pr-bg relative border-[2px] ${
             isDup ? 'border-yellow-400/90 shadow-yellow-400/40 shadow-md' : 'border-black/10'
-          }`}
+          } transition-transform ease-out`}
+          style={
+            swipetState.code == data.code && swipetState.sec == data.sec
+              ? { transform: `translateX(${swipetState.x}px)` }
+              : {}
+          }
         >
           <span className="absolute left-0 top-0 w-full justify-between grid grid-flow-col">
             <div className="relative grid grid-flow-col grid-cols-[auto_1fr]">
