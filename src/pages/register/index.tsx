@@ -1,7 +1,7 @@
 import PlainPageLayout from '@/app/layout/plainlayout';
 import { getUniversityData, getUniversityListData } from '@/app/utils/universityAPI';
 import { Player } from '@lottiefiles/react-lottie-player';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ import { PatternFormat } from 'react-number-format';
 import { toast } from 'react-toastify';
 import AvatarEditor from 'react-avatar-editor';
 import { Position } from 'postcss';
+import uploadImageToImgbb from '@/app/utils/imgbb';
 
 type IRegsterStepData = {
   uni_id: Number;
@@ -40,6 +41,11 @@ function RegisterPage(props: any) {
   const redirect = useRouter();
 
   async function updateSession() {
+    let imgUploaded = '';
+    if (imgState.preview != undefined) {
+      const res = await uploadImageToImgbb(imgState?.preview?.img as string);
+      imgUploaded = res.data.thumb.url;
+    }
     const bd = {
       uni_id: firstStepData.uni_id,
       fac_id: firstStepData.fac_id,
@@ -50,21 +56,19 @@ function RegisterPage(props: any) {
       username: firstStepData.username,
       password: firstStepData.password,
       email: firstStepData.email,
-      img: '',
-      // img: imgState?.preview != undefined ? imgState?.preview?.img : null, //TODO: come check this dudududu
+      image: imgUploaded,
       std_name: firstStepData.std_name,
       std_surname: firstStepData.std_surname,
       phone: firstStepData.phone,
       auth_reg_username: firstStepData.std_id.length == 11 ? firstStepData.std_id.length : '',
     };
 
-    console.log(bd);
-    console.log(JSON.stringify(bd));
+    // console.log(bd);
+    // console.log(JSON.stringify(bd));
     // TODO: register not send body throught api
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      mode: 'no-cors',
       body: JSON.stringify(bd),
     });
     // The return value is *not* serialized
@@ -73,13 +77,20 @@ function RegisterPage(props: any) {
     // Recommendation: handle errors
     if (!res.ok) {
       toast.error('เกิดข้อผิดพลาด');
-      console.log('error:', res.status);
+      console.log('error:', res.status, res);
       return;
     }
 
-    setTimeout(() => {
-      redirect.push({ pathname: '/login' });
-    }, 1000);
+    toast.success('สมัครสมาชิกเรียบร้อย');
+
+    const result = await signIn('planriean', {
+      redirect: false,
+      username: firstStepData.username,
+      password: firstStepData.password,
+    });
+    if (result?.ok) {
+      redirect.push({ pathname: '/plan' });
+    }
   }
 
   const animationURL = '/assets/lotties/loading.json';
@@ -146,7 +157,7 @@ function RegisterPage(props: any) {
   }, []);
 
   useEffect(() => {
-    getUniversityData(firstStepData.uni_id, null).then((fac_list: any) => {
+    getUniversityData(firstStepData.uni_id, false, null).then((fac_list: any) => {
       const fac: any = [];
       // console.log(fac_list.facultys)
       setUniFacData(fac_list.facultys);
@@ -219,15 +230,8 @@ function RegisterPage(props: any) {
       .has()
       .uppercase(1, 'รหัสผ่านต้องมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัวอักษร') // Must have uppercase letters
       .has()
-      .lowercase(1, 'รหัสผ่านต้องมีตัวพิมพ์เล็กอย่างน้อย 1 ตัวอักษร') // Must have lowercase letters
-      .has()
-      .digits(2, 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 2 ตัว') // Must have at least 2 digits
-      .has()
       .not()
-      .spaces(1, 'รหัสผ่านต้องไม่มีเว้นวรรค') // Should not have spaces
-      .is()
-      .not()
-      .oneOf(['Passw0rd', 'Password123'], 'รหัสผ่านต้องไม่ใช่ Passw0rd และ Password123'); // Blacklist these values
+      .spaces(1, 'รหัสผ่านต้องไม่มีเว้นวรรค'); // Should not have spaces
 
     // Get a full list of rules which failed
     let t = schema.validate(firstStepData.password, { details: true, list: true });
@@ -766,7 +770,7 @@ function RegisterPage(props: any) {
               />
             </div>
           </div>
-          <div className="content-step px-4">
+          <div className="content-step px-4 my-4">
             <div
               className={` ${step.process == 0 ? '' : 'transition-all duration-300'} ${
                 (step.process == 0 && step.pre_process == 1) || step.process == 3
@@ -779,7 +783,7 @@ function RegisterPage(props: any) {
               {stepContent[step.index].content}
             </div>
           </div>
-          <section className="buttons mb-6 flex max-md:flex-col justify-between items-end">
+          <section className="buttons pb-6 flex max-md:flex-col justify-between items-end">
             <div className="mb-2 text-xs flex gap-4">
               <p className="text-gray-400">เป็นสมาชิกอยู่แล้วเหรอ?</p>
               <Link

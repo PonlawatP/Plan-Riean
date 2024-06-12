@@ -10,26 +10,27 @@ import HelpAboutYou from '../components/hompage/helpAboutYou';
 import Landing from '@/components/hompage/landing';
 import { motion, useScroll } from 'framer-motion';
 
+import Head from 'next/head';
 
 const HomePage = () => {
-  
   return (
     <>
-      
-    
-      <motion.section
-         initial={{ opacity: 0, y: 50 }}
-         animate={{ opacity: 2, y: 0 }}
-         transition={{ duration: 1 }}
-      >
-      <Nav/>
-      <Landing/>
+      <Head>
+        <title>Planriean: จัดตารางเรียนง่ายๆ ไม่ต้องปวดหัวอีกต่อไป</title>
+      </Head>
+      {/* <div className="min-h-[100dvh] flex justify-center items-center">
+        <p>hi สวัสดีครับ</p>
+        <Link href="/plan">จัดตารางเรียน</Link>
+      </div> */}
+      <motion.section initial={{ opacity: 0, y: 50 }} animate={{ opacity: 2, y: 0 }} transition={{ duration: 1 }}>
+        <Nav />
+        <Landing />
       </motion.section>
-      <HelpAboutYou/>
-      <SearchSubject/>
-      <FilterSubjectt/>
-      <SumaryData/>
-      <Footer/>
+      <HelpAboutYou />
+      <SearchSubject />
+      <FilterSubjectt />
+      <SumaryData />
+      <Footer />
     </>
   );
 };

@@ -1,9 +1,12 @@
 import { CalendarContext, CalendarFilterContext, ICalendarFilter } from '@/app/providers/CalendarProvider';
-import { Ifilter, getData, getUpdatedData } from '@/app/utils/subjectAPI';
+import { Ifilter, getCoursesByKey, getData, getUpdatedData } from '@/app/utils/subjectAPI';
 import { IFloorData, IRoomData } from '@/app/utils/test-data/rooms';
 import { subjectDemoData } from '@/app/utils/test-data/subjects';
+import { useBreakpoint } from '@/app/utils/useBreakpoint';
 import { name_days } from '@/components/PRCalendarSubject';
-import { SetStateAction, useContext, useEffect, useState } from 'react';
+import { SetStateAction, useContext, useEffect, useRef, useState } from 'react';
+import { isMobile } from 'react-device-detect';
+import { setTimeout } from 'timers';
 
 export default function SubjectSelectorFilterModel(props: any) {
   const { children } = props;
@@ -13,14 +16,18 @@ export default function SubjectSelectorFilterModel(props: any) {
     focusTime,
 
     viewSchedule,
+    viewSummary,
 
     setViewState,
+    setViewSummary,
     setViewFilter,
     resizePlan,
     toggleHold,
     setTopbarToggle,
 
     getCurrentPlan,
+
+    uniFacGroupData,
   } = useContext(CalendarContext);
 
   const [filter, setFilter] = useState<ICalendarFilter>({
@@ -42,8 +49,13 @@ export default function SubjectSelectorFilterModel(props: any) {
     };
   }
 
+  const pinch_ref = useRef<any>(null);
+
   function handleOpenSubjectSelect() {
     setViewState(true);
+    setViewSummary(false);
+
+    handleSearch();
     setViewFilter(calsel_data.isFirstLoading);
 
     setTimeout(() => {
@@ -51,7 +63,15 @@ export default function SubjectSelectorFilterModel(props: any) {
     }, 250);
   }
 
+  const [calSearch, setCalSearch] = useState(false);
+
   function handleReleaceHoldClick(e: any) {
+    // console.log(isMobile);
+    if (isMobile && pinch_ref.current != null) {
+      if (pinch_ref.current.sad > 5) return;
+      pinch_ref.current.instance.setup.disabled = false;
+      pinch_ref.current.instance.setup.panning.disabled = false;
+    }
     if (topbarToggle.init) {
       if (focusTime.start_time < focusTime.end_time) {
         TimeFilterTogglePRC(
@@ -70,14 +90,28 @@ export default function SubjectSelectorFilterModel(props: any) {
       }
 
       setViewState(true);
-      setViewFilter(true);
+
+      if (calsel_data.isFirstLoading) {
+        setViewFilter(true);
+      } else {
+        setCalSearch(true);
+      }
+
       setTimeout(() => {
         resizePlan();
       }, 250);
     }
+
     clearTimeout(toggleHold);
     setTopbarToggle({ pre: false, init: false });
   }
+
+  useEffect(() => {
+    if (calSearch) {
+      handleFilterSubmit();
+      setCalSearch(false);
+    }
+  }, [calSearch]);
 
   function handleFilterPanel() {
     setViewFilter(!viewFilter);
@@ -101,9 +135,11 @@ export default function SubjectSelectorFilterModel(props: any) {
 
   let abortController: any;
   let abortUpdateController: any;
-  async function handleSearch() {
+  async function handleSearch(background = false) {
     let err = false;
-    setCalselData({ ...calsel_data, isLoading: true, isError: false, current_filter: filter });
+    setCalselData((prev: any) =>
+      background ? { ...prev, isError: false } : { ...prev, isLoading: true, current_filter: filter, isError: false },
+    );
 
     // TODO:search from API
     if (abortController) {
@@ -133,18 +169,24 @@ export default function SubjectSelectorFilterModel(props: any) {
                   return t.toString().split(':')[0];
                 })
                 .join('-'),
+        master: filter.master,
       };
+
+      // console.log(filter.group.find((f) => f.startsWith('_M-')).substring(3));
+      // console.log(uniFacGroupData.);
+
+      // console.log(getCoursesByKey(uniFacGroupData, filter.group.find((f) => f.startsWith('_M-')).substring(3)));
 
       const res = await getData(
         getCurrentPlan().detail.cr_year,
         getCurrentPlan().detail.cr_seamseter,
-        filter.group.length == 0 ? '00*' : filter.group.join('|'),
+        // filter.subject.length == 0 ? '00*' : filter.subject.join('|'),
         check_filt,
         abortController.signal,
       ); // Pass the signal to the getData function
 
       // setSubjectShowData(res);
-      console.log(check_filt, res);
+      // console.log(check_filt, res);
 
       // abortUpdateController = new AbortController(); // Create a new AbortController instance
       // await getUpdatedData(abortUpdateController.signal).then(res2=> {
@@ -157,7 +199,7 @@ export default function SubjectSelectorFilterModel(props: any) {
       //   // setSubjectUpdatedData(res);
       // });
       // TODO: re-make updated status and remove 1 below line
-      setCalData({ recommand: [], data: res });
+      setCalData({ recommand: [], data: res.subjects }, false, res.updated);
     } catch (error: any) {
       if (error.name === 'AbortError') {
         // Request was aborted, handle cancellation as needed
@@ -179,18 +221,34 @@ export default function SubjectSelectorFilterModel(props: any) {
     // },1000)
   }
 
-  function setCalData(list: any, error = false) {
-    setCalselData({ ...calsel_data, isLoading: false, isFirstLoading: false, isError: error, result: list });
+  function setCalData(list: any, error = false, updated = 'null') {
+    setCalselData((prev: any) => ({
+      ...prev,
+      isLoading: false,
+      isFirstLoading: false,
+      isError: error,
+      result: list,
+      updated,
+    }));
   }
 
   function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
-    if (viewSchedule) {
+    // console.log('test', pinch_ref.current.sad);
+    if (viewSchedule || viewSummary) {
       setViewState(false);
       setViewFilter(false);
     } else {
+      if (isMobile && pinch_ref.current != null) {
+        if (pinch_ref.current.sad > 5) return;
+      }
       if (tindex >= 0) SingleTimeFilterTogglePRC((8 + tindex).toString().padStart(2, '0') + ':00', true, dindex);
       setViewState(true);
-      setViewFilter(calsel_data.isFirstLoading);
+
+      if (calsel_data.isFirstLoading) {
+        setViewFilter(true);
+      } else {
+        setCalSearch(true);
+      }
     }
     setTimeout(() => {
       resizePlan();
@@ -201,8 +259,12 @@ export default function SubjectSelectorFilterModel(props: any) {
     return group.includes(name);
   }
 
-  function GroupFilterTogglePRC(name: string) {
+  function GroupFilterTogglePRC(name: string, majorgroup = false) {
     let temp_group = group;
+
+    if (majorgroup) {
+      temp_group = group.filter((item: string) => !item.startsWith('_M-'));
+    }
 
     if (group.includes(name)) {
       temp_group = group.filter((item: string) => item !== name);
@@ -211,6 +273,10 @@ export default function SubjectSelectorFilterModel(props: any) {
     }
 
     setFilter({ ...filter, group: temp_group });
+  }
+
+  function getGroupMajorFilterNamePRC(majorgroup = false) {
+    return group.find((item: string) => item.startsWith('_M-'))?.substring(3) || 'เลือกสาขา';
   }
 
   function isDayFilterOn(name: string = '') {
@@ -267,6 +333,10 @@ export default function SubjectSelectorFilterModel(props: any) {
       }
     } else if (time_start !== '' && time_stop !== '') {
       temp_time = [time_start, time_stop];
+    } else if (time_start !== '') {
+      temp_time = [time_start];
+    } else {
+      temp_time = [];
     }
 
     // day select
@@ -375,8 +445,17 @@ export default function SubjectSelectorFilterModel(props: any) {
   const [roomViewFilter, setRoomViewFilter] = useState(false);
   const [masterViewFilter, setMasterViewFilter] = useState(false);
   const [majorViewFilter, setMajorViewFilter] = useState(false);
+  const [timeSetViewFilter, setTimeSetViewFilter] = useState(false);
   const [filterDebounceProgress, setFilterDebounceProgress] = useState(0);
   const [filterDebounceProgressFunc, setFilterDebounceProgressFunc] = useState<any>();
+
+  function closeAllViewFilter() {
+    setSubjectViewFilter(false);
+    setRoomViewFilter(false);
+    setMasterViewFilter(false);
+    setMajorViewFilter(false);
+    setTimeSetViewFilter(false);
+  }
 
   function handleSubjectFilterSubmit() {
     setSubjectViewFilter(false);
@@ -398,6 +477,9 @@ export default function SubjectSelectorFilterModel(props: any) {
   }
   function handleMajorViewFilter() {
     setMajorViewFilter(false);
+  }
+  function handleTimeSetViewFilter() {
+    setTimeSetViewFilter(false);
   }
   function resetMajorViewFilter() {
     setFilter({ ...filter, group: [] });
@@ -424,6 +506,34 @@ export default function SubjectSelectorFilterModel(props: any) {
     debouncedFunction();
   }
 
+  // feat: auto search (5 sec) time reset after toggle search section
+  let searchInt: any = 0;
+  const [countingRefresh, setCountingRefresh] = useState(0);
+  useEffect(() => {
+    searchInt = setTimeout(() => {
+      // console.log('handleSearch', viewSchedule, !calsel_data.isFirstLoading, calsel_data.result.data.length > 0);
+      // console.log(countingRefresh, abortController);
+      if (viewSchedule && !calsel_data.isFirstLoading && calsel_data.result.data.length > 0) {
+        if (calsel_data.isLoading) {
+          setCountingRefresh(0);
+          return;
+        }
+        if (countingRefresh >= Number.parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL as string) * 1000) {
+          handleSearch(true);
+          // countingRefresh = 0
+          setCountingRefresh(0);
+          return;
+        }
+        setCountingRefresh((prev) => prev + 10);
+      }
+      // countingRefresh = countingRefresh + 10;
+    }, 10);
+
+    return () => {
+      clearInterval(searchInt);
+    };
+  }, [viewSchedule, calsel_data, countingRefresh]);
+
   return (
     <CalendarFilterContext.Provider
       value={{
@@ -441,6 +551,7 @@ export default function SubjectSelectorFilterModel(props: any) {
         isMasterFilterOn,
         isRoomFilterOn,
         GroupFilterTogglePRC,
+        getGroupMajorFilterNamePRC,
         DayFilterTogglePRC,
         TimeFilterTogglePRC,
         SingleTimeFilterTogglePRC,
@@ -468,10 +579,16 @@ export default function SubjectSelectorFilterModel(props: any) {
         resetRoomViewFilter,
         handleMajorViewFilter,
         resetMajorViewFilter,
+        timeSetViewFilter,
+        setTimeSetViewFilter,
+        handleTimeSetViewFilter,
+        pinch_ref,
+        closeAllViewFilter,
+        countingRefresh,
       }}
     >
       <div
-        className={'bg-pr-bg dark:bg-pr-bg-3 pr-layout h-[100dvh] grid grid-rows-[auto_1fr] ' + props.classname}
+        className={'bg-pr-bg dark:bg-pr-bg-3 pr-layout h-[100dvh] grid grid-rows-[auto_1fr_auto] ' + props.classname}
         onMouseUp={handleReleaceHoldClick}
       >
         {children}

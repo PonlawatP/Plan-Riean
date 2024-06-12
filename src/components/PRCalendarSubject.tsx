@@ -5,6 +5,10 @@ import { toast } from 'react-toastify';
 import ScheduleCard from './PRScheduleCard';
 import { getDayIndex, getHourIndex, getSplitedData } from '@/app/utils/msu/subjectUtils';
 
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { useBreakpoint } from '@/app/utils/useBreakpoint';
+import { isMobile } from 'react-device-detect';
+
 export const name_days = [
   {
     date_th: 'จันทร์',
@@ -45,7 +49,9 @@ export const name_days = [
 
 export default function PRCalendarSubject(props: any) {
   const {
+    webReady,
     viewSchedule,
+    viewSummary,
     topbarToggle,
     setTopbarToggle,
     setTopbarHtml,
@@ -65,7 +71,7 @@ export default function PRCalendarSubject(props: any) {
     getCurrentPlan,
   } = useContext(CalendarContext);
 
-  const { fnHandleClickedOnCalendar, handleReleaceHoldClick } = useContext(CalendarFilterContext);
+  const { fnHandleClickedOnCalendar, handleReleaceHoldClick, pinch_ref } = useContext(CalendarFilterContext);
 
   const memoizedTimeTable = useMemo(() => getTimeTable(MAX_SUBJECT_TIME), [MAX_SUBJECT_TIME, getTimeTable]);
 
@@ -144,6 +150,14 @@ export default function PRCalendarSubject(props: any) {
   function handleHoldClick(e: any, dindex: number, t: number) {
     setTooggleHold(
       setTimeout(() => {
+        // feat: pinch & pan plan ratio
+        // it counting per tick while moving plan. so if it not gather than 5 = not meant to filter => just ignore it
+        if (isMobile) {
+          if (pinch_ref.current.sad > 2) return;
+
+          pinch_ref.current.instance.setup.disabled = true;
+          pinch_ref.current.instance.setup.panning.disabled = true;
+        }
         setFocusTime({ day: dindex, start_time: t, end_time: t });
         setTopbarHtml(
           <>
@@ -157,172 +171,225 @@ export default function PRCalendarSubject(props: any) {
         setTooggleHold(
           setTimeout(() => {
             setTopbarToggle({ pre: false, init: true });
+
             clearTimeout(toggleHold);
           }, 500),
         );
-      }, 100),
+      }, 200),
     );
   }
 
   return (
-    <>
-      <div
-        className={`
-      p-canvas-plan relative w-full h-full ${toggleSidebar ? 'm-8' : ''} md:ml-0 flex justify-center items-center
-    `}
+    <TransformWrapper
+      ref={pinch_ref}
+      maxScale={3}
+      onPanningStart={(e) => {
+        if (!isMobile) {
+          e.resetTransform();
+          pinch_ref.current.instance.setup.disabled = true;
+          pinch_ref.current.instance.setup.panning.disabled = true;
+        }
+      }}
+      onPanning={(e) => {
+        // console.log('test', e.instance);
+        pinch_ref.current.sad = pinch_ref.current.sad == undefined ? 1 : pinch_ref.current.sad + 1;
+        // console.log(pinch_ref.current.sad);
+      }}
+      onPanningStop={(e) => {
+        setTimeout(() => {
+          pinch_ref.current.sad = 0;
+          // console.log(pinch_ref.current.sad);
+        }, 100);
+      }}
+      onPinchingStart={(e) => {
+        if (!isMobile) {
+          e.resetTransform();
+          pinch_ref.current.instance.setup.disabled = true;
+          pinch_ref.current.instance.setup.panning.disabled = true;
+        }
+      }}
+      onPinching={(e) => {
+        // console.log('test', e.instance);
+        pinch_ref.current.sad = pinch_ref.current.sad == undefined ? 1 : pinch_ref.current.sad + 1;
+        // console.log(pinch_ref.current.sad);
+      }}
+      onPinchingStop={(e) => {
+        setTimeout(() => {
+          pinch_ref.current.sad = 0;
+          // console.log(pinch_ref.current.sad);
+        }, 100);
+      }}
+      disabled={!isMobile}
+      doubleClick={{ disabled: true }}
+    >
+      <TransformComponent
+        contentStyle={{ width: '100%', height: '100%' }}
+        wrapperStyle={{ width: '100%', height: '100%' }}
+        wrapperClass="fade-x"
       >
-        <div
-          className="absolute flex flex-col gap-8 items-center"
-          style={{ width: planWidth > 0 ? planWidth + 'px' : undefined }}
-        >
-          {/* main schedule */}
+        <div className="w-full h-full relative flex flex-col items-center">
           <div
-            className="p-planmain select-none smooth-all min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip shadow-xl"
-            style={{ scale: planSize.toString() }}
-            onMouseMove={handleDragToSelectPlanTime}
-            onTouchMove={(e) => {
-              handleDragToSelectPlanTime(e, true);
-            }}
+            className={`
+      p-canvas-plan relative w-11/12 h-full ${toggleSidebar ? '' : ''} md:ml-0 flex justify-center items-center
+    `}
           >
-            {/* row for timer */}
-            <span className="grid grid-flow-col">
-              <span className="w-16 bg-pr-msu-1 border-b-2 border-black/10"></span>
-              {memoizedTimeTable.map((t: number, tindex: number) => (
-                <span
-                  key={`pr-time-${tindex}`}
-                  className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10"
-                >
-                  {t.toString().padStart(2, '0')}:00
-                </span>
-              ))}
-            </span>
-            {/* loop row from days */}
-            {name_days.map((day, dindex) => (
-              // row element
-              <span key={`pr-day-${day.date_en_1}`} className="grid grid-flow-col">
-                {/* day element */}
-                <span
-                  className={`w-16 bg-pr-msu-2 ${
-                    dindex != name_days.length - 1 ? 'border-b-2' : ''
-                  } border-black/10 flex items-center text-white`}
-                >
-                  <p className="ml-3">{day.date_en_3}</p>
-                </span>
-                {/* loop schedule from timetable */}
-                {memoizedTimeTable.map((t: number, tindex: number) => (
-                  <span key={`pr-day-${day.date_en_1}-${t}`} className="relative">
+            {/* plan component (schedule & detail) right here */}
+            <div
+              className="absolute flex flex-col gap-8 items-center"
+              style={{ width: planWidth > 0 ? planWidth + 'px' : undefined }}
+            >
+              {/* main schedule */}
+              <div
+                className="p-planmain select-none smooth-all min-w-[4rem] min-h-[4rem] bg-white/60 border-2 border-white/80 text-black/30 font-medium rounded-2xl overflow-clip shadow-xl"
+                style={{ scale: planSize.toString() }}
+                onMouseMove={handleDragToSelectPlanTime}
+                onTouchMove={(e) => {
+                  handleDragToSelectPlanTime(e, true);
+                }}
+              >
+                {/* row for timer */}
+                <span className="grid grid-flow-col">
+                  <span className="w-16 bg-pr-msu-1 border-b-2 border-black/10"></span>
+                  {memoizedTimeTable.map((t: number, tindex: number) => (
                     <span
-                      id={'plan-' + t.toString().padStart(2, '0') + '-' + dindex}
-                      className={`block w-20 h-16 p-2 border-l-2 ${
-                        dindex != name_days.length - 1 && tindex != 4 ? 'border-b-2' : ''
-                      } border-black/10 group text-black/10`}
-                      onMouseUp={handleReleaceHoldClick}
-                      onTouchEnd={handleReleaceHoldClick}
-                    ></span>
-
-                    {/* hover to guide user clicked */}
-                    {tindex != 4 ? (
-                      <span
-                        className={`pr-hover-toclick group absolute select-none cursor-pointer left-0 top-0 w-[100%] h-full flex justify-center items-center z-10`}
-                        id={'planhover-' + t.toString().padStart(2, '0') + '-' + dindex}
-                        onMouseDown={(e) => {
-                          handleHoldClick(e, dindex, t);
-                        }}
-                        onMouseUp={handleReleaceHoldClick}
-                        onTouchStart={(e) => {
-                          handleHoldClick(e, dindex, t);
-                        }}
-                        onTouchEnd={handleReleaceHoldClick}
-                        onClick={() => fnHandleClickedOnCalendar(tindex, dindex)}
-                      >
+                      key={`pr-time-${tindex}`}
+                      className="bg-pr-msu-1 w-20 p-2 border-2 border-t-0 border-r-0 border-black/10"
+                    >
+                      {t.toString().padStart(2, '0')}:00
+                    </span>
+                  ))}
+                </span>
+                {/* loop row from days */}
+                {name_days.map((day, dindex) => (
+                  // row element
+                  <span key={`pr-day-${day.date_en_1}`} className="grid grid-flow-col">
+                    {/* day element */}
+                    <span
+                      className={`w-16 bg-pr-msu-2 ${
+                        dindex != name_days.length - 1 ? 'border-b-2' : ''
+                      } border-black/10 flex items-center text-white`}
+                    >
+                      <p className="ml-3">{day.date_en_3}</p>
+                    </span>
+                    {/* loop schedule from timetable */}
+                    {memoizedTimeTable.map((t: number, tindex: number) => (
+                      <span key={`pr-day-${day.date_en_1}-${t}`} className="relative">
                         <span
-                          className={`smooth-opacity opacity-0 ${
-                            !topbarToggle.init && !viewSchedule ? 'group-hover:opacity-100' : ''
-                          } relative rounded-lg text-sm w-11/12 h-5/6 bg-black/40 text-white/80 flex justify-center items-center`}
-                          id={'planhover-' + t.toString().padStart(2, '0') + '-' + dindex}
-                        >
-                          ดูรายวิชา
-                        </span>
-                      </span>
-                    ) : null}
-                    {/* TODO: badge of subjects here */}
-                    {getCurrentPlan().subjects.map((data: any, dataindex: any) => {
-                      return getSplitedData(data.time).map((split_date, spindex) => {
-                        return dindex == getDayIndex(split_date.fullDate) &&
-                          tindex == getHourIndex(split_date.fullDate) ? (
-                          <ScheduleCard
-                            position={{ x: tindex, y: dindex }}
-                            key={'d-' + dataindex}
-                            data={data}
-                            time={split_date.fullDate}
-                          />
-                        ) : null;
-                      });
-                    })}
+                          id={'plan-' + t.toString().padStart(2, '0') + '-' + dindex}
+                          className={`block w-20 h-16 p-2 border-l-2 ${
+                            dindex != name_days.length - 1 && tindex != 4 ? 'border-b-2' : ''
+                          } border-black/10 group text-black/10`}
+                          onMouseUp={handleReleaceHoldClick}
+                          onTouchEnd={handleReleaceHoldClick}
+                        ></span>
 
-                    {/* hover when user drag clicked */}
-                    {dindex === focusTime.day && t === focusTime.start_time ? (
-                      <span
-                        className={`pr-hover-dragged smooth-all pointer-events-none select-none absolute h-full flex justify-center items-center top-0 z-50`}
-                        style={{
-                          width:
-                            (focusTime.start_time > focusTime.end_time
-                              ? (focusTime.start_time - focusTime.end_time + 1) * 100
-                              : (focusTime.end_time - focusTime.start_time + 1) * 100) + '%',
-                          left:
-                            (focusTime.start_time > focusTime.end_time
-                              ? (focusTime.end_time - focusTime.start_time) * 100
-                              : 0) + '%',
-                        }}
-                      >
-                        <span
-                          className={`smooth-opacity pr-border-dotspace ${
-                            !topbarToggle.init ? 'opacity-0' : ''
-                          } pointer-events-none select-none relative rounded-lg text-sm w-[calc(100%-10px)] h-5/6 bg-black/60 text-white/80 flex justify-center items-center`}
-                        >
-                          {getRangeTimeFormat(focusTime.start_time, focusTime.end_time, true)}
-                        </span>
+                        {/* hover to guide user clicked */}
+                        {tindex != 4 ? (
+                          <span
+                            className={`pr-hover-toclick group absolute select-none cursor-pointer left-0 top-0 w-[100%] h-full flex justify-center items-center z-10`}
+                            id={'planhover-' + t.toString().padStart(2, '0') + '-' + dindex}
+                            onMouseDown={(e) => {
+                              handleHoldClick(e, dindex, t);
+                            }}
+                            onMouseUp={handleReleaceHoldClick}
+                            onTouchStart={(e) => {
+                              handleHoldClick(e, dindex, t);
+                            }}
+                            onTouchEnd={handleReleaceHoldClick}
+                            onClick={() => fnHandleClickedOnCalendar(tindex, dindex)}
+                          >
+                            <span
+                              className={`smooth-opacity opacity-0 ${
+                                !topbarToggle.init && !viewSchedule && !viewSummary ? 'group-hover:opacity-100' : ''
+                              } relative rounded-lg text-sm w-11/12 h-5/6 bg-black/40 text-white/80 flex justify-center items-center`}
+                              id={'planhover-' + t.toString().padStart(2, '0') + '-' + dindex}
+                            >
+                              ดูรายวิชา
+                            </span>
+                          </span>
+                        ) : null}
+                        {/* TODO: badge of subjects here */}
+                        {getCurrentPlan().subjects.map((data: any, dataindex: any) => {
+                          return getSplitedData(data.time).map((split_date, spindex) => {
+                            return dindex == getDayIndex(split_date.fullDate) &&
+                              tindex == getHourIndex(split_date.fullDate) ? (
+                              <ScheduleCard
+                                position={{ x: tindex, y: dindex }}
+                                key={`d-${dataindex}:${spindex}`}
+                                data={data}
+                                time={split_date.fullDate}
+                              />
+                            ) : null;
+                          });
+                        })}
+
+                        {/* hover when user drag clicked */}
+                        {dindex === focusTime.day && t === focusTime.start_time ? (
+                          <span
+                            className={`pr-hover-dragged smooth-all pointer-events-none select-none absolute h-full flex justify-center items-center top-0 z-50`}
+                            style={{
+                              width:
+                                (focusTime.start_time > focusTime.end_time
+                                  ? (focusTime.start_time - focusTime.end_time + 1) * 100
+                                  : (focusTime.end_time - focusTime.start_time + 1) * 100) + '%',
+                              left:
+                                (focusTime.start_time > focusTime.end_time
+                                  ? (focusTime.end_time - focusTime.start_time) * 100
+                                  : 0) + '%',
+                            }}
+                          >
+                            <span
+                              className={`smooth-opacity pr-border-dotspace ${
+                                !topbarToggle.init ? 'opacity-0' : ''
+                              } pointer-events-none select-none relative rounded-lg text-sm w-[calc(100%-10px)] h-5/6 bg-black/60 text-white/80 flex justify-center items-center`}
+                            >
+                              {getRangeTimeFormat(focusTime.start_time, focusTime.end_time, true)}
+                            </span>
+                          </span>
+                        ) : null}
                       </span>
-                    ) : null}
+                    ))}
                   </span>
                 ))}
-              </span>
-            ))}
-          </div>
+              </div>
 
-          {/* summary plan detail */}
-          <span
-            className={`pr-plandetail select-none smooth-all flex w-full justify-between text-black/40 smooth-opacity ${
-              topbarToggle.init ? 'opacity-20' : 'opacity-100'
-            }`}
-            style={{ transform: `translateY(${(1 - planSize) * -200}px)` }}
-          >
-            <div className="flex gap-10">
-              <span>{getCurrentPlan().subjects.length} วิชา</span>
-              <span>
-                {getCurrentPlan()
-                  .subjects.map((s: any) => Number.parseInt(s.credit.split(' ')[0]))
-                  .reduce((a, b) => a + b, 0)}
-                /21 หน่วยกิต
+              {/* summary plan detail */}
+              <span
+                className={`pr-plandetail select-none smooth-all flex w-full justify-between text-black/40 smooth-opacity ${
+                  topbarToggle.init ? 'opacity-20' : 'opacity-100'
+                }`}
+                style={{ transform: `translateY(${(1 - planSize) * -200}px)` }}
+              >
+                <div className="flex gap-10">
+                  <span>{getCurrentPlan().subjects.length} วิชา</span>
+                  <span>
+                    {getCurrentPlan()
+                      .subjects.map((s: any) => Number.parseInt(s.credit.split(' ')[0]))
+                      .reduce((a: number, b: number) => a + b, 0)}{' '}
+                    หน่วยกิต
+                  </span>
+                </div>
+
+                {/* action button */}
+                <span
+                  className={`pr-planaction flex gap-4 text-black/30 smooth-opacity ${
+                    topbarToggle.init ? 'opacity-20' : 'opacity-100'
+                  }`}
+                >
+                  {/* TODO: download function */}
+                  {/* <button id="plan-download" aria-label="plan-download" className="hover:text-black/60">
+                <i className="text-2xl bx bx-download"></i>
+              </button> */}
+                  {/* TODO: share function */}
+                  {/* <button id="plan-share" aria-label="plan-share" className="hover:text-black/60">
+                <i className="text-2xl bx bx-share"></i>
+              </button> */}
+                </span>
               </span>
             </div>
-
-            {/* action button */}
-            <span
-              className={`pr-planaction flex gap-4 text-black/30 smooth-opacity ${
-                topbarToggle.init ? 'opacity-20' : 'opacity-100'
-              }`}
-            >
-              <button id="plan-download" aria-label="plan-download" className="hover:text-black/60">
-                <i className="text-2xl bx bx-download"></i>
-              </button>
-              <button id="plan-share" aria-label="plan-share" className="hover:text-black/60">
-                <i className="text-2xl bx bx-share"></i>
-              </button>
-            </span>
-          </span>
+          </div>
         </div>
-      </div>
-    </>
+      </TransformComponent>
+    </TransformWrapper>
   );
 }

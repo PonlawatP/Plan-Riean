@@ -7,6 +7,7 @@ import PlanPageLayout from '@/app/layout/planlayout';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Player } from '@lottiefiles/react-lottie-player';
+import SubjectSelectedList from '@/components/SubjectSelectedList';
 
 function PlanPage(props: any) {
   const { theme, setTheme } = useContext(ThemeContext);
@@ -94,11 +95,46 @@ function PlanPage(props: any) {
       </span>
 
       <div
-        className={`smooth-out w-full h-full flex justify-center items-center relative`}
+        className={`smooth-out w-full h-full relative`}
         // onClick={()=>{if(state.viewSchedule) {toggleScheduleSpectate(false); toggleScheduleNameFilter(false); toggleScheduleTimeFilter(false); }}} {...handlers}
       >
         {/* Summary Calendar Component */}
         <PRCalendarSubject />
+        {/* <section className={`bg-white rounded-t-3xl md:m-6 md:mb-0 p-8 min-h-[40dvh]`}>
+            <h2 className="text-xl font-semibold text-pr-blue">ข้อมูลรายวิชา</h2>
+            <section className="subject-table">
+              <div className="">
+                <button
+                  onClick={() => {
+                    // handleNextStep();
+                  }}
+                  className={`smooth-all mt-4 text-white h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-blue border-b-[3px] border-slate-800/50 hover:bg-white hover:border-[2px] hover:border-b-[4px] hover:border-pr-blue hover:text-pr-blue active:border-0 active:bg-pr-msu-1-60 active:text-white/80`}
+                >
+                  แบบที่ 1
+                </button>
+                <button
+                  onClick={() => {
+                    // handleBackStep();
+                  }}
+                  className={`smooth-all mt-4 text-pr-text-menu h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80`}
+                >
+                  แบบที่ 2
+                </button>
+                <button
+                  onClick={() => {
+                    // handleBackStep();
+                  }}
+                  className={`smooth-all mt-4 text-pr-text-menu h-10 w-24 px-2 py-1 mr-2 rounded-lg bg-pr-bg border-b-[3px] border-slate-400/50 hover:bg-slate-300 active:border-0 active:bg-slate-400 active:text-white/80`}
+                >
+                  แบบที่ 3
+                </button>
+              </div>
+              <div className="mt-8">
+                <SubjectSelectedList />
+              </div>
+            </section>
+            <h2 className="mt-8 text-xl font-semibold text-pr-blue">ตารางสอบ</h2>
+          </section> */}
       </div>
     </div>
   );

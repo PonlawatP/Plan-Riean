@@ -1,6 +1,6 @@
 import { ThemeContext } from '@/app/providers';
 import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google';
-import { Fragment, useContext, useRef, useState } from 'react';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import Image from 'next/image';
 import { CalendarContext, ICalendarData } from '@/app/providers/CalendarProvider';
@@ -22,6 +22,8 @@ import Link from 'next/link';
 import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { getPlanData, updatePlanData } from '../utils/userAPI';
 import { Player } from '@lottiefiles/react-lottie-player';
+import PRPlanFootbar from '@/components/PRPlanFootbar';
+import PRSubjectSummary from '@/components/PRSubjectSummary';
 
 export const font = IBM_Plex_Sans_Thai({
   weight: ['100', '200', '300', '400', '500', '600', '700'],
@@ -37,7 +39,7 @@ export const k2dfont = K2D({
 export const newPlanReset = {
   open: false,
   custom_plan_open: false,
-  plan_name: `แผนการเรียนใหม่`,
+  plan_name: `แพลนเรียน`,
   university: 'MSU',
   cr_year: 2567,
   fac_id: -1,
@@ -56,6 +58,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
 
   const [viewSchedule, setViewState] = useState(false);
   const [viewFilter, setViewFilter] = useState(false);
+  const [viewSummary, setViewSummary] = useState(false);
   const [webReady, setWebReady] = useState(false);
   const [scrolled, setScrolled] = useState(0);
   const [topbarToggle, setTopbarToggle] = useState({ pre: false, init: false });
@@ -98,8 +101,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     if (canvasElem instanceof HTMLElement && planElem instanceof HTMLElement) {
       const canvas = canvasElem?.offsetWidth || 0;
       const plan = planElem?.offsetWidth || 0;
-
-      if (canvas / plan <= 1) {
+      const canvasH = canvasElem?.offsetHeight || 0;
+      const planH = planElem?.offsetHeight || 0;
+      // console.log(canvas, plan);
+      if (canvas / plan <= 1 || canvasH / planH <= 1) {
         setPlanSize(canvas / plan);
         setPlanWidth(canvas);
       } else {
@@ -139,12 +144,19 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
       0
     );
   };
-  const saveSubjectPlanData = () => {
+  function getDuplicatedSubject(code: string) {
+    return getCurrentPlan()?.subjects.filter((m: any) => m.code == code).length > 1;
+  }
+  const updateScheduleTimeRange = (numb: any) => {
+    setMAX_SUBJECT_TIME(numb > 18 ? numb - 1 : 18);
+  };
+  const saveSubjectPlanData = (plan_id = -1, plan_subjects = [null]) => {
     const plan = getCurrentPlan();
+    // console.log(plan.subjects);
 
     updatePlanData(
-      plan.detail.plan_id,
-      plan.subjects.map((d: any) => {
+      plan_id != -1 ? plan_id : plan.detail.plan_id,
+      (plan_subjects[0] != null ? plan_subjects : plan.subjects).map((d: any) => {
         return {
           year: d.year,
           semester: d.semester,
@@ -158,30 +170,44 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     );
   };
   const addSubjectSchedule = (subject: any) => {
-    const plan = getCurrentPlan();
     subject = { ...subject, mute_alert: false };
-    plan.subjects.push(subject);
-    setMyPlan(plan);
-
-    saveSubjectPlanData();
+    let temp;
+    setMyPlan((prev: any) => {
+      temp = prev;
+      prev.subjects.push(subject);
+      saveSubjectPlanData(prev.detail.plan_id, prev.subjects);
+      const c = prev.subjects
+        .map((m: any) => getSplitedData(m.time).map((m: any) => Number.parseInt(m.to.substring(0, 2))))
+        .flatMap((m: any) => m);
+      updateScheduleTimeRange(Math.max(...c));
+      return { ...prev };
+    });
   };
   const removeSubjectSchedule = (subject: any) => {
-    const plan = getCurrentPlan();
-    plan.subjects = plan.subjects.filter(
-      (data: any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec,
-    );
-    setMyPlan(plan);
-
-    saveSubjectPlanData();
+    setMyPlan((prev: any) => {
+      prev.subjects = prev.subjects.filter(
+        (data: any) => data.code.trim() !== subject.code.trim() || data.sec !== subject.sec,
+      );
+      saveSubjectPlanData(prev.detail.plan_id, prev.subjects);
+      const c = prev.subjects
+        .map((m: any) => getSplitedData(m.time).map((m: any) => Number.parseInt(m.to.substring(0, 2))))
+        .flatMap((m: any) => m);
+      updateScheduleTimeRange(Math.max(...c));
+      return { ...prev };
+    });
   };
   const openPlan = async (plan_id: number) => {
     // console.log(plan_id, session?.accessToken);
     const res = await getPlanData(plan_id, session?.accessToken, null);
-    console.log(res);
+    // console.log(res);
     if (res.error) {
       router.push('/plan');
       return;
     }
+    const c = res.subjects
+      .map((m: any) => getSplitedData(m.time).map((m: any) => Number.parseInt(m.to.substring(0, 2))))
+      .flatMap((m: any) => m);
+    updateScheduleTimeRange(Math.max(...c));
     setMyPlan(res);
   };
 
@@ -240,6 +266,23 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
     });
   }
 
+  const [uniFacGroupData, setUniFacGroupData] = useState<any>([]);
+  const [uniGroupSubjectData, setUniGroupSubjectData] = useState<any>([]);
+  const [uniLecturerData, setUniLecturerData] = useState<any>([]);
+
+  // summary zone
+  function toggleSummaryZone(force = false) {
+    if (force) {
+      setViewState(false);
+      setViewFilter(false);
+    }
+    setViewSummary((prev) => (!force ? !prev : true));
+
+    setTimeout(() => {
+      resizePlan();
+    }, 250);
+  }
+
   return (
     <>
       <style jsx global>{`
@@ -248,6 +291,9 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
         }
         body {
           touch-action: none;
+        }
+        html {
+          overflow: hidden;
         }
       `}</style>
 
@@ -297,18 +343,29 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
           newPlanData,
           setNewPlanData,
           openPlan,
+          uniFacGroupData,
+          setUniFacGroupData,
+          uniGroupSubjectData,
+          setUniGroupSubjectData,
+          uniLecturerData,
+          setUniLecturerData,
+          viewSummary,
+          setViewSummary,
+          toggleSummaryZone,
+          getDuplicatedSubject,
         }}
       >
         <SubjectSelectorFilterModel classname={font.className}>
           <section
-            className={`pr-topbar flex justify-center sm:justify-between items-center p-8 py-4 h-28 smooth-opacity ${
+            className={`pr-topbar flex justify-between items-center p-8 py-4 h-18 sm:h-28 smooth-opacity ${
               topbarToggle.init ? 'opacity-20' : 'opacity-100'
             }`}
           >
-            <Link href={'/plan'} className="hidden sm:flex">
+            <Link href={'/'} className="flex">
               <Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image>
             </Link>
-            {getCurrentPlan().detail ? (
+            {/* TODO: next phase -> remove "false" */}
+            {false && getCurrentPlan().detail ? (
               <article className="pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl">
                 {/* <button className="header text-xl font-medium flex gap-3 group">
                   <h1>{getCurrentPlan().detail.plan_name}</h1>
@@ -348,9 +405,9 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
               </article>
             ) : null}
             {hasSession ? (
-              <Menu as="div" className={font.className}>
+              <Menu as="div" className={font.className + ' z-20'}>
                 <div>
-                  <Menu.Button className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
+                  <Menu.Button className="pr-account flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline">
                     {/* <span className="absolute -inset-1.5" /> */}
                     {/* <span className="sr-only">Open user menu</span>
                         <img
@@ -363,7 +420,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                       {/* <p className='font-light text-sm'>ทำอะไรได้มากกว่า</p> */}
                     </div>
                     <img
-                      src={session?.user?.image as string}
+                      src={session?.user?.image || '/assets/images/prof.jpg'}
                       onError={(e: any) => {
                         e.target.src = '/assets/images/prof.jpg';
                       }}
@@ -387,17 +444,24 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                   <Menu.Items className="absolute overflow-hidden right-8 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <Menu.Item>
                       {({ active }) => (
-                        <Link
-                          href="/account"
+                        <p
                           className={
-                            'profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu hover:bg-pr-msu-1'
+                            'profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu bg-pr-msu-1'
                           }
                         >
                           {session?.user?.name || 'User'}
-                        </Link>
+                        </p>
+                        // <Link
+                        //   href="/account"
+                        //   className={
+                        //     'profile-badge-li block cursor-pointer text-sm py-2 pt-3 w-full font-medium text-center text-pr-text-menu hover:bg-pr-msu-1'
+                        //   }
+                        // >
+                        //   {session?.user?.name || 'User'}
+                        // </Link>
                       )}
                     </Menu.Item>
-                    <Menu.Item>
+                    {/* <Menu.Item>
                       {({ active }) => (
                         <Link
                           href="/plan"
@@ -420,7 +484,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                           จัดการบัญชี
                         </Link>
                       )}
-                    </Menu.Item>
+                    </Menu.Item> */}
                     <Menu.Item>
                       {({ active }) => (
                         <a
@@ -460,7 +524,6 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
               </Link>
             )}
           </section>
-
           <div
             className={`pr-main select-none grid ${
               toggleSidebar ? 'md:grid-cols-[auto_1fr]' : ''
@@ -486,7 +549,10 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                 <DialogSearchNotFound />
               )}
             </PRSubjectSelector>
+            <PRSubjectSummary />
+            {/*  */}
           </div>
+          <PRPlanFootbar></PRPlanFootbar>
           <ToastContainer
             position="bottom-right"
             autoClose={3000}

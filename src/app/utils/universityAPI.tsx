@@ -20,14 +20,17 @@ export async function getUniversityListData(signal: any) {
   return res.json();
 }
 
-export async function getUniversityData(uni_id: Number, signal: any) {
+export async function getUniversityData(uni_id: Number, major_group = false, signal: any) {
   const requestOptions = {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     signal,
   };
 
-  const res = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT + '/university/' + uni_id, requestOptions);
+  const res = await fetch(
+    process.env.NEXT_PUBLIC_API_ENDPOINT + '/university/' + uni_id + (major_group ? '?type=major_group' : ''),
+    requestOptions,
+  );
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
 
