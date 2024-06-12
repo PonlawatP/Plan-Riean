@@ -68,7 +68,7 @@ function PlanPage() {
     toastId.current = toast('รอสักครู่', { autoClose: false });
 
     const res = await createPlan(newPlanData, session?.accessToken as string, null);
-    console.log(res);
+    // console.log(res);
     if (res.success) {
       toast.update(toastId.current, { render: 'สร้างแพลนเรียนใหม่แล้ว', type: toast.TYPE.SUCCESS, autoClose: 5000 });
       setNewPlanData(newPlanReset);

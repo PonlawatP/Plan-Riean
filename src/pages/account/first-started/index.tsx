@@ -58,7 +58,7 @@ function ProfileFSPage(props: any) {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         data.user = {
           ...data.user,
           name: data.user.std_name + ' ' + data.user.std_surname,
@@ -71,7 +71,7 @@ function ProfileFSPage(props: any) {
             ...data.user,
           },
         });
-        console.log('update complete');
+        // console.log('update complete');
 
         setTimeout(() => {
           redirect.push({ pathname: '/plan' });
