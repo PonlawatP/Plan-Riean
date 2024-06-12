@@ -1,6 +1,6 @@
 import { ThemeContext } from '@/app/providers';
 import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google';
-import { Fragment, useContext, useRef, useState } from 'react';
+import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import Image from 'next/image';
 import { CalendarContext, ICalendarData } from '@/app/providers/CalendarProvider';

@@ -61,7 +61,7 @@ export default function SubjectSelectedList(props: any) {
     );
   }, [getCurrentPlan]);
 
-  const createHandlers = (data: any) => {
+  const UseSwipedHandlers = (data: any) => {
     const t = useSwipeable({
       onSwiped: (eventData) => {
         const elem = swipeStates.filter((state: any) => state.code === data.code && state.sec === data.sec)[0].x;
@@ -158,7 +158,7 @@ export default function SubjectSelectedList(props: any) {
         <div
           // data-subject-code={data.code}
           // data-subject-sec={data.sec}
-          {...createHandlers(data)}
+          {...UseSwipedHandlers(data)}
           // onClick={() => {
           //   removeSubjectSchedule(data);
           // }}

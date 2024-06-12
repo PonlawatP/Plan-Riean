@@ -6,6 +6,7 @@ import { useBreakpoint } from '@/app/utils/useBreakpoint';
 import { name_days } from '@/components/PRCalendarSubject';
 import { SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { setTimeout } from 'timers';
 
 export default function SubjectSelectorFilterModel(props: any) {
   const { children } = props;
@@ -54,6 +55,7 @@ export default function SubjectSelectorFilterModel(props: any) {
     setViewState(true);
     setViewSummary(false);
 
+    handleSearch();
     setViewFilter(calsel_data.isFirstLoading);
 
     setTimeout(() => {
@@ -133,9 +135,11 @@ export default function SubjectSelectorFilterModel(props: any) {
 
   let abortController: any;
   let abortUpdateController: any;
-  async function handleSearch() {
+  async function handleSearch(background = false) {
     let err = false;
-    setCalselData({ ...calsel_data, isLoading: true, isError: false, current_filter: filter });
+    setCalselData((prev: any) =>
+      background ? { ...prev, isError: false } : { ...prev, isLoading: true, current_filter: filter, isError: false },
+    );
 
     // TODO:search from API
     if (abortController) {
@@ -195,7 +199,7 @@ export default function SubjectSelectorFilterModel(props: any) {
       //   // setSubjectUpdatedData(res);
       // });
       // TODO: re-make updated status and remove 1 below line
-      setCalData({ recommand: [], data: res });
+      setCalData({ recommand: [], data: res.subjects }, false, res.updated);
     } catch (error: any) {
       if (error.name === 'AbortError') {
         // Request was aborted, handle cancellation as needed
@@ -217,8 +221,15 @@ export default function SubjectSelectorFilterModel(props: any) {
     // },1000)
   }
 
-  function setCalData(list: any, error = false) {
-    setCalselData({ ...calsel_data, isLoading: false, isFirstLoading: false, isError: error, result: list });
+  function setCalData(list: any, error = false, updated = 'null') {
+    setCalselData((prev: any) => ({
+      ...prev,
+      isLoading: false,
+      isFirstLoading: false,
+      isError: error,
+      result: list,
+      updated,
+    }));
   }
 
   function fnHandleClickedOnCalendar(tindex: number, dindex: number) {
@@ -495,6 +506,34 @@ export default function SubjectSelectorFilterModel(props: any) {
     debouncedFunction();
   }
 
+  // feat: auto search (5 sec) time reset after toggle search section
+  let searchInt: any = 0;
+  const [countingRefresh, setCountingRefresh] = useState(0);
+  useEffect(() => {
+    searchInt = setTimeout(() => {
+      // console.log('handleSearch', viewSchedule, !calsel_data.isFirstLoading, calsel_data.result.data.length > 0);
+      // console.log(countingRefresh, abortController);
+      if (viewSchedule && !calsel_data.isFirstLoading && calsel_data.result.data.length > 0) {
+        if (calsel_data.isLoading) {
+          setCountingRefresh(0);
+          return;
+        }
+        if (countingRefresh >= Number.parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL as string) * 1000) {
+          handleSearch(true);
+          // countingRefresh = 0
+          setCountingRefresh(0);
+          return;
+        }
+        setCountingRefresh((prev) => prev + 10);
+      }
+      // countingRefresh = countingRefresh + 10;
+    }, 10);
+
+    return () => {
+      clearInterval(searchInt);
+    };
+  }, [viewSchedule, calsel_data, countingRefresh]);
+
   return (
     <CalendarFilterContext.Provider
       value={{
@@ -545,6 +584,7 @@ export default function SubjectSelectorFilterModel(props: any) {
         handleTimeSetViewFilter,
         pinch_ref,
         closeAllViewFilter,
+        countingRefresh,
       }}
     >
       <div

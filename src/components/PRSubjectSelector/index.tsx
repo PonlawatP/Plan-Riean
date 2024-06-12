@@ -3,12 +3,13 @@ import { useContext, useEffect, useState } from 'react';
 import FilterPreview from './filterPreview';
 import { isMobile } from 'react-device-detect';
 import PRSubjectFilter from '../PRSubjectFilter';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 
 export default function PRSubjectSelector(props: any) {
   const { isShowDialog, children } = props;
   const { viewSchedule, viewFilter, setViewFilter, topbarToggle, calsel_data, toggleSidebar, setTooggleSidebar } =
     useContext(CalendarContext);
-  const { fnHandleClickedOnCalendar, closeAllViewFilter } = useContext(CalendarFilterContext);
+  const { fnHandleClickedOnCalendar, closeAllViewFilter, countingRefresh } = useContext(CalendarFilterContext);
 
   const { updated, isLoading, isError } = calsel_data;
 
@@ -55,7 +56,28 @@ export default function PRSubjectSelector(props: any) {
                 </button>
                 <div className="">
                   <h1>เลือกรายวิชา</h1>
-                  {updated === 'null' ? null : <p className="text-sm font-normal text-pr-gray-1">อัพเดต: {updated}</p>}
+                  {updated === 'null' ? null : (
+                    <div className="text-sm font-normal text-pr-gray-1 flex gap-2">
+                      <div className="smooth-all h-5 w-5">
+                        <CircularProgressbar
+                          value={countingRefresh}
+                          strokeWidth={15}
+                          maxValue={Number.parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL as string) * 1000}
+                          styles={buildStyles({
+                            // How long animation takes to go from one percentage to another, in seconds
+                            pathTransitionDuration: 0.5,
+
+                            // Colors
+                            pathColor: `#0075F7`,
+                            textColor: '#f88',
+                            trailColor: '#CACFD9',
+                            backgroundColor: '#3e98c7',
+                          })}
+                        />
+                      </div>{' '}
+                      <p>{updated}</p>
+                    </div>
+                  )}
                 </div>
               </div>
               <button
