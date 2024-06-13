@@ -5,8 +5,15 @@ import PRSummaryContent from './content';
 
 export default function PRSubjectSummary(props: any) {
   const { isShowDialog, children } = props;
-  const { viewSummary, toggleSummaryZone, topbarToggle, calsel_data, toggleSidebar, setTooggleSidebar } =
-    useContext(CalendarContext);
+  const {
+    getCurrentPlan,
+    viewSummary,
+    toggleSummaryZone,
+    topbarToggle,
+    calsel_data,
+    toggleSidebar,
+    setTooggleSidebar,
+  } = useContext(CalendarContext);
   const { closeAllViewFilter } = useContext(CalendarFilterContext);
 
   const { updated, isLoading, isError } = calsel_data;
@@ -53,7 +60,9 @@ export default function PRSubjectSummary(props: any) {
                 </button>
                 <div className="">
                   <h1>สรุปตารางเรียน</h1>
-                  {updated === 'null' ? null : <p className="text-sm font-normal text-pr-gray-1">อัพเดต: {updated}</p>}
+                  <p className="text-sm font-normal text-pr-gray-1">
+                    ปีการศึกษา {getCurrentPlan().detail.cr_year} ภาคเรียนที่ {getCurrentPlan().detail.cr_seamseter}
+                  </p>
                 </div>
               </div>
               {/* <button

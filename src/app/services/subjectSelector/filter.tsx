@@ -52,10 +52,12 @@ export default function SubjectSelectorFilterModel(props: any) {
   const pinch_ref = useRef<any>(null);
 
   function handleOpenSubjectSelect() {
+    if (!viewSchedule && !calsel_data.isFirstLoading) {
+      handleSearch();
+    }
     setViewState(true);
     setViewSummary(false);
 
-    handleSearch();
     setViewFilter(calsel_data.isFirstLoading);
 
     setTimeout(() => {
