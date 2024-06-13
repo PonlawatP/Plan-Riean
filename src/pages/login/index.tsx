@@ -43,9 +43,10 @@ function LoginPage(props: any) {
             <form
               onSubmit={(e: any) => {
                 e.preventDefault();
+
                 signIn('planriean', {
                   username: e.target[0].value,
-                  password: encryptPassword(e.target[1].value),
+                  password: e.target[1].value,
                 });
               }}
               className="text-sm flex flex-col gap-4 mt-4"

@@ -98,3 +98,58 @@ export const encryptPassword = async (password: string) => {
   const hashedPassword = await bcrypt.hash(password, salt);
   return hashedPassword;
 };
+
+export async function registerUserData(data: any, signal: any = null) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    signal,
+  });
+
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    // throw new Error('Failed to fetch data');
+    return {
+      error: true,
+      status: res.status,
+    };
+  }
+
+  return res.json();
+}
+export async function checkUsernameUserData(username: String, signal: any = null) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register/username`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username }),
+    signal,
+  });
+
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    // throw new Error('Failed to fetch data');
+    return false;
+  }
+
+  return res.json();
+}
+export async function checkEmailUserData(email: String, signal: any = null) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register/email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+    signal,
+  });
+
+  // Recommendation: handle errors
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    // throw new Error('Failed to fetch data');
+    return false;
+  }
+
+  return res.json();
+}
