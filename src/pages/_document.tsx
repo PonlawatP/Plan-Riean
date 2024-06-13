@@ -17,6 +17,9 @@ class MyDocument extends Document {
             name="keywords"
             content="จัดตารางเรียน, แผนการเรียน, ตัวช่วยนักศึกษา, เครื่องมือจัดตารางเรียน, วางแผนการเรียน, Planriean, ตารางเรียน"
           ></meta>
+
+          <meta property="og:title" content="จัดตารางเรียนสุดง่ายด้วยแพลนเรียน!" />
+          <meta property="og:image" content="/assets/images/thumbnail.png" />
         </Head>
         <body>
           <Main />
