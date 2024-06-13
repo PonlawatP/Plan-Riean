@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import AvatarEditor from 'react-avatar-editor';
 import { Position } from 'postcss';
 import uploadImageToImgbb from '@/app/utils/imgbb';
-import { checkEmailUserData, checkUsernameUserData, encryptPassword, registerUserData } from '@/app/utils/userAPI';
+import { checkEmailUserData, checkUsernameUserData, registerUserData } from '@/app/utils/userAPI';
 
 type IRegsterStepData = {
   uni_id: Number;
@@ -79,7 +79,6 @@ function RegisterPage(props: any) {
       const res = await uploadImageToImgbb(imgState?.preview?.img as string);
       imgUploaded = res.data.thumb.url;
     }
-    const passHash = await encryptPassword(firstStepData.password);
     const bd = {
       uni_id: firstStepData.uni_id,
       fac_id: firstStepData.fac_id,
@@ -88,7 +87,7 @@ function RegisterPage(props: any) {
       cr_id: firstStepData.cr_id,
       std_start_year: new Date(Date.now()).getFullYear() + 543 - (firstStepData.std_year || 0).valueOf(),
       username: firstStepData.username,
-      password: passHash,
+      password: firstStepData.password,
       email: firstStepData.email,
       image: imgUploaded,
       std_name: firstStepData.std_name,

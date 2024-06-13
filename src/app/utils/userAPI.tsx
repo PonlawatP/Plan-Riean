@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs';
-
 export async function getPlanListData(token: string, signal: any) {
   const requestOptions = {
     method: 'GET',
@@ -93,11 +91,6 @@ export async function updatePlanData(plan_id: number, plan_data: any, token: str
 
   return res.json();
 }
-export const encryptPassword = async (password: string) => {
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  return hashedPassword;
-};
 
 export async function registerUserData(data: any, signal: any = null) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {

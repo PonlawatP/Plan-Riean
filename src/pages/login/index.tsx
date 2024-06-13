@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { Player } from '@lottiefiles/react-lottie-player';
 import AuthPageLayout from '@/app/layout/authlayout';
 import Head from 'next/head';
-import { encryptPassword } from '@/app/utils/userAPI';
 
 function LoginPage(props: any) {
   // console.log(session)
