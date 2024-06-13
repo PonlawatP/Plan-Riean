@@ -7,12 +7,17 @@ import Link from 'next/link';
 import { Player } from '@lottiefiles/react-lottie-player';
 import AuthPageLayout from '@/app/layout/authlayout';
 import Head from 'next/head';
+import { encryptPassword } from '@/app/utils/userAPI';
 
 function LoginPage(props: any) {
   // console.log(session)
   const animationURL = '/assets/lotties/loading.json';
   const { data: session, status: session_status } = useSession();
   const redirect = useRouter();
+
+  if (session_status == 'authenticated') {
+    redirect.push({ pathname: '/plan' });
+  }
 
   return (
     <>
@@ -40,7 +45,7 @@ function LoginPage(props: any) {
                 e.preventDefault();
                 signIn('planriean', {
                   username: e.target[0].value,
-                  password: e.target[1].value,
+                  password: encryptPassword(e.target[1].value),
                 });
               }}
               className="text-sm flex flex-col gap-4 mt-4"
@@ -64,11 +69,12 @@ function LoginPage(props: any) {
                 เข้าสู่ระบบ
               </button>
             </form>
-            <div className="mt-2 text-xs text-pr-blue-dark underline">
+            {/* TODO: forget password feature soon */}
+            {/* <div className="mt-2 text-xs text-pr-blue-dark underline">
               <Link href={{ pathname: '/forget-password', query: { fallbackUrl: redirect.query.fallbackUrl } }}>
                 ลืมรหัสผ่าน
               </Link>
-            </div>
+            </div> */}
             <div className="mt-6 text-gray-400 grid items-center grid-cols-3">
               <hr className="border-gray-400" />
               <p className="text-center text-sm">หรือ</p>

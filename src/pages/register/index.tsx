@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import AvatarEditor from 'react-avatar-editor';
 import { Position } from 'postcss';
 import uploadImageToImgbb from '@/app/utils/imgbb';
+import { encryptPassword } from '@/app/utils/userAPI';
 
 type IRegsterStepData = {
   uni_id: Number;
@@ -40,6 +41,10 @@ function RegisterPage(props: any) {
   const { data: session, status: session_status, update } = useSession();
   const redirect = useRouter();
 
+  if (session_status == 'authenticated') {
+    redirect.push({ pathname: '/plan' });
+  }
+
   async function updateSession() {
     let imgUploaded = '';
     if (imgState.preview != undefined) {
@@ -54,7 +59,7 @@ function RegisterPage(props: any) {
       cr_id: firstStepData.cr_id,
       std_start_year: new Date(Date.now()).getFullYear() + 543 - (firstStepData.std_year || 0).valueOf(),
       username: firstStepData.username,
-      password: firstStepData.password,
+      password: encryptPassword(firstStepData.password),
       email: firstStepData.email,
       image: imgUploaded,
       std_name: firstStepData.std_name,
@@ -86,7 +91,7 @@ function RegisterPage(props: any) {
     const result = await signIn('planriean', {
       redirect: false,
       username: firstStepData.username,
-      password: firstStepData.password,
+      password: encryptPassword(firstStepData.password),
     });
     if (result?.ok) {
       redirect.push({ pathname: '/plan' });
@@ -220,7 +225,7 @@ function RegisterPage(props: any) {
 
   const [pwdC, setPwdC] = useState<any>([]);
 
-  function handlePasswordCheck() {
+  function handlePasswordCheck(pass: any) {
     var schema = new PasswordValidator();
     schema
       .is()
@@ -234,7 +239,7 @@ function RegisterPage(props: any) {
       .spaces(1, 'รหัสผ่านต้องไม่มีเว้นวรรค'); // Should not have spaces
 
     // Get a full list of rules which failed
-    let t = schema.validate(firstStepData.password, { details: true, list: true });
+    let t = schema.validate(pass ? pass : firstStepData.password, { details: true, list: true });
     setPwdC(t);
   }
 
@@ -332,7 +337,7 @@ function RegisterPage(props: any) {
               }}
             />
             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-              กรอกชื่อผู้ใช้ของคุณ
+              ชื่อผู้ใช้
             </label>
           </div>
           <div className="relative text-sm flex flex-col gap-4 mt-4">
@@ -342,11 +347,14 @@ function RegisterPage(props: any) {
               placeholder=""
               value={firstStepData.email ? (firstStepData.email as string) : ''}
               onChange={(e) => {
-                setFirstStepData({ ...firstStepData, email: e.target.value.toLowerCase() });
+                setFirstStepData((prev: any) => {
+                  const email = e.target.value.toLowerCase();
+                  return { ...prev, email };
+                });
               }}
             />
             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-              กรอกอีเมลของคุณ
+              อีเมล
             </label>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -361,7 +369,7 @@ function RegisterPage(props: any) {
                 }}
               />
               <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                ชื่อของคุณ
+                ชื่อจริง
               </label>
             </div>
             <div className="relative text-sm flex flex-col gap-4 mt-4">
@@ -375,7 +383,7 @@ function RegisterPage(props: any) {
                 }}
               />
               <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                นามสกุลของคุณ
+                นามสกุล
               </label>
             </div>
           </div>
@@ -386,12 +394,14 @@ function RegisterPage(props: any) {
               placeholder=""
               value={firstStepData.password ? (firstStepData.password as string) : ''}
               onChange={(e) => {
-                setFirstStepData({ ...firstStepData, password: e.target.value });
-                handlePasswordCheck();
+                setFirstStepData((prev: any) => {
+                  handlePasswordCheck(e.target.value);
+                  return { ...prev, password: e.target.value };
+                });
               }}
             />
             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-              กรอกรหัสผ่านของคุณ
+              กรอกรหัสผ่าน
             </label>
           </div>
           <div className="mt-4 relative">
@@ -401,7 +411,7 @@ function RegisterPage(props: any) {
               placeholder=""
               value={firstStepData.passwordc ? (firstStepData.passwordc as string) : ''}
               onChange={(e) => {
-                setFirstStepData({ ...firstStepData, passwordc: e.target.value });
+                setFirstStepData((prev: any) => ({ ...prev, passwordc: e.target.value }));
               }}
             />
             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
