@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import AvatarEditor from 'react-avatar-editor';
 import { Position } from 'postcss';
 import uploadImageToImgbb from '@/app/utils/imgbb';
+import { checkEmailUserData, checkUsernameUserData, registerUserData } from '@/app/utils/userAPI';
 
 type IRegsterStepData = {
   uni_id: Number;
@@ -40,7 +41,39 @@ function RegisterPage(props: any) {
   const { data: session, status: session_status, update } = useSession();
   const redirect = useRouter();
 
+  if (session_status == 'authenticated') {
+    redirect.push({ pathname: '/plan' });
+  }
+
+  const [inputStatus, setInputStatus] = useState({
+    username_first: false,
+    email_first: false,
+    username: false,
+    email: false,
+  });
+
+  async function checkUsername() {
+    const res = await checkUsernameUserData(firstStepData.username);
+    // console.log('check', firstStepData.username, res);
+    setInputStatus((prev: any) => ({ ...prev, username_first: true, username: res }));
+    return res;
+  }
+  async function checkEmail() {
+    const res = await checkEmailUserData(firstStepData.email);
+    // console.log('check', firstStepData.email, res);
+    setInputStatus((prev: any) => ({ ...prev, email_first: true, email: res }));
+    return res;
+  }
   async function updateSession() {
+    if (!checkUsername()) {
+      toast.error('โปรดตรวจชื่อผู้ใช้งานใหม่');
+      return false;
+    }
+    if (!checkEmail()) {
+      toast.error('โปรดตรวจอีเมลใหม่');
+      return false;
+    }
+
     let imgUploaded = '';
     if (imgState.preview != undefined) {
       const res = await uploadImageToImgbb(imgState?.preview?.img as string);
@@ -66,19 +99,17 @@ function RegisterPage(props: any) {
     // console.log(bd);
     // console.log(JSON.stringify(bd));
     // TODO: register not send body throught api
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(bd),
-    });
+    const res = await registerUserData(bd);
     // The return value is *not* serialized
     // You can return Date, Map, Set, etc.
 
     // Recommendation: handle errors
-    if (!res.ok) {
+    if (res.error != undefined) {
       toast.error('เกิดข้อผิดพลาด');
+      setRedir(false);
+
       console.log('error:', res.status, res);
-      return;
+      return false;
     }
 
     toast.success('สมัครสมาชิกเรียบร้อย');
@@ -91,6 +122,7 @@ function RegisterPage(props: any) {
     if (result?.ok) {
       redirect.push({ pathname: '/plan' });
     }
+    return true;
   }
 
   const animationURL = '/assets/lotties/loading.json';
@@ -220,7 +252,7 @@ function RegisterPage(props: any) {
 
   const [pwdC, setPwdC] = useState<any>([]);
 
-  function handlePasswordCheck() {
+  function handlePasswordCheck(pass: any) {
     var schema = new PasswordValidator();
     schema
       .is()
@@ -234,7 +266,7 @@ function RegisterPage(props: any) {
       .spaces(1, 'รหัสผ่านต้องไม่มีเว้นวรรค'); // Should not have spaces
 
     // Get a full list of rules which failed
-    let t = schema.validate(firstStepData.password, { details: true, list: true });
+    let t = schema.validate(pass ? pass : firstStepData.password, { details: true, list: true });
     setPwdC(t);
   }
 
@@ -324,35 +356,80 @@ function RegisterPage(props: any) {
           <div className="relative text-sm flex flex-col gap-4 mt-4">
             <input
               type="text"
-              className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+              className={`peer h-full w-full rounded-[7px] border border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50 ${
+                inputStatus.username_first
+                  ? !inputStatus.username
+                    ? 'bg-red-100 border-red-700 placeholder-shown:border-red-700 placeholder-shown:border-t-red-700'
+                    : 'bg-green-100 border-green-700 placeholder-shown:border-green-700 placeholder-shown:border-t-green-700'
+                  : 'border-blue-gray-200 placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200'
+              }`}
               placeholder=""
+              name="username"
+              id="username"
               value={firstStepData.username ? (firstStepData.username as string) : ''}
               onChange={(e) => {
                 setFirstStepData({ ...firstStepData, username: e.target.value.toLowerCase() });
               }}
+              onBlur={(e) => {
+                checkUsername();
+              }}
             />
-            <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-              กรอกชื่อผู้ใช้ของคุณ
+            <label
+              htmlFor="username"
+              className={`${
+                inputStatus.username_first
+                  ? !inputStatus.username
+                    ? 'before:border-red-700 after:border-red-700'
+                    : 'before:border-green-700 after:border-green-700'
+                  : 'before:border-blue-gray-200 after:border-blue-gray-200'
+              } before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500`}
+            >
+              ชื่อผู้ใช้
             </label>
           </div>
           <div className="relative text-sm flex flex-col gap-4 mt-4">
             <input
               type="email"
-              className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+              id="email"
+              name="email"
+              className={`peer h-full w-full rounded-[7px] border border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50 ${
+                inputStatus.email_first
+                  ? !inputStatus.email
+                    ? 'bg-red-100 border-red-700 placeholder-shown:border-red-700 placeholder-shown:border-t-red-700'
+                    : 'bg-green-100 border-green-700 placeholder-shown:border-green-700 placeholder-shown:border-t-green-700'
+                  : 'border-blue-gray-200 placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200'
+              }`}
               placeholder=""
               value={firstStepData.email ? (firstStepData.email as string) : ''}
               onChange={(e) => {
-                setFirstStepData({ ...firstStepData, email: e.target.value.toLowerCase() });
+                setFirstStepData((prev: any) => {
+                  const email = e.target.value.toLowerCase();
+                  return { ...prev, email };
+                });
+              }}
+              onBlur={(e) => {
+                checkEmail();
               }}
             />
-            <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-              กรอกอีเมลของคุณ
+            <label
+              htmlFor="email"
+              className={`${
+                inputStatus.email_first
+                  ? !inputStatus.email
+                    ? 'before:border-red-700 after:border-red-700'
+                    : 'before:border-green-700 after:border-green-700'
+                  : 'before:border-blue-gray-200 after:border-blue-gray-200'
+              } before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500`}
+            >
+              อีเมล
             </label>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="relative text-sm flex flex-col gap-4 mt-4">
               <input
                 type="text"
+                id="name"
+                name="name"
                 className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                 placeholder=""
                 value={firstStepData.std_name ? (firstStepData.std_name as string) : ''}
@@ -360,13 +437,18 @@ function RegisterPage(props: any) {
                   setFirstStepData({ ...firstStepData, std_name: e.target.value.trim() });
                 }}
               />
-              <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                ชื่อของคุณ
+              <label
+                htmlFor="name"
+                className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500"
+              >
+                ชื่อจริง
               </label>
             </div>
             <div className="relative text-sm flex flex-col gap-4 mt-4">
               <input
                 type="text"
+                id="surname"
+                name="surname"
                 className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                 placeholder=""
                 value={firstStepData.std_surname ? (firstStepData.std_surname as string) : ''}
@@ -374,8 +456,11 @@ function RegisterPage(props: any) {
                   setFirstStepData({ ...firstStepData, std_surname: e.target.value.trim() });
                 }}
               />
-              <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-                นามสกุลของคุณ
+              <label
+                htmlFor="surname"
+                className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500"
+              >
+                นามสกุล
               </label>
             </div>
           </div>
@@ -384,14 +469,27 @@ function RegisterPage(props: any) {
               type="password"
               className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
               placeholder=""
+              id="surname"
+              name="surname"
               value={firstStepData.password ? (firstStepData.password as string) : ''}
               onChange={(e) => {
-                setFirstStepData({ ...firstStepData, password: e.target.value });
-                handlePasswordCheck();
+                setFirstStepData((prev: any) => {
+                  handlePasswordCheck(e.target.value);
+                  return { ...prev, password: e.target.value };
+                });
+              }}
+              onBlur={(e) => {
+                setFirstStepData((prev: any) => {
+                  handlePasswordCheck(e.target.value);
+                  return { ...prev, password: e.target.value };
+                });
               }}
             />
-            <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
-              กรอกรหัสผ่านของคุณ
+            <label
+              htmlFor="surname"
+              className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500"
+            >
+              กรอกรหัสผ่าน
             </label>
           </div>
           <div className="mt-4 relative">
@@ -399,12 +497,17 @@ function RegisterPage(props: any) {
               type="password"
               className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
               placeholder=""
+              id="password_confirm"
+              name="password_confirm"
               value={firstStepData.passwordc ? (firstStepData.passwordc as string) : ''}
               onChange={(e) => {
-                setFirstStepData({ ...firstStepData, passwordc: e.target.value });
+                setFirstStepData((prev: any) => ({ ...prev, passwordc: e.target.value }));
               }}
             />
-            <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
+            <label
+              htmlFor="password_confirm"
+              className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-normal leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500"
+            >
               ยืนยันรหัสผ่าน
             </label>
           </div>
@@ -424,6 +527,14 @@ function RegisterPage(props: any) {
         </>
       ),
       check: () => {
+        if (!inputStatus.username_first || !inputStatus.username) {
+          toast.error('โปรดตรวจชื่อผู้ใช้งานใหม่');
+          return false;
+        }
+        if (!inputStatus.email || !inputStatus.email) {
+          toast.error('โปรดตรวจอีเมลใหม่');
+          return false;
+        }
         if (firstStepData.username.trim() == '') {
           toast.error('โปรดกรอกชื่อผู้ใช้งาน');
           return false;
@@ -704,9 +815,11 @@ function RegisterPage(props: any) {
   }
 
   const [redir, setRedir] = useState(false);
-  function confirmAccount() {
+  async function confirmAccount() {
     // setRedir(true);
-    updateSession();
+    if (await !updateSession()) {
+      setStep({ index: 0, process: 0, pre_process: 1 });
+    }
   }
 
   return (

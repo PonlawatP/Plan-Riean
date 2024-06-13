@@ -14,6 +14,10 @@ function LoginPage(props: any) {
   const { data: session, status: session_status } = useSession();
   const redirect = useRouter();
 
+  if (session_status == 'authenticated') {
+    redirect.push({ pathname: '/plan' });
+  }
+
   return (
     <>
       <Head>
@@ -38,6 +42,7 @@ function LoginPage(props: any) {
             <form
               onSubmit={(e: any) => {
                 e.preventDefault();
+
                 signIn('planriean', {
                   username: e.target[0].value,
                   password: e.target[1].value,
@@ -64,11 +69,12 @@ function LoginPage(props: any) {
                 เข้าสู่ระบบ
               </button>
             </form>
-            <div className="mt-2 text-xs text-pr-blue-dark underline">
+            {/* TODO: forget password feature soon */}
+            {/* <div className="mt-2 text-xs text-pr-blue-dark underline">
               <Link href={{ pathname: '/forget-password', query: { fallbackUrl: redirect.query.fallbackUrl } }}>
                 ลืมรหัสผ่าน
               </Link>
-            </div>
+            </div> */}
             <div className="mt-6 text-gray-400 grid items-center grid-cols-3">
               <hr className="border-gray-400" />
               <p className="text-center text-sm">หรือ</p>
