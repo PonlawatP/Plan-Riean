@@ -129,7 +129,26 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
                 </Menu.Items>
               </Transition>
             </Menu>
-          ) : null}
+          ) : (
+            <Link
+              href={{
+                pathname: '/login',
+              }}
+              className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline"
+            >
+              <div className="text-right hidden md:block mt-2">
+                <p className="">เป็นครอบครัวแพลนเรียน</p>
+                <p className="font-light text-sm">ทำอะไรได้มากกว่า</p>
+              </div>
+              <Image
+                src="/assets/images/prof.jpg"
+                alt="Planriean Logo"
+                width={50}
+                height={50}
+                className="rounded-full aspect-square object-cover border-2 border-white/30"
+              ></Image>
+            </Link>
+          )}
         </section>
 
         <div className={`pr-main relative`}>{children}</div>

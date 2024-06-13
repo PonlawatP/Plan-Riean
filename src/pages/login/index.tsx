@@ -19,7 +19,7 @@ function LoginPage(props: any) {
       <Head>
         <title>เข้าสู่ระบบ : Planriean</title>
       </Head>
-      <section className="relative bg-gradient-to-t from-pr-blue/80 to-pr-bg min-h-[100dvh] flex items-center justify-center z-10">
+      <section className="relative bg-gradient-to-t from-pr-blue/90 to-pr-blue/80 min-h-[100dvh] flex items-center justify-center z-10">
         {/* loading overlay */}
         <div
           className={`transition-opacity duration-300 fixed top-0 left-0 w-full h-full z-50 bg-white flex items-center justify-center ${

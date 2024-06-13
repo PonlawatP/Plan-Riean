@@ -506,7 +506,6 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
               <Link
                 href={{
                   pathname: '/login',
-                  query: { fallbackUrl: rollback_url },
                 }}
                 className="pr-account hidden sm:flex group gap-3 items-center text-pr-gray-1 text-md font-normal leading-4 hover:underline"
               >
