@@ -114,7 +114,7 @@ export default function SubjectSelectedList(props: any) {
         className={`relative group transition-all duration-300 ${incommingRemoving ? 'opacity-0 scale-0 h-0' : ''}`}
       >
         <div
-          className={`pr-subject-object transition-all duration-300 absolute w-full h-full bg-red-200 rounded-xl border-yellow-400/90 shadow-yellow-400/40 shadow-md text-pr-dark/50 ${
+          className={`pr-subject-object transition-all duration-300 absolute w-full h-full bg-red-200 rounded-xl border-red-400/90 shadow-red-400/40 shadow-md text-pr-dark/50 ${
             swipeState && swipeState.toggle ? '' : 'scale-90 opacity-0'
           }`}
         >
@@ -146,7 +146,7 @@ export default function SubjectSelectedList(props: any) {
                 <i className={`bx bx-${swipeState && swipeState.x < 0 ? 'left' : 'right'}-arrow-alt`}></i>
               </div>
               <div
-                className={`w-full relative flex justify-center transition-all ${
+                className={`w-full relative flex justify-center transition-all delay-50 ${
                   swipeState && Math.abs(swipeState.x) < 100 ? 'opacity-0 translate-y-2' : 'translate-y-0'
                 }`}
               >

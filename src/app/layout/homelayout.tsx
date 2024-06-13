@@ -67,13 +67,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 วางแผนกัน !
               </button>
             </div>
-            {/* <Image
-                src="/assets/images/prof.jpg"
-                alt="Planriean Logo"
-                width={50}
-                height={50}
-                className="rounded-full aspect-square object-cover border-2 border-white/30"
-              ></Image> */}
           </Link>
         </section>
 

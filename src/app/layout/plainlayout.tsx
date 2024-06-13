@@ -39,7 +39,13 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
       <div className={`grid grid-rows-[auto_minmax(0,1fr)] h-[100dvh] ${font.className}`}>
         <section className={`pr-topbar flex justify-between items-center p-6 sm:p-8 py-4 h-18 sm:h-28 smooth-opacity`}>
           <div className="flex">
-            <Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image>
+            <Link
+              href={{
+                pathname: '/',
+              }}
+            >
+              <Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image>
+            </Link>
           </div>
           {hasSession ? (
             <Menu as="div" className="">
