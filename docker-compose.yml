@@ -6,7 +6,7 @@ services:
       - posgres
     image: postgres:latest
     container_name: planriean-db
-    hostname: planriean_db
+    hostname: planriean-db
     environment:
       POSTGRES_DB: planriean_master
       POSTGRES_USER: planriean_user
