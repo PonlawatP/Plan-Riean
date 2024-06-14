@@ -7,6 +7,8 @@ services:
     image: postgres:latest
     container_name: planriean-db
     hostname: planriean-db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: planriean_master
       POSTGRES_USER: planriean_user
