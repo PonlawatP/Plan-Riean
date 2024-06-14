@@ -5,7 +5,7 @@ services:
     profiles:
       - posgres
     image: postgres:latest
-    container_name: planriean_db
+    container_name: planriean-db
     hostname: planriean_db
     environment:
       POSTGRES_DB: planriean_master
@@ -21,7 +21,7 @@ services:
       - nginx
     image: nginx_custom:latest
     restart: unless-stopped
-    container_name: nginx-proxy
+    container_name: planriean-nginx
     volumes:
       - ./certs:/etc/letsencrypt/live
     ports:
