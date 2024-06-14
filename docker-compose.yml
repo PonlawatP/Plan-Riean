@@ -25,10 +25,9 @@ services:
     container_name: nginx-proxy
     ports:
       - "80:80"
-    environment:
-      VIRTUAL_HOST: "beta-api.planriean.com"
     networks:
       - planriean
+    command: ["nginx", "-g", "daemon off;"]
 
 volumes:
   postgres_data:
