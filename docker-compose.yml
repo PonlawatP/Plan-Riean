@@ -25,10 +25,8 @@ services:
     container_name: nginx-proxy
     ports:
       - "80:80"
-      - "81:81"
-      - "82:82"
     environment:
-      VIRTUAL_HOST: "lvh.me"
+      VIRTUAL_HOST: "beta-api.planriean.com"
     networks:
       - planriean
 
