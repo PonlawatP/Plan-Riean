@@ -23,6 +23,8 @@ services:
     image: nginx_custom:latest
     restart: unless-stopped
     container_name: nginx-proxy
+    volumes:
+      - ./certs:/etc/letsencrypt/live
     ports:
       - "80:80"
       - "443:443"
