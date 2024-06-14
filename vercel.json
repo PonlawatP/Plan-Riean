@@ -1,0 +1,7 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "nginx-docker-1.0": false
+    }
+  }
+}
