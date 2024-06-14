@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: P1anS4O0Om92lan4!3aN
     restart: unless-stopped
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - ./db_data:/var/lib/postgresql/data
     networks:
       - planriean
   nginx:
