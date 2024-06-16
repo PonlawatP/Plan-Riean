@@ -106,7 +106,6 @@ function LoginPage(props: any) {
                 setClicked(() => true);
                 if (clicked) return;
 
-                searchParams?.delete();
                 signIn('google');
               }}
               className="smooth-all bg-white px-2 py-2 mt-5 border w-full rounded-xl 
