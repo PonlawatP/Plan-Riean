@@ -409,19 +409,39 @@ export default function PRSubjectFilter({ children }: any, props: any) {
                       return {
                         ...group,
                         subjects: group.subjects.filter((subject: any) => {
-                          const code = subject.code;
+                          const { code, name_en, name_th } = subject;
+                          const spl = input.split(':'),
+                            spl_check = spl.length > 1;
+                          let input_name = input.toLowerCase(),
+                            input_code = input.toLowerCase();
 
-                          if (input.startsWith('*') && input.endsWith('*')) {
-                            const term = input.slice(1, -1);
-                            return code.includes(term);
-                          } else if (input.startsWith('*')) {
-                            const term = input.slice(1);
-                            return code.endsWith(term);
-                          } else if (input.endsWith('*')) {
-                            const term = input.slice(0, -1);
-                            return code.startsWith(term);
+                          if (spl_check) {
+                            input_name = spl[1].toLowerCase();
+                            input_code = spl[0];
+                          }
+
+                          let inp_spl_name =
+                            name_en?.toLowerCase().includes(input_name) || name_th?.toLowerCase().includes(input_name);
+
+                          if (input_code.startsWith('*') && input_code.endsWith('*')) {
+                            const term = input_code.slice(1, -1);
+                            return spl_check ? code.includes(term) && inp_spl_name : code.includes(term);
+                          } else if (input_code.startsWith('*')) {
+                            const term = input_code.slice(1);
+                            return spl_check ? code.endsWith(term) && inp_spl_name : code.endsWith(term);
+                          } else if (input_code.endsWith('*')) {
+                            const term = input_code.slice(0, -1);
+                            return spl_check ? code.startsWith(term) && inp_spl_name : code.startsWith(term);
+                          }
+
+                          // else -> find name first
+                          // if not found name -> find codes
+                          if (!spl_check && inp_spl_name) {
+                            return true;
                           } else {
-                            return code.startsWith(input);
+                            return spl_check
+                              ? code.startsWith(input_code) && inp_spl_name
+                              : code.startsWith(input_code);
                           }
                         }),
                       };
@@ -454,12 +474,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
               {g.groups.map((gs: any, gsIndex: number) => {
                 if (gs.global) {
                   return gs.subjects.map((gsi: any, gsiIndex: number) => (
-                    <SubjectObject
-                      key={gsiIndex}
-                      code={gsi.code}
-                      title={gsi.name_en}
-                      desc={'เตรียมความพร้อมภาษาอังกฤษ'}
-                    />
+                    <SubjectObject key={gsiIndex} code={gsi.code} title={gsi.name_en} desc={gsi.name_th} />
                   ));
                 } else {
                   return (
@@ -470,12 +485,7 @@ export default function PRSubjectFilter({ children }: any, props: any) {
                       subDesc={`${gs.subjects.length} วิชา`}
                     >
                       {gs.subjects.map((gsi: any, gsiIndex: number) => (
-                        <SubjectObject
-                          key={gsiIndex}
-                          code={gsi.code}
-                          title={gsi.name_en}
-                          desc={'เตรียมความพร้อมภาษาอังกฤษ'}
-                        />
+                        <SubjectObject key={gsiIndex} code={gsi.code} title={gsi.name_en} desc={gsi.name_th} />
                       ))}
 
                       {/* <SubjectObject code={'0041001'} title={'Preparatory English'} desc={'เตรียมความพร้อมภาษาอังกฤษ'} />
