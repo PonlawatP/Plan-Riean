@@ -13,6 +13,9 @@ import AuthProvider from '@/app/providers/AuthProvider';
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
 
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
@@ -35,6 +38,19 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         </Head>
         <GoogleAnalytics strategy="lazyOnload" trackPageViews={true} />
         {getLayout(<Component {...pageProps} />)}
+
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         {/* <Component {...pageProps} /> */}
       </AuthProvider>
     </ThemeProvider>
