@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSession, signIn } from 'next-auth/react';
 // import { useRouter } from "next/navigation";
@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Player } from '@lottiefiles/react-lottie-player';
 import AuthPageLayout from '@/app/layout/authlayout';
 import Head from 'next/head';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 function LoginPage(props: any) {
   // console.log(session)
@@ -14,6 +16,21 @@ function LoginPage(props: any) {
   const { data: session, status: session_status } = useSession();
   const [clicked, setClicked] = useState(false);
   const redirect = useRouter();
+
+  useEffect(() => {
+    const { pathname, query } = redirect;
+    if (Object.keys(query).length > 0) {
+      // Construct the new URL without the query parameters
+      const newUrl = pathname;
+
+      if (query.error != null) {
+        toast.error(query.error);
+      }
+
+      // Use the router's replace method to update the URL without causing a page reload
+      redirect.replace(newUrl, undefined, { shallow: true });
+    }
+  }, [redirect]);
 
   if (session_status == 'authenticated') {
     redirect.push({ pathname: '/plan' });
@@ -88,6 +105,8 @@ function LoginPage(props: any) {
               onClick={() => {
                 setClicked(() => true);
                 if (clicked) return;
+
+                searchParams?.delete();
                 signIn('google');
               }}
               className="smooth-all bg-white px-2 py-2 mt-5 border w-full rounded-xl 

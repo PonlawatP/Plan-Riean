@@ -4,9 +4,7 @@ import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import Image from 'next/image';
 import { CalendarContext, ICalendarData } from '@/app/providers/CalendarProvider';
-import { ToastContainer, toast } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
 import PRSubjectSelector from '../../components/PRSubjectSelector';
 import PRSidebar from '../../components/PRSidebar';
 import DialogFirstSearch from '../../components/PRSubjectSelector/dialogue/firstSearch';
@@ -552,18 +550,6 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
             {/*  */}
           </div>
           <PRPlanFootbar></PRPlanFootbar>
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
         </SubjectSelectorFilterModel>
       </CalendarContext.Provider>
     </>

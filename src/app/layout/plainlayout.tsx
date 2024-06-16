@@ -3,9 +3,7 @@ import { IBM_Plex_Sans_Thai, K2D } from 'next/font/google';
 import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import 'boxicons/css/boxicons.min.css';
 import Image from 'next/image';
-import { ToastContainer, toast } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
 import { useSession, signOut } from 'next-auth/react';
 import { Menu, Transition } from '@headlessui/react';
 import Link from 'next/link';
@@ -159,18 +157,6 @@ export default function PlainPageLayout({ children }: { children: React.ReactNod
 
         <div className={`pr-main relative`}>{children}</div>
       </div>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
     </>
   );
 }

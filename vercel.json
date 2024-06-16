@@ -1,0 +1,7 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "hotfix/1.0.1": false
+    }
+  }
+}

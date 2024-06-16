@@ -163,7 +163,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/login',
-    error: '/login?error=msg',
+    error: '/login',
   },
 };
 
