@@ -29,7 +29,7 @@ export default function SubjectObject(props: any) {
         ) : null}
         <span className={`text-left ${isActive ? '' : 'group-active:text-white'}`}>
           {title !== 'title' ? <p>{title}</p> : null}
-          {desc !== 'subtitle' ? (
+          {desc != null && desc !== 'subtitle' ? (
             <p className={`text-sm text-pr-gray-1 ${isActive ? '' : 'group-active:text-white/70'}`}>{desc}</p>
           ) : null}
         </span>
