@@ -50,7 +50,11 @@ export default function SubjectList(props: any) {
           </div>
           <span
             className={`pt-1 pr-2 text-sm text-right ${
-              data.seat_remain > 10 ? 'text-pr-gray-1' : data.seat_remain != 0 ? 'text-orange-600' : 'text-red-700'
+              data.seat_available - data.seat_remain > 10
+                ? 'text-pr-gray-1'
+                : data.seat_available - data.seat_remain != 0
+                ? 'text-orange-600'
+                : 'text-red-700'
             }`}
           >
             {data.seat_remain}/{data.seat_available} <i className="bx bx-chair translate-y-[1px]"></i>
