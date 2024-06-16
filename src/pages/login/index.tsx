@@ -12,6 +12,7 @@ function LoginPage(props: any) {
   // console.log(session)
   const animationURL = '/assets/lotties/loading.json';
   const { data: session, status: session_status } = useSession();
+  const [clicked, setClicked] = useState(false);
   const redirect = useRouter();
 
   if (session_status == 'authenticated') {
@@ -27,7 +28,7 @@ function LoginPage(props: any) {
         {/* loading overlay */}
         <div
           className={`transition-opacity duration-300 fixed top-0 left-0 w-full h-full z-50 bg-white flex items-center justify-center ${
-            session_status != 'loading' ? 'opacity-0 pointer-events-none' : ''
+            session_status != 'loading' && !clicked ? 'opacity-0 pointer-events-none' : ''
           }`}
         >
           <div className="box text-pr-blue text-center">
@@ -42,6 +43,9 @@ function LoginPage(props: any) {
             <form
               onSubmit={(e: any) => {
                 e.preventDefault();
+                if (clicked) return;
+
+                setClicked(() => true);
 
                 signIn('planriean', {
                   username: e.target[0].value,
@@ -81,7 +85,11 @@ function LoginPage(props: any) {
               <hr className="border-gray-400" />
             </div>
             <button
-              onClick={() => signIn('google')}
+              onClick={() => {
+                setClicked(() => true);
+                if (clicked) return;
+                signIn('google');
+              }}
               className="smooth-all bg-white px-2 py-2 mt-5 border w-full rounded-xl 
               flex justify-center items-center text-sm hover:scale-105 duration-300 text-[#002D74]"
             >
