@@ -1,11 +1,12 @@
 {
   "name": "planriean",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3003",
     "build": "next build",
     "start": "next start --port 3003 --hostname 0.0.0.0",
+    "start-2": "next start --port 3004 --hostname 0.0.0.0",
     "lint": "next lint"
   },
   "dependencies": {
