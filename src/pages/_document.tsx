@@ -1,5 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document';
-
+import { SpeedInsights } from '@vercel/speed-insights/next';
 class MyDocument extends Document {
   render() {
     return (
@@ -11,7 +11,7 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#E6EDF3" />
           <meta
             name="description"
-            content="บอกลาความปวดหัวกับการจัดตารางเรียนไปได้เลย! Planriean จะมาทำให้การจัดตารางเรียน, วางแผนการเรียนของคุณเป็นเรื่องง่ายและสนุกกว่าเดิม"
+            content="บอกลาความปวดหัวกับการจัดตารางเรียนไปได้เลย! แพลนเรียน จะมาทำให้การจัดตารางเรียน, วางแผนการเรียนของคุณเป็นเรื่องง่ายและสนุกกว่าเดิม"
           />
           <meta
             name="keywords"
@@ -24,6 +24,7 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
+          <SpeedInsights />
         </body>
       </Html>
     );
