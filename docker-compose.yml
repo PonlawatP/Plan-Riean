@@ -30,12 +30,12 @@ services:
       - "80:80"
       - "443:443"
     networks:
-      - planriean
+      - nginx_planriean
     command: ["nginx", "-g", "daemon off;"]
 
 volumes:
   postgres_data:
     external: true
 networks:
-  planriean:
+  nginx_planriean:
     external: true
