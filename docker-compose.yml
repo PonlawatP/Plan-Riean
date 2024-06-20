@@ -38,3 +38,5 @@ volumes:
     external: true
 networks:
   planriean:
+    external:
+      name: nginx_planriean
