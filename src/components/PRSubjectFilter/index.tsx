@@ -80,14 +80,6 @@ export default function PRSubjectFilter({ children }: any, props: any) {
     return number >= 0 ? time.filter((t: string) => t !== 'total')[number] : time.filter((t: string) => t !== 'total');
   }
 
-  function test(ts: any = <></>) {
-    const t = [];
-    for (let index = 0; index < 30; index++) {
-      t.push(ts);
-    }
-    return t;
-  }
-
   const [tempOn, setTempOn] = useState(false);
   useEffect(() => {
     if (viewFilter) {
