@@ -21,14 +21,13 @@ function LoginPage(props: any) {
     const { pathname, query } = redirect;
     if (Object.keys(query).length > 0) {
       // Construct the new URL without the query parameters
-      const newUrl = pathname;
+      let newUrl = pathname;
 
       if (query.error != null) {
         toast.error(query.error);
+        // Use the router's replace method to update the URL without causing a page reload
+        redirect.replace(newUrl, undefined, { shallow: true });
       }
-
-      // Use the router's replace method to update the URL without causing a page reload
-      redirect.replace(newUrl, undefined, { shallow: true });
     }
   }, [redirect]);
 

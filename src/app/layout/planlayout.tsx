@@ -487,7 +487,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                     <Menu.Item>
                       {({ active }) => (
                         <Link
-                          href={`http://bk-ofce.${process.env.NEXT_PUBLIC_HOSTNAME_URL}`}
+                          href={`${process.env.NEXT_PUBLIC_ADMIN_ENDPOINT}`}
                           className={
                             'profile-badge-li block cursor-pointer text-sm py-2 pb-3 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4'
                           }

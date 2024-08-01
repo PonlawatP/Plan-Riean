@@ -38,7 +38,7 @@ export async function middleware(req: any) {
         } else {
           // console.log(url.searchParams.get('fallbackUrl'))
           if (url.pathname != '/plan') {
-            url.pathname = url.searchParams.get('fallbackUrl') || '/plan';
+            url.href = url.searchParams.get('fallbackUrl') || `${process.env.NEXT_PUBLIC_MAIN_ENDPOINT}/plan`;
             return NextResponse.redirect(url);
           }
         }
