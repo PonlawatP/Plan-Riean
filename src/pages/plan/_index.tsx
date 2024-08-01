@@ -144,7 +144,7 @@ function PlanPage() {
         return (
           <Link
             key={pind}
-            href={`/plan/plan/${p.plan_id}`}
+            href={`/plan/${p.plan_id}`}
             className="plan-folder relative w-[8em] h-[8em] md:w-[9em] md:h-[9em] p-2 rounded-2xl flex flex-col items-center group text-pr-dark hover:bg-black/60 hover:text-white"
           >
             <div className="relative flex justify-center items-center w-full h-4/6 pointer-events-none">

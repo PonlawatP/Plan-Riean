@@ -72,7 +72,7 @@ function PlanPage() {
     if (res.success) {
       toast.update(toastId.current, { render: 'สร้างแพลนเรียนใหม่แล้ว', type: toast.TYPE.SUCCESS, autoClose: 5000 });
       setNewPlanData(newPlanReset);
-      redirect.push(`/plan/plan/${res.result.plan_id}`);
+      redirect.push(`/plan/${res.result.plan_id}`);
     } else {
       toast.update(toastId.current, {
         render: `สร้างแพลนเรียนไม่ได้ ${res.message}`,
@@ -133,24 +133,23 @@ function PlanPage() {
     const elems = planList.map((p: any, pind: number) => {
       if (folder && p.is_folder) {
         return (
-          <button
+          <Link
             key={pind}
+            href={`/plan/${p.plan_id}`}
             className="plan-folder relative w-[8em] h-[8em] md:w-[9em] md:h-[9em] p-2 rounded-2xl flex flex-col items-center group text-pr-dark hover:bg-pr-gray-1 hover:text-white"
           >
             <div className="relative flex justify-center items-center w-full h-4/6">
               <i className="bx bxs-folder text-[4em]"></i>
             </div>
-            <p className="relative whitespace-normal line-clamp-2 text-center">
-              ชื่อโฟลเดอร์ทดสอบ 1234567 asdasdasdasd
-            </p>
-          </button>
+            <p className="relative whitespace-normal line-clamp-2 text-center">{p.plan_name}</p>
+          </Link>
         );
       } else {
         return (
           <Link
             key={pind}
-            href={`/plan/plan/${p.plan_id}`}
-            className="plan-folder relative w-[8em] h-[8em] md:w-[9em] md:h-[9em] p-2 rounded-2xl flex flex-col items-center group text-pr-dark hover:bg-black/60 hover:text-white"
+            href={`/plan/${p.plan_id}`}
+            className="plan-thing relative w-[8em] h-[8em] md:w-[9em] md:h-[9em] p-2 rounded-2xl flex flex-col items-center group text-pr-dark hover:bg-black/60 hover:text-white"
           >
             <div className="relative flex justify-center items-center w-full h-4/6 pointer-events-none">
               <Image
@@ -177,7 +176,7 @@ function PlanPage() {
 
     return elems;
   }
-
+  console.log(session);
   return (
     <div className={`relative w-full h-full whitespace-nowrap overflow-auto`}>
       <Head>
@@ -197,10 +196,10 @@ function PlanPage() {
         </div>
       </div>
 
-      <div className={`smooth-out w-full h-full relative grid grid-rows-[auto_minmax(0,1fr)] p-8 gap-4`}>
+      <div className={`smooth-out w-full h-full relative grid grid-rows-[auto_minmax(0,1fr)] md:p-8 gap-4`}>
         {/* Summary Calendar Component */}
-        <h1 className="text-2xl font-medium">แผนการเรียนของคุณ</h1>
-        <div className="bg-white/60 border-[1px] rounded-3xl drop-shadow-xl p-4 relative overflow-auto">
+        <h1 className="text-2xl font-medium text-pr-blue max-md:pt-4 max-md:px-8">แผนการเรียนของคุณ</h1>
+        <div className="bg-white/60 border-[1px] md:rounded-3xl drop-shadow-xl p-4 relative overflow-[initial]">
           {getPlanListElem().length == 0 ? (
             <div className="h-full w-full flex flex-col justify-center items-center text-pr-text-menu/60">
               <i className="bx bx-task text-[6rem]"></i>
@@ -220,11 +219,11 @@ function PlanPage() {
       </div>
       {/* modal */}
       <div
-        className={`fixed left-0 top-0 w-full h-full bg-black/30 flex items-end lg:items-center justify-center transition-opacity duration-200 ${
+        className={`z-20 fixed left-0 top-0 w-full h-full bg-black/30 flex items-end lg:items-center justify-center transition-opacity duration-200 ${
           newPlanData.open ? '' : 'invisible opacity-0'
         }`}
         id="modal_overlay"
-        onClick={(e: any) => {
+        onMouseDown={(e: any) => {
           if (e.target.id == 'modal_overlay') {
             setNewPlanData(newPlanReset);
           }
@@ -259,7 +258,7 @@ function PlanPage() {
                 }}
                 disabled
                 value={newPlanData.cr_year}
-                className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                className="appearance-none peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
               >
                 {uniSeason.map((d: any, dind: number) => (
                   <option key={dind} value={d.year}>{`${d.year}`}</option>
@@ -282,7 +281,7 @@ function PlanPage() {
                 }}
                 disabled
                 value={newPlanData.cr_seamseter}
-                className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                className="appearance-none peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
               >
                 <option value="1">{`1`}</option>
                 {/* {getCourseSetRelation().map((c: any, cind: number) => (
@@ -294,21 +293,28 @@ function PlanPage() {
               </label>
             </div>
           </div>
-          {/* TODO: Final Project Phase just disable it for now */}
-          {/* <div className="mt-8">
+          {/* TODO: Final Project Phase - ปรับข้อมูลหลักสูตรของตารางเรียน */}
+          <div className="mt-8">
             <h2 className="mt-2 text-2xl font-medium">ข้อมูลตารางเรียน</h2>
             <div className={`flex justify-between items-center py-2`}>
               <div className="pt-1">
                 <div className="flex items-start text-pr-gray-1">
                   <i className="mr-4 bx bx-notepad"></i>
-                  <p className="text-sm">วิทยาการคอมพิวเตอร์</p>
+                  <p className="text-sm">
+                    {uniFacData.length > 0
+                      ? uniFacData.find((f: any) => f.fac_id == newPlanData.fac_id)['fac_name_' + 'th']
+                      : ''}
+                  </p>
                 </div>
                 <div className="mt-1 flex items-start">
                   <i className="mr-4 bx bx-id-card text-pr-gray-1"></i>
                   <div className="flex gap-8 text-sm">
-                    {!newPlanData.custom_plan_open ? <p>67011212087</p> : null}
+                    {!newPlanData.custom_plan_open ? <p>64011212087</p> : null}
                     <p className="text-pr-gray-1">
-                      ชั้นปีที่<span className="ml-4 text-black">1</span>
+                      ชั้นปีที่
+                      <span className="ml-4 text-black">
+                        {Number.isNaN(newPlanData.std_year) ? 1 : newPlanData.std_year}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -342,9 +348,9 @@ function PlanPage() {
                 ></div>
               </span>
             </div>
-          </div> */}
+          </div>
           {/* TODO: thease below neiter */}
-          {newPlanData.custom_plan_open && false ? (
+          {newPlanData.custom_plan_open ? (
             <>
               <div className="mt-8 relative h-10 col-span-2">
                 <select
@@ -353,7 +359,7 @@ function PlanPage() {
                     setNewPlanData((prev: any) => ({ ...prev, fac_id: e.target.value }));
                   }}
                   value={newPlanData.fac_id ? (newPlanData.fac_id as number) : 1}
-                  className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                  className="appearance-none peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                 >
                   {uniFacData.map((f: any, find: number) => (
                     <option key={find} value={f.fac_id}>
@@ -370,11 +376,21 @@ function PlanPage() {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div className="mt-8 relative h-10">
+                  {/* std_year: new Date(Date.now()).getFullYear() + 543 - (prev.std_year || 0).valueOf(), */}
                   <input
                     type="number"
                     className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                     placeholder=""
                     value={newPlanData.std_year ? (newPlanData.std_year as number) : ''}
+                    onBlur={(e) => {
+                      const stdy =
+                        Number.isNaN(Number.parseInt(e.target.value)) ||
+                        Number.parseInt(e.target.value) <= 0 ||
+                        Number.parseInt(e.target.value) >= 100
+                          ? 1
+                          : Number.parseInt(e.target.value);
+                      setNewPlanData((prev: any) => ({ ...prev, std_year: stdy }));
+                    }}
                     onChange={(e) => {
                       const stdy =
                         Number.parseInt(e.target.value) <= 0 || Number.parseInt(e.target.value) >= 100
@@ -391,10 +407,13 @@ function PlanPage() {
                   <select
                     // ref={ref_major}
                     onChange={(e: any) => {
-                      setNewPlanData((prev: any) => ({ ...prev, cr_id: e.target.value }));
+                      setNewPlanData((prev: any) => ({
+                        ...prev,
+                        cr_id: e.target.value,
+                      }));
                     }}
                     value={newPlanData.cr_id ? (newPlanData.cr_id as number) : 'เลือกสาขา'}
-                    className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                    className="appearance-none peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 text-sm pb-1 font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                   >
                     {getCourseSetRelation().map((c: any, cind: number) => (
                       <option key={cind} value={c.cr_id}>{`${c.cr_key} - ${c['name_' + 'th']}`}</option>

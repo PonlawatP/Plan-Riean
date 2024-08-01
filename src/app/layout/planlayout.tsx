@@ -40,9 +40,10 @@ export const newPlanReset = {
   plan_name: `แพลนเรียน`,
   university: 'MSU',
   cr_year: 2567,
-  fac_id: -1,
+  fac_id: 1,
   cr_id: -1,
-  std_year: -1,
+  std_id: '',
+  std_year: 1,
   cr_seamseter: 1,
   plan_color: null,
   plan_img: null,
@@ -359,11 +360,11 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
               topbarToggle.init ? 'opacity-20' : 'opacity-100'
             }`}
           >
-            <Link href={'/'} className="flex">
+            <Link href={'/plan'} className="flex">
               <Image src="/assets/images/logo/Planriean.png" alt="Planriean Logo" width={30} height={30}></Image>
             </Link>
             {/* TODO: next phase -> remove "false" */}
-            {false && getCurrentPlan().detail ? (
+            {getCurrentPlan().detail && false ? (
               <article className="pr-planheader relative bg-white/80 border-1 border-white p-4 px-8 min-w-full md:min-w-[25rem] w-[45%] rounded-full shadow-xl">
                 {/* <button className="header text-xl font-medium flex gap-3 group">
                   <h1>{getCurrentPlan().detail.plan_name}</h1>
@@ -394,7 +395,7 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                   </span> */}
                 </span>
                 {pathn == '/plan' ? (
-                  <Link href={`/plan/plan/${getCurrentPlan().detail.plan_id}`}>
+                  <Link href={`/plan/${getCurrentPlan().detail.plan_id}`}>
                     <button className="absolute right-10 top-1/2 -mt-4 rounded-xl text-pr-msu-1-60 bg-pr-msu-1 border-2 border-pr-msu-1-60/30 p-1 px-2">
                       กลับไปที่แผน
                     </button>

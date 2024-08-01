@@ -93,7 +93,7 @@ function RegisterPage(props: any) {
       std_name: firstStepData.std_name,
       std_surname: firstStepData.std_surname,
       phone: firstStepData.phone,
-      auth_reg_username: firstStepData.std_id.length == 11 ? firstStepData.std_id.length : '',
+      auth_reg_username: firstStepData.std_id.length == 11 ? firstStepData.std_id : '',
     };
 
     // console.log(bd);
