@@ -61,12 +61,23 @@ export async function middleware(req: any) {
   const host = req.headers.get('host');
   const subdomain = getValidSubdomain(host);
 
-  const api_pattern = /^\/api/;
+  const apiPattern = /^\/api/;
+  // console.log(subdomain);
 
-  if (subdomain && !api_pattern.test(url.pathname)) {
+  if (subdomain && !apiPattern.test(url.pathname)) {
     // Subdomain available, rewriting
     console.log(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
     url.pathname = `/${subdomain}${url.pathname}`;
+
+    const token = await getToken({ req });
+    console.log(host, token);
+    if (token == null) {
+      if (url.pathname.startsWith('/_subdomains/bk-ofce')) {
+        url.pathname = `//${host.split('.').slice(1).join('.')}/login`;
+        return NextResponse.redirect(url);
+      }
+    }
+
     return NextResponse.rewrite(new URL(`${url.pathname}`, req.url));
   }
   return res;

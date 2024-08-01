@@ -5,8 +5,14 @@ export const getValidSubdomain = (host?: string | null) => {
     host = window.location.host;
   }
   if (host && host.includes('.')) {
+    // console.log(host);
     const candidate = host.split('.')[0];
-    if (candidate && !candidate.includes('localhost')) {
+    if (
+      candidate &&
+      !candidate.includes('prlocal') &&
+      !candidate.includes('dev-pluto') &&
+      !candidate.includes('localhost')
+    ) {
       // Valid candidate
       subdomain = `_subdomains/${candidate}`;
     }

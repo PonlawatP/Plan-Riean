@@ -4,7 +4,17 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 
 import * as jose from 'jose';
 
+const useSecureCookies = (process.env.NEXTAUTH_URL as string).startsWith('https://');
+const cookiePrefix = useSecureCookies ? '__Secure-' : '';
+const hostName = new URL(process.env.NEXTAUTH_URL as string).hostname;
+// Check if the hostName is localhost
+const isLocalhost = hostName === 'localhost' || hostName.endsWith('.localhost');
+
+// If it's localhost, don't set the domain for the cookie
+const cookieDomain = isLocalhost ? undefined : `.${hostName}`;
+
 // console.log(process.env.GOOGLE_CLIENT_ID);
+// console.log(cookieDomain);
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -164,6 +174,18 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
     error: '/login',
+  },
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        domain: cookieDomain,
+        secure: useSecureCookies,
+      },
+    },
   },
 };
 
