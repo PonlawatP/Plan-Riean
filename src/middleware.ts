@@ -15,7 +15,7 @@ export async function middleware(req: any) {
   // Skip public files
   if (PUBLIC_FILE.test(url.pathname) || url.pathname.includes('_next')) return;
 
-  const res = NextResponse.rewrite(url);
+  // const res = NextResponse.rewrite(url);
   // The outgoing response will have a `Set-Cookie:vercel=fast;path=/` header.
 
   const pattern = /^(\/login|\/plan|\/account\/first-started)(?!\/plan\/\w+)?$/;
@@ -58,29 +58,29 @@ export async function middleware(req: any) {
     }
   }
 
-  const host = req.headers.get('host');
-  const subdomain = getValidSubdomain(host);
+  // const host = req.headers.get('host');
+  // const subdomain = getValidSubdomain(host);
 
-  const apiPattern = /^\/api/;
-  // console.log(subdomain);
+  // const apiPattern = /^\/api/;
+  // // console.log(subdomain);
 
-  if (subdomain && !apiPattern.test(url.pathname)) {
-    // Subdomain available, rewriting
-    console.log(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
-    url.pathname = `/${subdomain}${url.pathname}`;
+  // if (subdomain && !apiPattern.test(url.pathname)) {
+  //   // Subdomain available, rewriting
+  //   console.log(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
+  //   url.pathname = `/${subdomain}${url.pathname}`;
 
-    const token = await getToken({ req });
-    console.log(host, token);
-    if (token == null) {
-      if (url.pathname.startsWith('/_subdomains/bk-ofce')) {
-        url.pathname = `//${host.split('.').slice(1).join('.')}/login`;
-        return NextResponse.redirect(url);
-      }
-    }
+  //   const token = await getToken({ req });
+  //   console.log(host, token);
+  //   if (token == null) {
+  //     if (url.pathname.startsWith('/_subdomains/bk-ofce')) {
+  //       url.pathname = `//${host.split('.').slice(1).join('.')}/login`;
+  //       return NextResponse.redirect(url);
+  //     }
+  //   }
 
-    return NextResponse.rewrite(new URL(`${url.pathname}`, req.url));
-  }
-  return res;
+  //   return NextResponse.rewrite(new URL(`${url.pathname}`, req.url));
+  // }
+  // return res;
 }
 
 export { default } from 'next-auth/middleware';
