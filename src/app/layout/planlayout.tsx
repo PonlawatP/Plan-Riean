@@ -486,6 +486,18 @@ export default function PlanPageLayout({ children }: { children: React.ReactNode
                     </Menu.Item> */}
                     <Menu.Item>
                       {({ active }) => (
+                        <Link
+                          href={'http://bo.localhost:3003/setting'}
+                          className={
+                            'profile-badge-li block cursor-pointer text-sm py-2 pb-3 pl-3 w-full text-pr-text-menu hover:bg-pr-msu-1 hover:pl-4'
+                          }
+                        >
+                          จัดการระบบ
+                        </Link>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
                         <a
                           onClick={() => {
                             signOut();

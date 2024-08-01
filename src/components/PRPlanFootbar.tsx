@@ -1,6 +1,7 @@
 import { CalendarContext, CalendarFilterContext } from '@/app/providers/CalendarProvider';
 import { useContext } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 export default function PRPlanFootbar(props: any) {
   const { handleOpenSubjectSelect, closeAllViewFilter } = useContext(CalendarFilterContext);
@@ -42,7 +43,8 @@ export default function PRPlanFootbar(props: any) {
             <i className={`bx bx-plus text-2xl`} />
             <p className="-mt-1 text-xs text-black/50">สร้างแผนใหม่</p>
           </button>
-          <button
+          <Link
+            href={'/plan/subject-map'}
             onClick={() => {
               // TODO: subjects mapping
             }}
@@ -52,7 +54,7 @@ export default function PRPlanFootbar(props: any) {
           >
             <i className={`bx bx-git-repo-forked rotate-90 text-2xl`} />
             <p className="-mt-1 text-xs text-black/50">แผนเปิดรายวิชา</p>
-          </button>
+          </Link>
         </>
       ) : (
         <>

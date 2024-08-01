@@ -198,7 +198,7 @@ function PlanPage() {
 
       <div className={`smooth-out w-full h-full relative grid grid-rows-[auto_minmax(0,1fr)] md:p-8 gap-4`}>
         {/* Summary Calendar Component */}
-        <h1 className="text-2xl font-medium text-pr-blue max-md:pt-4 max-md:px-8">แผนการเรียนของคุณ</h1>
+        <h1 className="text-2xl font-medium text-pr-blue max-md:pt-4 max-md:px-8">ตารางเรียนของคุณ</h1>
         <div className="bg-white/60 border-[1px] md:rounded-3xl drop-shadow-xl p-4 relative overflow-[initial]">
           {getPlanListElem().length == 0 ? (
             <div className="h-full w-full flex flex-col justify-center items-center text-pr-text-menu/60">
